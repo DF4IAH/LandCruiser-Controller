@@ -86,14 +86,14 @@ static void s_io_preinit(void)
 	 * most critical pins are handled first.
 	 */
 
-	PORTB = 0b00000000;								// in:  PB0: NC, PB1: NC, PB6: MP_SK_G, PB7: MP_SK_O
 	DDRB  = 0b00111100;								// out: PB2: MP_M2, PB3: MP_M1, PB4: MP_PV_O, PB5: MP_PV_G
+	PORTB = 0b11000011;								// in:  PB0: NC, PB1: NC, PB6: MP_SK_G, PB7: MP_SK_O
 
-	PORTC = 0b00100000;								// in:  PC0: NC, PC1: NC, PC2: NC, PC4: SDA, PC6: NC, PC7: NC
 	DDRC  = 0b00101000;								// out: PC3: MP_KL, PC5: SCL
+	PORTC = 0b11110111;								// in:  PC0: NC, PC1: NC, PC2: NC, PC4: SDA, PC6: NC, PC7: NC
 
-	PORTD = 0b00000010;								// in:  PD0: MP_RXD, PD2: MP_INT, PD3: NC, PD4: MP_FB, PD5: NC, PD6: MP_SA_G, PD7: MP_SA_O
 	DDRD  = 0b00000010;								// out: PD1: MP_TXD
+	PORTD = 0b11111111;								// in:  PD0: MP_RXD, PD2: MP_INT, PD3: NC, PD4: MP_FB, PD5: NC, PD6: MP_SA_G, PD7: MP_SA_O
 
 	// Analog input: Digital Disable Register
 	DIDR0 = 0b00000111;								// PC0: NC_A, PC1: NC_A, PC2: NC_A
@@ -381,68 +381,278 @@ void eeprom_nvm_settings_read(uint8_t flags)
 
 /* TASK section */
 
-void task(float timestamp)
+void task(uint64_t now)
 {
 	/* TASK when woken up */
-	static uint8_t s_fsm_state = 0;
-	static bool s_o_kl		= false;
-	static bool s_o_pv_g	= false;
-	static bool s_o_pv_o	= false;
-	static bool s_o_m1		= false;
-	static bool s_o_m2		= false;
-	uint8_t l_port_b, l_port_c, l_port_d;
+	static uint64_t s_timer_task_next	= 0ULL;
+	static uint64_t s_timer_fb			= 0ULL;
+	static uint64_t s_timer_pv			= 0ULL;
+	static uint8_t s_fsm_state			= 0;
+
+	static bool s_i_fb_t1				= false;
+
+	static bool s_o_kl					= false;
+	static bool s_o_pv_g				= false;
+	static bool s_o_pv_o				= false;
+	static bool s_o_m1					= false;
+	static bool s_o_m2					= false;
+
+	/* Running every C_TASK_TIMESPAN milliseconds */
+	if (s_timer_task_next <= now) {
+		s_timer_task_next = now + C_TASK_TIMESPAN;
+	} else {
+		return;
+	}
 
 	/* Read in the current input vector */
 	irqflags_t flags = cpu_irq_save();
-	l_port_b = PORTB;
-	l_port_c = PORTC;
-	l_port_d = PORTD;
+	volatile uint8_t l_pin_b = PINB;
+	// uint8_t l_pin_c = PINC;
+	volatile uint8_t l_pin_d = PIND;
 	cpu_irq_restore(flags);
 
 	/* Break up into single input signals */
-	bool l_i_fb		= (l_port_d & _BV(4)) ?  true : false;
-	bool l_i_sa_g	= (l_port_d & _BV(6)) ?  true : false;
-	bool l_i_sa_o	= (l_port_d & _BV(7)) ?  true : false;
-	bool l_i_sk_g	= (l_port_b & _BV(6)) ?  true : false;
-	bool l_i_sk_o	= (l_port_b & _BV(7)) ?  true : false;
+	volatile bool l_i_fb	= (l_pin_d & _BV(4)) ?  false : true;
+	volatile bool l_i_sa_g	= (l_pin_d & _BV(6)) ?  false : true;
+	volatile bool l_i_sa_o	= (l_pin_d & _BV(7)) ?  false : true;
+	volatile bool l_i_sk_g	= (l_pin_b & _BV(6)) ?  false : true;
+	volatile bool l_i_sk_o	= (l_pin_b & _BV(7)) ?  false : true;
 
 	/* FSM (Finite State Machine) */
 	{
 		/* FSM_1 - Logic */
 		switch (s_fsm_state) {
 			case 0x00:
-			{
-				/* Init */
+			{	/* INIT: Init and Error handling: check for correct starting vector */
+				s_o_kl		= false;
+				s_o_pv_g	= false;
+				s_o_pv_o	= false;
+				s_o_m1		= false;
+				s_o_m2		= false;
 
+				/* Input vector correct */
+				if (!l_i_fb && l_i_sa_g && !l_i_sa_o && l_i_sk_g && !l_i_sk_o) {
+					s_fsm_state = 0x01;
+				}
 			}
 			break;
 
-			#if 0
-			case 0xff:
+			case 0x01:
 			{
-				/* TEMPLATE */
+				/* STANDBY CLOSED: Tailgate closed, normal LandCruiser driving state, KL dark */
 
+				/* Remote control button pressed */
+				if (l_i_fb && l_i_sa_g && !l_i_sa_o && l_i_sk_g && !l_i_sk_o) {
+					s_o_kl = true;
+
+					/* Button just pressed */
+					if (!s_i_fb_t1) {
+						s_timer_fb = now + C_FB_PRESS_SHORT_TIME;  // Start button low-pass filtering
+					}
+
+					/* Button pressed long enough, open valve for unlocking */
+					if (s_timer_fb && (s_timer_fb <= now)) {
+						s_o_pv_o	= true;
+						s_timer_pv	= now + C_PV_ACTION_TIME;
+						s_fsm_state = 0x10;
+					}
+
+				} else {
+					/* Reset timer when released within low-pass filtering time */
+					if (!l_i_fb) {
+						s_timer_fb = 0ULL;
+					}
+
+					/* Invalid input vector */
+					if (!(l_i_sa_g && !l_i_sa_o && l_i_sk_g && !l_i_sk_o)) {
+						s_fsm_state = 0;  // Jump to INIT
+					}
+				}
 			}
 			break;
-			#endif
 
-			case 0x80:
+			case 0x10:
 			{
-				/* Error handling - check for input vector and decide where to jump in */
+				/* GATE-OPENING UNLOCKING: valve for unlocking is opened for 0.5 sec */
 
+				/* Release pressure of opening valve in case we block in this state */
+				if (s_timer_pv && (s_timer_pv <= now)) {
+					s_o_pv_o	= false;
+				}
+
+				/* Sensor reports being unlocked, start actor to open wings */
+				if (l_i_sk_o && !l_i_sk_g && l_i_fb && s_timer_fb && (s_timer_fb <= now)) {
+					/* Combination for actor to OPEN wings */
+					s_o_pv_o	= false;
+					s_o_m1		= true;
+					s_o_m2		= false;
+					s_fsm_state = 0x11;
+
+				} else {
+					/* Dropping the button allowance */
+					if (!l_i_fb) {
+						s_timer_fb = 0ULL;
+					} else if (!s_i_fb_t1) {
+						/* After repressing the button, wait until low-pass filtering time is over */
+						s_timer_fb = now + C_FB_PRESS_SHORT_TIME;
+					}
+				}
+			}
+			break;
+
+			case 0x11:
+			{
+				/* GATE-OPENING MOTOR running: valve for unlocking is opened for 1 sec */
+
+				/* Release pressure of opening valve */
+				if (s_timer_pv && (s_timer_pv <= now)) {
+					s_o_pv_o	= false;
+				}
+
+				/* Stop motor */
+				if (l_i_sa_o) {
+					s_o_m1	= false;
+					s_o_m2	= false;
+					s_fsm_state = 0x13;
+
+				} else {
+					/* Button check */
+					{
+						/* Dropping the button allowance */
+						if (!l_i_fb) {
+							s_timer_fb = 0ULL;
+
+							/* Stop motor at once */
+							s_o_m1	= false;
+							s_o_m2	= false;
+
+						} else if (!s_i_fb_t1) {
+							/* After repressing the button, wait until low-pass filtering time is over */
+							s_timer_fb = now + C_FB_PRESS_SHORT_TIME;
+						}
+					}
+
+					/* Restart motor after qualified button press */
+					if (l_i_fb && s_timer_fb && (s_timer_fb <= now)) {
+						/* Motor on, again */
+						s_o_m1	= true;
+						s_o_m2	= false;
+					}
+				}
+			}
+			break;
+
+			case 0x13:
+			{
+				/* OPENING - WAIT FOR RELEASE: after motor stops, wait for button release */
+				if (!l_i_fb) {
+					s_fsm_state = 0x20;
+				}
+			}
+			break;
+
+			case 0x20:
+			{
+				/* STANDBY OPENED: wait for close command */
+
+				/* Remote control button pressed */
+				if (l_i_fb && !l_i_sa_g && l_i_sa_o && !l_i_sk_g && l_i_sk_o) {
+					/* Button just pressed */
+					if (!s_i_fb_t1) {
+						s_timer_fb = now + C_FB_PRESS_SHORT_TIME;  // Start button low-pass filtering
+					}
+
+					/* Button pressed long enough, move wings back to lock position */
+					if (s_timer_fb && (s_timer_fb <= now)) {
+						s_o_m1	= false;
+						s_o_m2	= true;
+						s_fsm_state = 0x21;
+					}
+
+				} else {
+					/* Reset timer when released within low-pass filtering time */
+					if (!l_i_fb) {
+						s_timer_fb = 0ULL;
+					}
+				}
+			}
+
+			case 0x21:
+			{
+				/* MOVING WINGS BACK: motors running */
+
+				/* Stop motor due to reaching end position and open valve for securing */
+				if (l_i_sa_g) {
+					s_o_m1		= false;
+					s_o_m2		= false;
+					s_timer_pv	= now + C_PV_ACTION_TIME;
+					s_o_pv_g	= true;
+					s_fsm_state = 0x22;
+
+				} else {
+					/* Stop motor due to release of button */
+					if (!l_i_fb) {
+						s_o_m1		= false;
+						s_o_m2		= false;
+						s_timer_fb	= 0ULL;
+
+					} else {
+						/* Button just pressed */
+						if (!s_i_fb_t1) {
+							/* After repressing the button, wait until low-pass filtering time is over */
+							s_timer_fb = now + C_FB_PRESS_SHORT_TIME;
+						}
+					}
+
+					/* Restart motor after qualified button press */
+					if (l_i_fb && s_timer_fb && (s_timer_fb <= now)) {
+						/* Motor on, again */
+						s_o_m1	= false;
+						s_o_m2	= true;
+					}
+				}
+			}
+			break;
+
+			case 0x22:
+			{
+				/* SECURING WINGS: valve for locking is opened for 1 sec */
+
+				/* Release pressure of opening valve */
+				if (s_timer_pv <= now) {
+					s_o_pv_g	= false;
+				}
+
+				/* Locks at their position and timer done */
+				if (l_i_sk_g) {
+					s_o_pv_g	= false;
+					s_o_kl		= false;
+					s_fsm_state = 0x23;
+				}
+			}
+			break;
+
+			case 0x23:
+			{
+				/* PREPARING FOR STANDBY: wait for the button to be released */
+
+				/* Button released, power off signal lamp and fall back to STANDBY */
+				if (!l_i_fb) {
+					s_fsm_state = 0x00;
+				}
 			}
 			break;
 
 			default:
-				/* Jump to error handling */
-				s_fsm_state = 0x80;
+				/* Jump to Init / error handling */
+				s_fsm_state = 0x00;
 		}
 	}
 
 	/* Assemble output signals */
-	l_port_b = (s_o_pv_g ?  _BV(5) : 0) | (s_o_pv_o ?  _BV(4) : 0) | (s_o_m1 ?  _BV(3) : 0) | (s_o_m2 ?  _BV(2) : 0);
-	l_port_c = (            _BV(5)    ) | (            _BV(4)    ) | (s_o_kl ?  _BV(3) : 0);
-	l_port_d = 0b00000010;
+	uint8_t l_port_b = 0b11000011 | (s_o_pv_g ?  _BV(5) : 0) | (s_o_pv_o ?  _BV(4) : 0) | (s_o_m1 ?  _BV(3) : 0) | (s_o_m2 ?  _BV(2) : 0);
+	uint8_t l_port_c = 0b11110111 |                                                       (s_o_kl ?  _BV(3) : 0);
+	uint8_t l_port_d = 0b11111111;
 
 	/* Write out the new output vector */
 	flags = cpu_irq_save();
@@ -450,6 +660,10 @@ void task(float timestamp)
 	PORTC = l_port_c;
 	PORTD = l_port_d;
 	cpu_irq_restore(flags);
+
+	/* Shift for t1 := t+1 */
+	s_i_fb_t1 = l_i_fb;
+
 
 	#if 0
 	float l_adc_temp, l_adc_light;

@@ -26,7 +26,16 @@
 
 
 /* TC1 timer runs @ 8 MHz / overflows every 1 ms */
-#define C_TC1_TOP_VAL												8000
+#define C_TC1_TOP_VAL												4000
+
+/* Task runs with this intervals */
+#define C_TASK_TIMESPAN												100
+
+/* Remote control timer */
+#define C_FB_PRESS_SHORT_TIME										500
+
+/* Securing valve timer */
+#define C_PV_ACTION_TIME											1000
 
 
 enum C_SMART_LCD_MODE__ENUM {
@@ -100,7 +109,7 @@ void eeprom_nvm_settings_read(uint8_t flags);
 
 
 /* TASK section */
-void task(float timestamp);
+void task(uint64_t timestamp);
 void enter_sleep(uint8_t sleep_mode);
 void halt(void);
 
