@@ -43,7 +43,7 @@
 
 /* GLOBAL section */
 
-uint_fast64_t		g_timer_abs_msb						= 0;
+uint_fast64_t		g_timer_abs_msb						= 0ULL;
 //uint8_t			g_adc_state							= 0;
 //bool				g_lcdbl_auto						= true;
 //uint8_t			g_lcdbl_dimmer						= 0;
@@ -59,7 +59,7 @@ uint8_t				g_resetCause						= 0;
 
 /* MAIN STATIC section */
 
-static uint8_t		runmode								= 0;			// static runmode of main.c
+static uint8_t		runmode								= 0;
 
 
 
@@ -68,12 +68,12 @@ static uint8_t		runmode								= 0;			// static runmode of main.c
 static void s_reset_global_vars(void)
 {
 	irqflags_t flags	= cpu_irq_save();
-	cpu_irq_disable();
+	g_timer_abs_msb		= 0ULL;
 
-	g_timer_abs_msb		= 0UL;
-//	g_adc_state			= ADC_STATE_PRE_LDR;
-//	g_lcdbl_dimmer		= 64;
-
+	#if 0
+	g_adc_state			= ADC_STATE_PRE_LDR;
+	g_lcdbl_dimmer		= 64;
+	#endif
 	cpu_irq_restore(flags);
 }
 
@@ -132,8 +132,6 @@ static void s_tc_init(void)
 
 	/* TC1 global clock - OC1A: NC */
 	{
-		const uint16_t c_TC1_TOP_VAL = 8000U;
-
 		sysclk_enable_module(POWER_RED_REG0, PRTIM1_bm);
 
 		TCCR1A  = (0b00  << COM1A0)		 			// OC1A: disconnected - normal port function
@@ -146,9 +144,9 @@ static void s_tc_init(void)
 		barrier();
 		TCNT1L	=            0b00000000;
 
-		OCR1AH  = (uint8_t) (c_TC1_TOP_VAL >> 8);	// 1 kHz overflow frequency (1 ms)
+		OCR1AH  = (uint8_t) (C_TC1_TOP_VAL >> 8);	// 1 kHz overflow frequency (1 ms)
 		barrier();
-		OCR1AL  = (uint8_t) (c_TC1_TOP_VAL & 0xff);
+		OCR1AL  = (uint8_t) (C_TC1_TOP_VAL & 0xff);
 
 		TIFR1   = 0b00100111;						// Clear all flags (when restarting without reset)
 		TIMSK1  = _BV(TOIE1);						// TOIE1 interrupt
@@ -321,24 +319,15 @@ static void s_twi_disable(void)
 
 /* UTILITIES section */
 
-float get_abs_time(void)
+uint64_t get_abs_time_ms(void)
 {
-	const float ticks_per_sec = 8e6f;  // TODO: recalc
-	float now;						// TODO: no float
-	uint8_t l_tmr_l;
-	uint8_t l_tmr_h;
-	uint_fast32_t l_tmr_msb;
+	uint_fast64_t l_tmr_msb;
 
 	irqflags_t flags = cpu_irq_save();
-	l_tmr_l = TCNT1L;
-	l_tmr_h = TCNT1H;
 	l_tmr_msb = g_timer_abs_msb;
 	cpu_irq_restore(flags);
 
-	/* calculate ticks to sec */
-	now  = ((l_tmr_h << 8) | l_tmr_l  ) / ticks_per_sec;
-	now += (        512.f  * l_tmr_msb) / ticks_per_sec;
-	return now;
+	return l_tmr_msb;
 }
 
 void mem_set(uint8_t* buf, uint8_t count, uint8_t val)
@@ -395,6 +384,73 @@ void eeprom_nvm_settings_read(uint8_t flags)
 void task(float timestamp)
 {
 	/* TASK when woken up */
+	static uint8_t s_fsm_state = 0;
+	static bool s_o_kl		= false;
+	static bool s_o_pv_g	= false;
+	static bool s_o_pv_o	= false;
+	static bool s_o_m1		= false;
+	static bool s_o_m2		= false;
+	uint8_t l_port_b, l_port_c, l_port_d;
+
+	/* Read in the current input vector */
+	irqflags_t flags = cpu_irq_save();
+	l_port_b = PORTB;
+	l_port_c = PORTC;
+	l_port_d = PORTD;
+	cpu_irq_restore(flags);
+
+	/* Break up into single input signals */
+	bool l_i_fb		= (l_port_d & _BV(4)) ?  true : false;
+	bool l_i_sa_g	= (l_port_d & _BV(6)) ?  true : false;
+	bool l_i_sa_o	= (l_port_d & _BV(7)) ?  true : false;
+	bool l_i_sk_g	= (l_port_b & _BV(6)) ?  true : false;
+	bool l_i_sk_o	= (l_port_b & _BV(7)) ?  true : false;
+
+	/* FSM (Finite State Machine) */
+	{
+		/* FSM_1 - Logic */
+		switch (s_fsm_state) {
+			case 0x00:
+			{
+				/* Init */
+
+			}
+			break;
+
+			#if 0
+			case 0xff:
+			{
+				/* TEMPLATE */
+
+			}
+			break;
+			#endif
+
+			case 0x80:
+			{
+				/* Error handling - check for input vector and decide where to jump in */
+
+			}
+			break;
+
+			default:
+				/* Jump to error handling */
+				s_fsm_state = 0x80;
+		}
+	}
+
+	/* Assemble output signals */
+	l_port_b = (s_o_pv_g ?  _BV(5) : 0) | (s_o_pv_o ?  _BV(4) : 0) | (s_o_m1 ?  _BV(3) : 0) | (s_o_m2 ?  _BV(2) : 0);
+	l_port_c = (            _BV(5)    ) | (            _BV(4)    ) | (s_o_kl ?  _BV(3) : 0);
+	l_port_d = 0b00000010;
+
+	/* Write out the new output vector */
+	flags = cpu_irq_save();
+	PORTB = l_port_b;
+	PORTC = l_port_c;
+	PORTD = l_port_d;
+	cpu_irq_restore(flags);
+
 	#if 0
 	float l_adc_temp, l_adc_light;
 	uint8_t l_portB, l_portC;
@@ -509,7 +565,7 @@ int main (void)
 	/* main loop */
 	runmode = 1;
     while (runmode) {
-	    task(get_abs_time());
+	    task(get_abs_time_ms());
 	    enter_sleep(SLEEP_MODE_IDLE);
     }
 

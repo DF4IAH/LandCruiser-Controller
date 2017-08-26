@@ -14,15 +14,19 @@
 //#include "twi.h"
 
 
-/* ATmega 328P - fuses ext:0xFD hi:0xB9 lo:0xC2 */
+/* ATmega 328P - fuses ext:0xFD hi:0xB7 lo:0xE2 */
 
 
 /* VERSION: YYM, MDD */
 #define VERSION_HIGH												170
-#define VERSION_LOW													825
+#define VERSION_LOW													826
 
 /* I2C-Version V1.1 */
 #define I2C_VERSION													0x11
+
+
+/* TC1 timer runs @ 8 MHz / overflows every 1 ms */
+#define C_TC1_TOP_VAL												8000
 
 
 enum C_SMART_LCD_MODE__ENUM {
@@ -89,7 +93,7 @@ typedef struct showData {
 
 
 /* UTILITIES section */
-float get_abs_time(void);
+uint64_t get_abs_time_ms(void);
 void mem_set(uint8_t* buf, uint8_t count, uint8_t val);
 void eeprom_nvm_settings_write(uint8_t flags);
 void eeprom_nvm_settings_read(uint8_t flags);
