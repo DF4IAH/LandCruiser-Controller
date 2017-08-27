@@ -29,7 +29,7 @@
 #define C_TC1_TOP_VAL												4000
 
 /* Task runs with this intervals */
-#define C_TASK_TIMESPAN												100
+#define C_TASK_TIMESPAN												50
 
 /* Remote control timer */
 #define C_FB_PRESS_SHORT_TIME										500

@@ -643,12 +643,18 @@ void task(uint64_t now)
 					}
 				}
 
+				/* When S-K.O has opened due to pressure release, re-open PV_O until contact is made again */
+				if (s_i_fb && !s_i_sk_o) {
+					s_o_pv_o = true;
+				}
+
 				/* Remote control button pressed */
 				if (s_i_fb && !s_i_sa_g && s_i_sa_o && !s_i_sk_g && s_i_sk_o) {
 					/* Button pressed long enough, move wings back to lock position */
 					if (s_timer_fb && (s_timer_fb <= now)) {
-						s_o_m1	= false;
-						s_o_m2	= true;
+						s_o_m1		= false;
+						s_o_m2		= true;
+						s_o_pv_o	= false;
 						s_fsm_state = 0x21;
 					}
 				}
@@ -686,14 +692,28 @@ void task(uint64_t now)
 							/* Button just pressed - after repressing the button, wait until low-pass filtering time is over */
 							s_timer_fb = now + C_FB_PRESS_LONG_TIME;
 						}
+
+						/* When pressure releases during swing of arms, keep the valve open as long contact is opened */
+						if (!s_i_sk_o) {
+							s_o_pv_o	= true;
+						} else {
+							s_o_pv_o	= false;
+						}
 					}
 
 					/* Restart motor after qualified button press */
 					if (s_i_fb && s_timer_fb && (s_timer_fb <= now)) {
 						if (!s_change_dir) {
-							/* Motor on, again */
-							s_o_m1	= false;
-							s_o_m2	= true;
+							if (!s_i_sk_o) {
+								/* Pressure has released, open valve to enable arms to be received */
+								s_o_pv_o = true;
+
+							} else {
+								/* Motor on, again */
+								s_o_m1		= false;
+								s_o_m2		= true;
+								s_o_pv_o	= false;
+							}
 
 						} else {
 							/* Motor on, in opposite direction */
