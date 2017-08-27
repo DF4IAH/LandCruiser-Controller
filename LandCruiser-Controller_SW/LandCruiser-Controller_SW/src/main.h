@@ -19,7 +19,7 @@
 
 /* VERSION: YYM, MDD */
 #define VERSION_HIGH												170
-#define VERSION_LOW													826
+#define VERSION_LOW													827
 
 /* I2C-Version V1.1 */
 #define I2C_VERSION													0x11
@@ -33,6 +33,7 @@
 
 /* Remote control timer */
 #define C_FB_PRESS_SHORT_TIME										500
+#define C_FB_PRESS_LONG_TIME										1000
 
 /* Securing valve timer */
 #define C_PV_ACTION_TIME											1000

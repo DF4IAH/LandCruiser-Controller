@@ -387,9 +387,31 @@ void task(uint64_t now)
 	static uint64_t s_timer_task_next	= 0ULL;
 	static uint64_t s_timer_fb			= 0ULL;
 	static uint64_t s_timer_pv			= 0ULL;
-	static uint8_t s_fsm_state			= 0;
 
+	static uint8_t s_fsm_state			= 0;
+	static bool s_change_dir			= false;
+
+	static bool s_i_fb					= false;
+	static bool s_i_fb_t0				= false;
 	static bool s_i_fb_t1				= false;
+	static bool s_i_fb_t2				= false;
+	static bool s_i_fb_t3				= false;
+	static bool s_i_sk_g				= false;
+	static bool s_i_sk_g_t0				= false;
+	static bool s_i_sk_g_t1				= false;
+	static bool s_i_sk_g_t2				= false;
+	static bool s_i_sk_o				= false;
+	static bool s_i_sk_o_t0				= false;
+	static bool s_i_sk_o_t1				= false;
+	static bool s_i_sk_o_t2				= false;
+	static bool s_i_sa_g				= false;
+	static bool s_i_sa_g_t0				= false;
+	static bool s_i_sa_g_t1				= false;
+	static bool s_i_sa_g_t2				= false;
+	static bool s_i_sa_o				= false;
+	static bool s_i_sa_o_t0				= false;
+	static bool s_i_sa_o_t1				= false;
+	static bool s_i_sa_o_t2				= false;
 
 	static bool s_o_kl					= false;
 	static bool s_o_pv_g				= false;
@@ -406,17 +428,67 @@ void task(uint64_t now)
 
 	/* Read in the current input vector */
 	irqflags_t flags = cpu_irq_save();
-	volatile uint8_t l_pin_b = PINB;
+	uint8_t l_pin_b = PINB;
 	// uint8_t l_pin_c = PINC;
-	volatile uint8_t l_pin_d = PIND;
+	uint8_t l_pin_d = PIND;
 	cpu_irq_restore(flags);
 
+	/* De-noising shifter */
+	{
+		s_i_fb_t3	= s_i_fb_t2;
+		s_i_fb_t2	= s_i_fb_t1;
+		s_i_fb_t1	= s_i_fb_t0;
+		s_i_sk_g_t2	= s_i_sk_g_t1;
+		s_i_sk_g_t1	= s_i_sk_g_t0;
+		s_i_sk_o_t2	= s_i_sk_o_t1;
+		s_i_sk_o_t1	= s_i_sk_o_t0;
+		s_i_sa_g_t2	= s_i_sa_g_t1;
+		s_i_sa_g_t1	= s_i_sa_g_t0;
+		s_i_sa_o_t2	= s_i_sa_o_t1;
+		s_i_sa_o_t1	= s_i_sa_o_t0;
+	}
+
 	/* Break up into single input signals */
-	volatile bool l_i_fb	= (l_pin_d & _BV(4)) ?  false : true;
-	volatile bool l_i_sa_g	= (l_pin_d & _BV(6)) ?  false : true;
-	volatile bool l_i_sa_o	= (l_pin_d & _BV(7)) ?  false : true;
-	volatile bool l_i_sk_g	= (l_pin_b & _BV(6)) ?  false : true;
-	volatile bool l_i_sk_o	= (l_pin_b & _BV(7)) ?  false : true;
+	{
+		s_i_fb_t0	= (l_pin_d & _BV(4)) ?  false : true;
+		s_i_sk_g_t0	= (l_pin_b & _BV(6)) ?  false : true;
+		s_i_sk_o_t0	= (l_pin_b & _BV(7)) ?  false : true;
+		s_i_sa_g_t0	= (l_pin_d & _BV(6)) ?  false : true;
+		s_i_sa_o_t0	= (l_pin_d & _BV(7)) ?  false : true;
+	}
+
+	/* De-noising logics */
+	{
+		if (s_i_fb_t2 && s_i_fb_t1 && s_i_fb_t0) {
+			s_i_fb = true;
+		} else if (!s_i_fb_t2 && !s_i_fb_t1 && !s_i_fb_t0) {
+			s_i_fb = false;
+		}
+
+		if (s_i_sk_g_t2 && s_i_sk_g_t1 && s_i_sk_g_t0) {
+			s_i_sk_g = true;
+		} else if (!s_i_sk_g_t2 && !s_i_sk_g_t1 && !s_i_sk_g_t0) {
+			s_i_sk_g = false;
+		}
+
+		if (s_i_sk_o_t2 && s_i_sk_o_t1 && s_i_sk_o_t0) {
+			s_i_sk_o = true;
+		} else if (!s_i_sk_o_t2 && !s_i_sk_o_t1 && !s_i_sk_o_t0) {
+			s_i_sk_o = false;
+		}
+
+		if (s_i_sa_g_t2 && s_i_sa_g_t1 && s_i_sa_g_t0) {
+			s_i_sa_g = true;
+		} else if (!s_i_sa_g_t2 && !s_i_sa_g_t1 && !s_i_sa_g_t0) {
+			s_i_sa_g = false;
+		}
+
+		if (s_i_sa_o_t2 && s_i_sa_o_t1 && s_i_sa_o_t0) {
+			s_i_sa_o = true;
+		} else if (!s_i_sa_o_t2 && !s_i_sa_o_t1 && !s_i_sa_o_t0) {
+			s_i_sa_o = false;
+		}
+	}
 
 	/* FSM (Finite State Machine) */
 	{
@@ -431,7 +503,7 @@ void task(uint64_t now)
 				s_o_m2		= false;
 
 				/* Input vector correct */
-				if (!l_i_fb && l_i_sa_g && !l_i_sa_o && l_i_sk_g && !l_i_sk_o) {
+				if (!s_i_fb && s_i_sa_g && !s_i_sa_o && s_i_sk_g && !s_i_sk_o) {
 					s_fsm_state = 0x01;
 				}
 			}
@@ -441,31 +513,23 @@ void task(uint64_t now)
 			{
 				/* STANDBY CLOSED: Tailgate closed, normal LandCruiser driving state, KL dark */
 
-				/* Remote control button pressed */
-				if (l_i_fb && l_i_sa_g && !l_i_sa_o && l_i_sk_g && !l_i_sk_o) {
-					s_o_kl = true;
+				/* Dropping the button allowance */
+				if (!s_i_fb) {
+					s_timer_fb = 0ULL;
+				} else if (!s_i_fb_t3) {
+					/* Button just pressed - after repressing the button, wait until low-pass filtering time is over */
+					s_timer_fb = now + C_FB_PRESS_SHORT_TIME;  // Short time is enough for the end points
+				}
 
-					/* Button just pressed */
-					if (!s_i_fb_t1) {
-						s_timer_fb = now + C_FB_PRESS_SHORT_TIME;  // Start button low-pass filtering
-					}
+				/* Remote control button pressed */
+				if (s_i_fb && s_i_sa_g && !s_i_sa_o && s_i_sk_g && !s_i_sk_o) {
+					s_o_kl = true;
 
 					/* Button pressed long enough, open valve for unlocking */
 					if (s_timer_fb && (s_timer_fb <= now)) {
 						s_o_pv_o	= true;
 						s_timer_pv	= now + C_PV_ACTION_TIME;
 						s_fsm_state = 0x10;
-					}
-
-				} else {
-					/* Reset timer when released within low-pass filtering time */
-					if (!l_i_fb) {
-						s_timer_fb = 0ULL;
-					}
-
-					/* Invalid input vector */
-					if (!(l_i_sa_g && !l_i_sa_o && l_i_sk_g && !l_i_sk_o)) {
-						s_fsm_state = 0;  // Jump to INIT
 					}
 				}
 			}
@@ -480,22 +544,22 @@ void task(uint64_t now)
 					s_o_pv_o	= false;
 				}
 
-				/* Sensor reports being unlocked, start actor to open wings */
-				if (l_i_sk_o && !l_i_sk_g && l_i_fb && s_timer_fb && (s_timer_fb <= now)) {
-					/* Combination for actor to OPEN wings */
-					s_o_pv_o	= false;
-					s_o_m1		= true;
-					s_o_m2		= false;
-					s_fsm_state = 0x11;
+				/* Dropping the button allowance */
+				if (!s_i_fb) {
+					s_timer_fb = 0ULL;
+				} else if (!s_i_fb_t3) {
+					/* Button just pressed - after repressing the button, wait until low-pass filtering time is over */
+					s_timer_fb = now + C_FB_PRESS_LONG_TIME;
+				}
 
-				} else {
-					/* Dropping the button allowance */
-					if (!l_i_fb) {
-						s_timer_fb = 0ULL;
-					} else if (!s_i_fb_t1) {
-						/* After repressing the button, wait until low-pass filtering time is over */
-						s_timer_fb = now + C_FB_PRESS_SHORT_TIME;
-					}
+				/* Sensor reports being unlocked, start actor to open wings */
+				if (s_i_sk_o && !s_i_sk_g && s_i_fb && s_timer_fb && (s_timer_fb <= now)) {
+					/* Combination for actor to OPEN wings */
+					s_o_pv_o		= false;
+					s_o_m1			= true;
+					s_o_m2			= false;
+					s_change_dir	= false;
+					s_fsm_state		= 0x11;
 				}
 			}
 			break;
@@ -510,42 +574,56 @@ void task(uint64_t now)
 				}
 
 				/* Stop motor */
-				if (l_i_sa_o) {
-					s_o_m1	= false;
-					s_o_m2	= false;
-					s_fsm_state = 0x13;
+				if (s_i_sa_o) {
+					s_o_m1		= false;
+					s_o_m2		= false;
+					s_fsm_state	= 0x12;
 
 				} else {
 					/* Button check */
 					{
 						/* Dropping the button allowance */
-						if (!l_i_fb) {
+						if (!s_i_fb) {
 							s_timer_fb = 0ULL;
 
-							/* Stop motor at once */
-							s_o_m1	= false;
-							s_o_m2	= false;
+							/* Stop motor at once and keep it off */
+							s_o_m1			= false;
+							s_o_m2			= false;
 
-						} else if (!s_i_fb_t1) {
-							/* After repressing the button, wait until low-pass filtering time is over */
-							s_timer_fb = now + C_FB_PRESS_SHORT_TIME;
+							if (s_i_fb_t3) {
+								/* Button just released */
+								s_change_dir = !s_change_dir;
+							}
+
+						} else if (!s_i_fb_t3) {
+							/* Button just pressed - after repressing the button, wait until low-pass filtering time is over */
+							s_timer_fb = now + C_FB_PRESS_LONG_TIME;
 						}
 					}
 
 					/* Restart motor after qualified button press */
-					if (l_i_fb && s_timer_fb && (s_timer_fb <= now)) {
-						/* Motor on, again */
-						s_o_m1	= true;
-						s_o_m2	= false;
+					if (s_i_fb && s_timer_fb && (s_timer_fb <= now)) {
+						if (!s_change_dir) {
+							/* Motor on, again */
+							s_o_m1	= true;
+							s_o_m2	= false;
+
+						} else {
+							/* Motor on, in opposite direction */
+							s_o_m1			= false;
+							s_o_m2			= true;
+							s_change_dir	= false;
+							s_fsm_state		= 0x21;
+						}
 					}
 				}
 			}
 			break;
 
-			case 0x13:
+			case 0x12:
 			{
 				/* OPENING - WAIT FOR RELEASE: after motor stops, wait for button release */
-				if (!l_i_fb) {
+				if (!s_i_fb) {
 					s_fsm_state = 0x20;
 				}
 			}
@@ -555,60 +633,75 @@ void task(uint64_t now)
 			{
 				/* STANDBY OPENED: wait for close command */
 
-				/* Remote control button pressed */
-				if (l_i_fb && !l_i_sa_g && l_i_sa_o && !l_i_sk_g && l_i_sk_o) {
-					/* Button just pressed */
-					if (!s_i_fb_t1) {
-						s_timer_fb = now + C_FB_PRESS_SHORT_TIME;  // Start button low-pass filtering
+				/* Reset timer when released within low-pass filtering time */
+				if (!s_i_fb) {
+					s_timer_fb = 0ULL;
+				} else {
+					if (!s_i_fb_t3) {
+						/* Button just pressed - after repressing the button, wait until low-pass filtering time is over */
+						s_timer_fb = now + C_FB_PRESS_SHORT_TIME;
 					}
+				}
 
+				/* Remote control button pressed */
+				if (s_i_fb && !s_i_sa_g && s_i_sa_o && !s_i_sk_g && s_i_sk_o) {
 					/* Button pressed long enough, move wings back to lock position */
 					if (s_timer_fb && (s_timer_fb <= now)) {
 						s_o_m1	= false;
 						s_o_m2	= true;
 						s_fsm_state = 0x21;
 					}
-
-				} else {
-					/* Reset timer when released within low-pass filtering time */
-					if (!l_i_fb) {
-						s_timer_fb = 0ULL;
-					}
 				}
 			}
+			break;
 
 			case 0x21:
 			{
 				/* MOVING WINGS BACK: motors running */
 
 				/* Stop motor due to reaching end position and open valve for securing */
-				if (l_i_sa_g) {
+				if (s_i_sa_g) {
 					s_o_m1		= false;
 					s_o_m2		= false;
 					s_timer_pv	= now + C_PV_ACTION_TIME;
 					s_o_pv_g	= true;
-					s_fsm_state = 0x22;
+					s_fsm_state	= 0x22;
 
 				} else {
 					/* Stop motor due to release of button */
-					if (!l_i_fb) {
-						s_o_m1		= false;
-						s_o_m2		= false;
-						s_timer_fb	= 0ULL;
+					if (!s_i_fb) {
+						s_timer_fb		= 0ULL;
+
+						/* Stop motor at once and keep it off */
+						s_o_m1			= false;
+						s_o_m2			= false;
+
+						if (s_i_fb_t3) {
+							/* Button just released */
+							s_change_dir = !s_change_dir;
+						}
 
 					} else {
-						/* Button just pressed */
-						if (!s_i_fb_t1) {
-							/* After repressing the button, wait until low-pass filtering time is over */
-							s_timer_fb = now + C_FB_PRESS_SHORT_TIME;
+						if (!s_i_fb_t3) {
+							/* Button just pressed - after repressing the button, wait until low-pass filtering time is over */
+							s_timer_fb = now + C_FB_PRESS_LONG_TIME;
 						}
 					}
 
 					/* Restart motor after qualified button press */
-					if (l_i_fb && s_timer_fb && (s_timer_fb <= now)) {
-						/* Motor on, again */
-						s_o_m1	= false;
-						s_o_m2	= true;
+					if (s_i_fb && s_timer_fb && (s_timer_fb <= now)) {
+						if (!s_change_dir) {
+							/* Motor on, again */
+							s_o_m1	= false;
+							s_o_m2	= true;
+
+						} else {
+							/* Motor on, in opposite direction */
+							s_o_m1			= true;
+							s_o_m2			= false;
+							s_change_dir	= false;
+							s_fsm_state		= 0x11;
+						}
 					}
 				}
 			}
@@ -624,7 +717,7 @@ void task(uint64_t now)
 				}
 
 				/* Locks at their position and timer done */
-				if (l_i_sk_g) {
+				if (s_i_sk_g) {
 					s_o_pv_g	= false;
 					s_o_kl		= false;
 					s_fsm_state = 0x23;
@@ -637,7 +730,7 @@ void task(uint64_t now)
 				/* PREPARING FOR STANDBY: wait for the button to be released */
 
 				/* Button released, power off signal lamp and fall back to STANDBY */
-				if (!l_i_fb) {
+				if (!s_i_fb) {
 					s_fsm_state = 0x00;
 				}
 			}
@@ -660,9 +753,6 @@ void task(uint64_t now)
 	PORTC = l_port_c;
 	PORTD = l_port_d;
 	cpu_irq_restore(flags);
-
-	/* Shift for t1 := t+1 */
-	s_i_fb_t1 = l_i_fb;
 
 
 	#if 0
