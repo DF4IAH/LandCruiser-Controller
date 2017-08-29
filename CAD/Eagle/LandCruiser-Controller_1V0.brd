@@ -1999,8 +1999,8 @@ Your Eurocircuits Team
 </element>
 <element name="X321" library="df4iah_connector" package="WIRE-TO-BOARD_5MM08_1X08" value="WEIDMUELLER 1234600000" x="93.98" y="31.75"/>
 <element name="D501" library="df4iah_diode" package="DO41-7.6" value="1N5817-B" x="25.4" y="39.37" rot="R270"/>
-<element name="U221" library="df4iah_esd" package="TSSOP-8" value="SN75240" x="-24.13" y="-16.51"/>
-<element name="U301" library="df4iah_dataconvertion" package="DIL18" value="MIC2981/2982" x="-10.16" y="-31.75"/>
+<element name="U221" library="df4iah_esd" package="TSSOP-8" value="SN75240" x="27.94" y="5.08"/>
+<element name="U301" library="df4iah_dataconvertion" package="DIL18" value="MIC2981/2982" x="86.36" y="25.4" rot="R90"/>
 </elements>
 <signals>
 <signal name="GND">
@@ -2067,14 +2067,14 @@ Your Eurocircuits Team
 <wire x1="4.96" y1="62.5" x2="27.94" y2="60.96" width="0" layer="19" extent="1-1"/>
 <wire x1="3.81" y1="44.45" x2="4.96" y2="62.5" width="0" layer="19" extent="1-1"/>
 <wire x1="4.96" y1="4.96" x2="31.75" y2="26.67" width="0" layer="19" extent="1-1"/>
-<wire x1="0" y1="-27.94" x2="4.96" y2="4.96" width="0" layer="19" extent="1-1"/>
-<wire x1="-2.54" y1="-35.56" x2="0" y2="-27.94" width="0" layer="19" extent="1-1"/>
-<wire x1="-5.08" y1="-35.56" x2="-2.54" y2="-35.56" width="0" layer="19" extent="1-1"/>
-<wire x1="-7.62" y1="-35.56" x2="-5.08" y2="-35.56" width="0" layer="19" extent="1-1"/>
-<wire x1="-23.805" y1="-19.3231" x2="-7.62" y2="-35.56" width="0" layer="19" extent="1-1"/>
-<wire x1="-25.105" y1="-19.3231" x2="-23.805" y2="-19.3231" width="0" layer="19" extent="1-1"/>
-<wire x1="-23.155" y1="-13.6969" x2="-23.805" y2="-19.3231" width="0" layer="19" extent="1-1"/>
-<wire x1="-24.455" y1="-13.6969" x2="-23.155" y2="-13.6969" width="0" layer="19" extent="1-1"/>
+<wire x1="82.55" y1="35.56" x2="4.96" y2="4.96" width="0" layer="19" extent="1-1"/>
+<wire x1="90.17" y1="33.02" x2="82.55" y2="35.56" width="0" layer="19" extent="1-1"/>
+<wire x1="90.17" y1="30.48" x2="90.17" y2="33.02" width="0" layer="19" extent="1-1"/>
+<wire x1="90.17" y1="27.94" x2="90.17" y2="30.48" width="0" layer="19" extent="1-1"/>
+<wire x1="28.265" y1="2.2669" x2="90.17" y2="27.94" width="0" layer="19" extent="1-1"/>
+<wire x1="26.965" y1="2.2669" x2="28.265" y2="2.2669" width="0" layer="19" extent="1-1"/>
+<wire x1="28.915" y1="7.8931" x2="28.265" y2="2.2669" width="0" layer="19" extent="1-1"/>
+<wire x1="27.615" y1="7.8931" x2="28.915" y2="7.8931" width="0" layer="19" extent="1-1"/>
 <wire x1="93.98" y1="13.97" x2="60.96" y2="24.765" width="0" layer="19" extent="1-1"/>
 <wire x1="93.77" y1="4.96" x2="93.98" y2="13.97" width="0" layer="19" extent="1-1"/>
 </signal>
@@ -2093,7 +2093,6 @@ Your Eurocircuits Team
 <contactref element="U511" pad="3"/>
 <contactref element="C521" pad="+"/>
 <contactref element="C101" pad="1"/>
-<contactref element="U301" pad="9"/>
 <wire x1="27.94" y1="63.5" x2="36.83" y2="63.5" width="0" layer="19" extent="1-1"/>
 <wire x1="36.83" y1="43.18" x2="36.83" y2="63.5" width="0" layer="19" extent="1-1"/>
 <wire x1="31.75" y1="43.18" x2="36.83" y2="43.18" width="0" layer="19" extent="1-1"/>
@@ -2107,7 +2106,6 @@ Your Eurocircuits Team
 <wire x1="31.75" y1="21.59" x2="41.91" y2="12.7" width="0" layer="19" extent="1-1"/>
 <wire x1="67.31" y1="12.7" x2="55.88" y2="24.765" width="0" layer="19" extent="1-1"/>
 <wire x1="72.39" y1="12.7" x2="67.31" y2="12.7" width="0" layer="19" extent="1-1"/>
-<wire x1="0" y1="-35.56" x2="41.91" y2="12.7" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="SCL">
 <contactref element="X401" pad="2"/>
@@ -2149,7 +2147,7 @@ Your Eurocircuits Team
 <contactref element="R212" pad="2"/>
 <contactref element="U221" pad="8"/>
 <wire x1="20.32" y1="19.05" x2="62.23" y2="29.845" width="0" layer="19" extent="1-1"/>
-<wire x1="-25.105" y1="-13.6969" x2="20.32" y2="19.05" width="0" layer="19" extent="1-1"/>
+<wire x1="26.965" y1="7.8931" x2="20.32" y2="19.05" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="MP_FB">
 <contactref element="U101" pad="6"/>
@@ -2163,7 +2161,7 @@ Your Eurocircuits Team
 <contactref element="R213" pad="2"/>
 <contactref element="U221" pad="6"/>
 <wire x1="20.32" y1="24.13" x2="64.77" y2="29.845" width="0" layer="19" extent="1-1"/>
-<wire x1="-23.805" y1="-13.6969" x2="20.32" y2="24.13" width="0" layer="19" extent="1-1"/>
+<wire x1="28.265" y1="7.8931" x2="20.32" y2="24.13" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="MP_SA_G">
 <contactref element="U101" pad="12"/>
@@ -2172,7 +2170,7 @@ Your Eurocircuits Team
 <contactref element="U221" pad="2"/>
 <wire x1="67.31" y1="25.4" x2="69.85" y2="29.845" width="0" layer="19" extent="1-1"/>
 <wire x1="20.32" y1="29.21" x2="67.31" y2="25.4" width="0" layer="19" extent="1-1"/>
-<wire x1="-24.455" y1="-19.3231" x2="20.32" y2="29.21" width="0" layer="19" extent="1-1"/>
+<wire x1="27.615" y1="2.2669" x2="20.32" y2="29.21" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="MP_SA_O">
 <contactref element="U101" pad="13"/>
@@ -2181,51 +2179,53 @@ Your Eurocircuits Team
 <contactref element="U221" pad="4"/>
 <wire x1="72.39" y1="25.4" x2="72.39" y2="29.845" width="0" layer="19" extent="1-1"/>
 <wire x1="20.32" y1="34.29" x2="72.39" y2="29.845" width="0" layer="19" extent="1-1"/>
-<wire x1="-23.155" y1="-19.3231" x2="20.32" y2="34.29" width="0" layer="19" extent="1-1"/>
+<wire x1="28.915" y1="2.2669" x2="20.32" y2="34.29" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="MP_M2">
 <contactref element="U101" pad="16"/>
 <contactref element="R134" pad="2"/>
 <contactref element="U301" pad="5"/>
 <wire x1="72.39" y1="37.465" x2="81.28" y2="41.91" width="0" layer="19" extent="1-1"/>
-<wire x1="-10.16" y1="-35.56" x2="72.39" y2="37.465" width="0" layer="19" extent="1-1"/>
+<wire x1="90.17" y1="25.4" x2="72.39" y2="37.465" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="MP_M1">
 <contactref element="U101" pad="17"/>
 <contactref element="R133" pad="2"/>
 <contactref element="U301" pad="4"/>
 <wire x1="69.85" y1="37.465" x2="76.2" y2="41.91" width="0" layer="19" extent="1-1"/>
-<wire x1="-12.7" y1="-35.56" x2="69.85" y2="37.465" width="0" layer="19" extent="1-1"/>
+<wire x1="90.17" y1="22.86" x2="69.85" y2="37.465" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="MP_PV_O">
 <contactref element="U101" pad="18"/>
 <contactref element="R132" pad="2"/>
 <contactref element="U301" pad="3"/>
 <wire x1="67.31" y1="37.465" x2="71.12" y2="41.91" width="0" layer="19" extent="1-1"/>
-<wire x1="-15.24" y1="-35.56" x2="67.31" y2="37.465" width="0" layer="19" extent="1-1"/>
+<wire x1="90.17" y1="20.32" x2="67.31" y2="37.465" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="MP_PV_G">
 <contactref element="U101" pad="19"/>
 <contactref element="R131" pad="2"/>
 <contactref element="U301" pad="2"/>
 <wire x1="64.77" y1="37.465" x2="66.04" y2="41.91" width="0" layer="19" extent="1-1"/>
-<wire x1="-17.78" y1="-35.56" x2="64.77" y2="37.465" width="0" layer="19" extent="1-1"/>
+<wire x1="90.17" y1="17.78" x2="64.77" y2="37.465" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="MP_KL">
 <contactref element="U101" pad="26"/>
 <contactref element="R135" pad="2"/>
 <contactref element="U301" pad="1"/>
 <wire x1="46.99" y1="37.465" x2="49.53" y2="54.61" width="0" layer="19" extent="1-1"/>
-<wire x1="-20.32" y1="-35.56" x2="46.99" y2="37.465" width="0" layer="19" extent="1-1"/>
+<wire x1="90.17" y1="15.24" x2="46.99" y2="37.465" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="+12V">
 <contactref element="U511" pad="1"/>
 <contactref element="C501" pad="+"/>
 <contactref element="F501" pad="2"/>
 <contactref element="D501" pad="C"/>
+<contactref element="U301" pad="9"/>
 <wire x1="31.5722" y1="49.53" x2="36.83" y2="54.61" width="0" layer="19" extent="1-1"/>
-<wire x1="27.94" y1="58.42" x2="31.5722" y2="49.53" width="0" layer="19" extent="1-1"/>
 <wire x1="25.4" y1="43.18" x2="31.5722" y2="49.53" width="0" layer="19" extent="1-1"/>
+<wire x1="27.94" y1="58.42" x2="31.5722" y2="49.53" width="0" layer="19" extent="1-1"/>
+<wire x1="90.17" y1="35.56" x2="25.4" y2="43.18" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="ECU_FB">
 <contactref element="X201" pad="1"/>

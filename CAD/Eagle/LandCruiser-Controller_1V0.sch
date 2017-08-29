@@ -14219,9 +14219,9 @@ Open collector driver for 8 channels</description>
 <part name="GND221" library="df4iah_supply" deviceset="GND" device=""/>
 <part name="GND1" library="df4iah_supply" deviceset="GND" device=""/>
 <part name="U301" library="df4iah_dataconvertion" deviceset="MIC2981/2982" device=""/>
-<part name="+5V0_1" library="df4iah_supply" deviceset="+5V" device=""/>
 <part name="GND302" library="df4iah_supply" deviceset="GND" device=""/>
 <part name="GND301" library="df4iah_supply" deviceset="GND" device=""/>
+<part name="P+12V_1" library="df4iah_supply" deviceset="+12V" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -14698,9 +14698,9 @@ X111-6 = GND</text>
 <instance part="X321" gate="G$1" x="241.3" y="91.44"/>
 <instance part="GND321" gate="1" x="220.98" y="73.66"/>
 <instance part="U301" gate="G$1" x="71.12" y="96.52"/>
-<instance part="+5V0_1" gate="G$1" x="48.26" y="121.92"/>
 <instance part="GND302" gate="1" x="91.44" y="66.04"/>
 <instance part="GND301" gate="1" x="40.64" y="66.04"/>
+<instance part="P+12V_1" gate="1" x="48.26" y="121.92"/>
 </instances>
 <busses>
 </busses>
@@ -14797,14 +14797,6 @@ X111-6 = GND</text>
 <label x="27.94" y="88.9" size="1.778" layer="95" rot="R180" xref="yes"/>
 </segment>
 </net>
-<net name="+5V" class="0">
-<segment>
-<pinref part="U301" gate="G$1" pin="VS"/>
-<wire x1="55.88" y1="68.58" x2="48.26" y2="68.58" width="0.1524" layer="91"/>
-<wire x1="48.26" y1="68.58" x2="48.26" y2="119.38" width="0.1524" layer="91"/>
-<pinref part="+5V0_1" gate="G$1" pin="+5V"/>
-</segment>
-</net>
 <net name="DRV_KL" class="0">
 <segment>
 <pinref part="U301" gate="G$1" pin="OUT1"/>
@@ -14838,6 +14830,14 @@ X111-6 = GND</text>
 <pinref part="U301" gate="G$1" pin="OUT5"/>
 <wire x1="86.36" y1="88.9" x2="106.68" y2="88.9" width="0.1524" layer="91"/>
 <label x="91.44" y="88.9" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="+12V" class="0">
+<segment>
+<pinref part="U301" gate="G$1" pin="VS"/>
+<wire x1="55.88" y1="68.58" x2="48.26" y2="68.58" width="0.1524" layer="91"/>
+<wire x1="48.26" y1="68.58" x2="48.26" y2="119.38" width="0.1524" layer="91"/>
+<pinref part="P+12V_1" gate="1" pin="+12V"/>
 </segment>
 </net>
 </nets>
