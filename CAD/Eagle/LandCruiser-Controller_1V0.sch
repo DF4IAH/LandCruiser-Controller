@@ -14222,6 +14222,7 @@ Open collector driver for 8 channels</description>
 <part name="GND302" library="df4iah_supply" deviceset="GND" device=""/>
 <part name="GND301" library="df4iah_supply" deviceset="GND" device=""/>
 <part name="P+12V_1" library="df4iah_supply" deviceset="+12V" device=""/>
+<part name="FRAME7" library="df4iah_frame" deviceset="A4L-LOC" device="" value="I2C connector"/>
 </parts>
 <sheets>
 <sheet>
@@ -14926,6 +14927,18 @@ X401-6 = GND</text>
 <junction x="157.48" y="86.36"/>
 </segment>
 </net>
+</nets>
+</sheet>
+<sheet>
+<description>V24 level shifter</description>
+<plain>
+</plain>
+<instances>
+<instance part="FRAME7" gate="G$1" x="0" y="0"/>
+</instances>
+<busses>
+</busses>
+<nets>
 </nets>
 </sheet>
 <sheet>
