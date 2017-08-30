@@ -1437,6 +1437,18 @@ type 0309, grid 12.5 mm</description>
 <rectangle x1="4.318" y1="-0.3048" x2="5.1816" y2="0.3048" layer="21"/>
 <rectangle x1="-5.1816" y1="-0.3048" x2="-4.318" y2="0.3048" layer="21"/>
 </package>
+<package name="L1812">
+<description>&lt;b&gt;INDUCTOR&lt;/b&gt;&lt;p&gt;
+chip</description>
+<wire x1="-1.4732" y1="1.6002" x2="1.4732" y2="1.6002" width="0.1016" layer="51"/>
+<wire x1="-1.4478" y1="-1.6002" x2="1.4732" y2="-1.6002" width="0.1016" layer="51"/>
+<smd name="1" x="-1.95" y="0" dx="1.9" dy="3.4" layer="1"/>
+<smd name="2" x="1.95" y="0" dx="1.9" dy="3.4" layer="1"/>
+<text x="-1.905" y="1.905" size="1.27" layer="25">&gt;NAME</text>
+<text x="-1.905" y="-3.175" size="1.27" layer="27">&gt;VALUE</text>
+<rectangle x1="-2.3876" y1="-1.651" x2="-1.4376" y2="1.649" layer="51"/>
+<rectangle x1="1.4478" y1="-1.651" x2="2.3978" y2="1.649" layer="51"/>
+</package>
 </packages>
 </library>
 <library name="holes">
@@ -2001,6 +2013,7 @@ Your Eurocircuits Team
 <element name="D501" library="df4iah_diode" package="DO41-7.6" value="1N5817-B" x="25.4" y="39.37" rot="R270"/>
 <element name="U221" library="df4iah_esd" package="TSSOP-8" value="SN75240" x="27.94" y="5.08"/>
 <element name="U301" library="df4iah_dataconvertion" package="DIL18" value="MIC2981/2982" x="86.36" y="25.4" rot="R90"/>
+<element name="L101" library="rcl" package="L1812" value="10uH" x="62.23" y="43.18" rot="MR90"/>
 </elements>
 <signals>
 <signal name="GND">
@@ -2084,7 +2097,6 @@ Your Eurocircuits Team
 <contactref element="R491" pad="2"/>
 <contactref element="R492" pad="2"/>
 <contactref element="R101" pad="1"/>
-<contactref element="U101" pad="20"/>
 <contactref element="U101" pad="7"/>
 <contactref element="R123" pad="2"/>
 <contactref element="R121" pad="2"/>
@@ -2093,19 +2105,20 @@ Your Eurocircuits Team
 <contactref element="U511" pad="3"/>
 <contactref element="C521" pad="+"/>
 <contactref element="C101" pad="1"/>
+<contactref element="L101" pad="2"/>
 <wire x1="27.94" y1="63.5" x2="36.83" y2="63.5" width="0" layer="19" extent="1-1"/>
 <wire x1="36.83" y1="43.18" x2="36.83" y2="63.5" width="0" layer="19" extent="1-1"/>
 <wire x1="31.75" y1="43.18" x2="36.83" y2="43.18" width="0" layer="19" extent="1-1"/>
 <wire x1="44.45" y1="43.815" x2="36.83" y2="43.18" width="0" layer="19" extent="1-1"/>
 <wire x1="52.07" y1="41.275" x2="44.45" y2="43.815" width="0" layer="19" extent="1-1"/>
-<wire x1="62.23" y1="37.465" x2="52.07" y2="41.275" width="0" layer="19" extent="1-1"/>
-<wire x1="57.15" y1="29.845" x2="62.23" y2="37.465" width="0" layer="19" extent="1-1"/>
+<wire x1="57.15" y1="29.845" x2="52.07" y2="41.275" width="0" layer="19" extent="1-1"/>
 <wire x1="55.88" y1="24.765" x2="57.15" y2="29.845" width="0" layer="19" extent="1-1"/>
 <wire x1="49.53" y1="12.7" x2="55.88" y2="24.765" width="0" layer="19" extent="1-1"/>
 <wire x1="41.91" y1="12.7" x2="49.53" y2="12.7" width="0" layer="19" extent="1-1"/>
 <wire x1="31.75" y1="21.59" x2="41.91" y2="12.7" width="0" layer="19" extent="1-1"/>
 <wire x1="67.31" y1="12.7" x2="55.88" y2="24.765" width="0" layer="19" extent="1-1"/>
 <wire x1="72.39" y1="12.7" x2="67.31" y2="12.7" width="0" layer="19" extent="1-1"/>
+<wire x1="62.23" y1="45.13" x2="31.75" y2="21.59" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="SCL">
 <contactref element="X401" pad="2"/>
@@ -2128,7 +2141,7 @@ Your Eurocircuits Team
 <wire x1="41.91" y1="25.4" x2="41.91" y2="29.845" width="0" layer="19" extent="1-1"/>
 <wire x1="34.29" y1="26.67" x2="41.91" y2="25.4" width="0" layer="19" extent="1-1"/>
 </signal>
-<signal name="AREF">
+<signal name="MP_AREF">
 <contactref element="C102" pad="2"/>
 <contactref element="U101" pad="21"/>
 <wire x1="60.96" y1="19.685" x2="59.69" y2="37.465" width="0" layer="19" extent="1-1"/>
@@ -2286,6 +2299,11 @@ Your Eurocircuits Team
 </signal>
 <signal name="DRV_M2">
 <contactref element="U301" pad="14"/>
+</signal>
+<signal name="MP_AVCC">
+<contactref element="U101" pad="20"/>
+<contactref element="L101" pad="1"/>
+<wire x1="62.23" y1="41.23" x2="62.23" y2="37.465" width="0" layer="19" extent="1-1"/>
 </signal>
 </signals>
 <errors>
