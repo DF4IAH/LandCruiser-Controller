@@ -1,7 +1,7 @@
 [Eagle]
 Version="07 07 00"
-Platform="Windows"
-Serial="60280E4FF6-LSR-WLM50EP"
+Platform="Mac OS X"
+Serial="7201DD2B7A-LSR-WLM-1SS"
 Globals="Globals"
 Desktop="Desktop"
 
@@ -22,23 +22,24 @@ UsedLibrary="lbr/df4iah_rf.lbr"
 UsedLibrary="lbr/Adafruit-Eagle-Library-master/adafruit.lbr"
 UsedLibrary="lbr/df4iah_bipoltransistor.lbr"
 UsedLibrary="lbr/df4iah_holes.lbr"
-UsedLibrary="C:/Users/habel/git/LandCruiser-Controller__HW_V1.0/CAD/Eagle/lbr/df4iah_relay.lbr"
-UsedLibrary="C:/Users/habel/git/LandCruiser-Controller__HW_V1.0/CAD/Eagle/lbr/df4iah_fuse.lbr"
+UsedLibrary="/Users/espero/nfs_ds_nfs/git/LandCruiser-Controller__HW_V1.0/CAD/Eagle/lbr/df4iah_fuse.lbr"
+UsedLibrary="/Users/espero/nfs_ds_nfs/git/LandCruiser-Controller__HW_V1.0/CAD/Eagle/lbr/df4iah_dataconvertion.lbr"
+UsedLibrary="/Users/espero/nfs_ds_nfs/git/LandCruiser-Controller__HW_V1.0/CAD/Eagle/lbr/df4iah_connector.lbr"
 
 [Win_1]
-Type="Board Editor"
-Loc="0 0 1919 1017"
-State=3
-Number=2
-File="C:/Users/habel/git/LandCruiser-Controller__HW_V1.0/CAD/Eagle/LandCruiser-Controller_1V0.brd"
-View="12.4694 9.28572 76.3346 73.3665"
-WireWidths=" 0 0.254 0.3048 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0.4064"
+Type="Library Editor"
+Loc="0 22 1919 1039"
+State=1
+Number=3
+File="/Users/espero/nfs_ds_nfs/git/LandCruiser-Controller__HW_V1.0/CAD/Eagle/lbr/df4iah_fuse.lbr"
+View="-9.77392 -3.69993 9.77392 5.98593"
+WireWidths=" 0 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0.4064 0.254 0.127"
 PadDiameters=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0"
 PadDrills=" 0.5 0.6 0.7 0.9 1 1.1 1.2 1.3 1.4 1.5 1.6 2 2.2 2.8 3.2 0.8"
 ViaDiameters=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0"
 ViaDrills=" 0.5 0.7 0.8 0.9 1 1.1 1.2 1.3 1.4 1.5 1.6 2 2.2 2.8 3.2 0.6"
 HoleDrills=" 0.5 0.7 0.8 0.9 1 1.1 1.2 1.3 1.4 1.5 1.6 2 2.2 2.8 3.2 0.6"
-TextSizes=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.9304 2.1844 2.54 3.81 5.08 6.4516 1.778"
+TextSizes=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.4224 1.6764 1.9304 2.1844 2.54 3.81 5.08 6.4516 1.778 1.27"
 PolygonSpacings=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 5.08 6.4516 1.27"
 PolygonIsolates=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0"
 MiterRadiuss=" 0.254 0.3175 0.635 1.27 2.54 1 2 2.5 5 7.5 10 0"
@@ -51,10 +52,10 @@ WireBend=0
 WireBendSet=0
 WireCap=1
 MiterStyle=0
-PadShape=0
+PadShape=1
 ViaShape=0
 PolygonPour=0
-PolygonRank=1
+PolygonRank=0
 PolygonThermals=1
 PolygonOrphans=0
 TextRatio=8
@@ -69,20 +70,21 @@ SwapLevel=0
 ArcDirection=0
 AddLevel=2
 PadsSameType=0
-Layer=16
+Layer=94
+Device="FUSE"
 
 [Win_2]
 Type="Control Panel"
-Loc="0 0 1919 1017"
-State=3
+Loc="0 22 1919 1039"
+State=1
 Number=0
 
 [Win_3]
 Type="Schematic Editor"
-Loc="0 0 1919 1017"
+Loc="0 22 1919 1039"
 State=1
 Number=1
-File="C:/Users/habel/git/LandCruiser-Controller__HW_V1.0/CAD/Eagle/LandCruiser-Controller_1V0.sch"
+File="/Users/espero/nfs_ds_nfs/git/LandCruiser-Controller__HW_V1.0/CAD/Eagle/LandCruiser-Controller_1V0.sch"
 View="-6.00112 -4.10556 279.641 182.968"
 WireWidths=" 0 0.3048 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0.4064 0.1524"
 PadDiameters=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0"
@@ -122,23 +124,23 @@ ArcDirection=0
 AddLevel=2
 PadsSameType=0
 Layer=91
-Views=" 1: -6.00112 -4.10556 279.641 182.968"
-Sheet="6"
+Views=" 1: 17.199 -2.09656 302.841 184.977 2: -6.00112 -4.10556 279.641 182.968 5: -15.9445 -24.2806 269.698 162.793 6: -6.00112 -4.10556 279.641 182.968"
+Sheet="2"
 
 [Win_4]
-Type="Library Editor"
-Loc="-8 -8 1911 1009"
+Type="Board Editor"
+Loc="0 22 1919 1039"
 State=1
-Number=3
-File="C:/Users/habel/git/LandCruiser-Controller__HW_V1.0/CAD/Eagle/lbr/df4iah_fuse.lbr"
-View="-0.508 -0.508 25.908 25.908"
-WireWidths=" 0 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0.4064 0.127 0.254"
+Number=2
+File="/Users/espero/nfs_ds_nfs/git/LandCruiser-Controller__HW_V1.0/CAD/Eagle/LandCruiser-Controller_1V0.brd"
+View="-6.3559 -3.00714 102.503 99.2357"
+WireWidths=" 0 0.254 0.3048 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0.4064"
 PadDiameters=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0"
 PadDrills=" 0.5 0.6 0.7 0.9 1 1.1 1.2 1.3 1.4 1.5 1.6 2 2.2 2.8 3.2 0.8"
 ViaDiameters=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0"
 ViaDrills=" 0.5 0.7 0.8 0.9 1 1.1 1.2 1.3 1.4 1.5 1.6 2 2.2 2.8 3.2 0.6"
 HoleDrills=" 0.5 0.7 0.8 0.9 1 1.1 1.2 1.3 1.4 1.5 1.6 2 2.2 2.8 3.2 0.6"
-TextSizes=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.4224 1.6764 1.9304 2.1844 2.54 3.81 5.08 6.4516 1.778 1.27"
+TextSizes=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.9304 2.1844 2.54 3.81 5.08 6.4516 1.778"
 PolygonSpacings=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 5.08 6.4516 1.27"
 PolygonIsolates=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0"
 MiterRadiuss=" 0.254 0.3175 0.635 1.27 2.54 1 2 2.5 5 7.5 10 0"
@@ -154,7 +156,7 @@ MiterStyle=0
 PadShape=0
 ViaShape=0
 PolygonPour=0
-PolygonRank=0
+PolygonRank=1
 PolygonThermals=1
 PolygonOrphans=0
 TextRatio=8
@@ -172,7 +174,7 @@ PadsSameType=0
 Layer=16
 
 [Desktop]
-Screen="1920 1080"
+Screen="640 480"
 Window="Win_1"
 Window="Win_2"
 Window="Win_3"
