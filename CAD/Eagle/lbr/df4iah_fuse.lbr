@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="6.5.3">
+<eagle version="7.7.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
@@ -19,7 +19,7 @@
 <layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="yes"/>
 <layer number="24" name="bOrigins" color="15" fill="1" visible="no" active="yes"/>
 <layer number="25" name="tNames" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="26" name="bNames" color="7" fill="1" visible="no" active="yes"/>
+<layer number="26" name="bNames" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="27" name="tValues" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="28" name="bValues" color="7" fill="1" visible="no" active="yes"/>
 <layer number="29" name="tStop" color="7" fill="3" visible="no" active="yes"/>
@@ -1275,6 +1275,29 @@ Source: http://www.farnell.com/datasheets/716597.pdf</description>
 <text x="-3.1" y="2.7" size="1.27" layer="25">&gt;NAME</text>
 <text x="-3.225" y="-4.05" size="1.27" layer="27">&gt;VALUE</text>
 </package>
+<package name="MCCQ-121">
+<description>&lt;b&gt;minicomp Automotive Fuse-Holder MCCQ-121&lt;/b&gt;</description>
+<pad name="P$1" x="-7" y="0" drill="2.5" diameter="3"/>
+<pad name="P$2" x="-2" y="0" drill="2.5" diameter="3"/>
+<pad name="P$3" x="2" y="0" drill="2.5" diameter="3"/>
+<pad name="P$4" x="7" y="0" drill="2.5" diameter="3"/>
+<wire x1="-9.5" y1="2" x2="9.5" y2="2" width="0.127" layer="21"/>
+<wire x1="-9.5" y1="-2.3" x2="9.5" y2="-2.3" width="0.127" layer="21"/>
+<wire x1="-9.5" y1="-2.3" x2="-9.5" y2="2" width="0.127" layer="21"/>
+<wire x1="9.5" y1="-2.3" x2="9.5" y2="2" width="0.127" layer="21"/>
+<wire x1="-8" y1="-2" x2="-1" y2="-2" width="0.127" layer="21"/>
+<wire x1="1" y1="-2" x2="8" y2="-2" width="0.127" layer="21"/>
+<wire x1="-8" y1="-2" x2="-8" y2="0" width="0.127" layer="21"/>
+<wire x1="-1" y1="-2" x2="-1" y2="0" width="0.127" layer="21"/>
+<wire x1="1" y1="-2" x2="1" y2="0" width="0.127" layer="21"/>
+<wire x1="8" y1="-2" x2="8" y2="0" width="0.127" layer="21"/>
+<wire x1="-8" y1="0" x2="-6" y2="0" width="0.127" layer="21" curve="-180"/>
+<wire x1="-3" y1="0" x2="-1" y2="0" width="0.127" layer="21" curve="-180"/>
+<wire x1="1" y1="0" x2="3" y2="0" width="0.127" layer="21" curve="-180"/>
+<wire x1="6" y1="0" x2="8" y2="0" width="0.127" layer="21" curve="-180"/>
+<text x="-3" y="3" size="1.27" layer="25">&gt;NAME</text>
+<text x="-5" y="-5" size="1.27" layer="27">&gt;VALUE</text>
+</package>
 </packages>
 <symbols>
 <symbol name="FUSE">
@@ -2142,6 +2165,20 @@ CS, Schukat</description>
 </technology>
 </technologies>
 </device>
+<device name="MCCQ-121" package="MCCQ-121">
+<connects>
+<connect gate="G$1" pin="1" pad="P$1 P$2"/>
+<connect gate="G$1" pin="2" pad="P$3 P$4"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="MF" value="MULTICOMP" constant="no"/>
+<attribute name="MPN" value="MCCQ-121" constant="no"/>
+<attribute name="OC_FARNELL" value="1586596" constant="no"/>
+<attribute name="OC_NEWARK" value="unknown" constant="no"/>
+</technology>
+</technologies>
+</device>
 </devices>
 </deviceset>
 <deviceset name="QPL" prefix="F">
@@ -2184,6 +2221,28 @@ Source: http://www.farnell.com/datasheets/716597.pdf</description>
 <technology name="050"/>
 <technology name="150"/>
 <technology name="200"/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="MCCQ-121" prefix="F">
+<description>&lt;b&gt;minicomp Automotive Fuse-Holder MCCQ-121&lt;/b&gt;</description>
+<gates>
+<gate name="G$1" symbol="FUSE" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="MCCQ-121">
+<connects>
+<connect gate="G$1" pin="1" pad="P$1 P$2"/>
+<connect gate="G$1" pin="2" pad="P$3 P$4"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="MF" value="MINICOMP" constant="no"/>
+<attribute name="MPN" value="MCCQ-121" constant="no"/>
+<attribute name="OC_FARNELL" value="1586596" constant="no"/>
+<attribute name="OC_NEWARK" value="unknown" constant="no"/>
+</technology>
 </technologies>
 </device>
 </devices>
