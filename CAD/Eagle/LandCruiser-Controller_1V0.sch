@@ -15933,10 +15933,10 @@ www.schrackrelays.com/pdf/UUB.pdf</description>
 <packages>
 <package name="MCCQ-121">
 <description>&lt;b&gt;minicomp Automotive Fuse-Holder MCCQ-121&lt;/b&gt;</description>
-<pad name="P$1" x="-7" y="0" drill="2.5" diameter="2.8"/>
-<pad name="P$2" x="-2" y="0" drill="2.5" diameter="2.8"/>
-<pad name="P$3" x="2" y="0" drill="2.5" diameter="2.8"/>
-<pad name="P$4" x="7" y="0" drill="2.5" diameter="2.8"/>
+<pad name="P$1" x="-7" y="0" drill="2.5" diameter="2.8" thermals="no" first="yes"/>
+<pad name="P$2" x="-2" y="0" drill="2.5" diameter="2.8" thermals="no"/>
+<pad name="P$3" x="2" y="0" drill="2.5" diameter="2.8" thermals="no"/>
+<pad name="P$4" x="7" y="0" drill="2.5" diameter="2.8" thermals="no"/>
 <wire x1="-9.5" y1="2" x2="9.5" y2="2" width="0.127" layer="21"/>
 <wire x1="-9.5" y1="-2.3" x2="9.5" y2="-2.3" width="0.127" layer="21"/>
 <wire x1="-9.5" y1="-2.3" x2="-9.5" y2="2" width="0.127" layer="21"/>
@@ -16062,7 +16062,6 @@ www.schrackrelays.com/pdf/UUB.pdf</description>
 <part name="R211" library="rcl" deviceset="R-EU_" device="R0805" value="56R"/>
 <part name="SUPPLY1" library="df4iah_supply" deviceset="+UB" device=""/>
 <part name="SUPPLY_601" library="df4iah_supply" deviceset="+UB" device=""/>
-<part name="F602" library="df4iah_fuse" deviceset="MCCQ-121" device="" value="500 mA (S)"/>
 <part name="X321" library="df4iah_connector" deviceset="WIRE-TO-BOARD_5MM08_1X08" device="" value="WEIDMUELLER 1234600000"/>
 <part name="GND321" library="df4iah_supply" deviceset="GND" device=""/>
 <part name="D601" library="df4iah_diode" deviceset="CRS08" device=""/>
@@ -16090,7 +16089,6 @@ www.schrackrelays.com/pdf/UUB.pdf</description>
 <part name="U501" library="df4iah_dataconvertion" deviceset="MAX232" device="_SOIC16"/>
 <part name="C501" library="rcl" deviceset="C-EU" device="C0805" value="1uF"/>
 <part name="C502" library="rcl" deviceset="C-EU" device="C0805" value="1uF"/>
-<part name="F601" library="df4iah_fuse" deviceset="MCCQ-121" device="" value="15 A (S)"/>
 <part name="C503" library="rcl" deviceset="C-EU" device="C0805" value="1uF"/>
 <part name="C504" library="rcl" deviceset="C-EU" device="C0805" value="1uF"/>
 <part name="GND501" library="df4iah_supply" deviceset="GND" device=""/>
@@ -16103,6 +16101,8 @@ www.schrackrelays.com/pdf/UUB.pdf</description>
 <part name="R232" library="rcl" deviceset="R-EU_" device="R0805" value="22kR"/>
 <part name="R231" library="rcl" deviceset="R-EU_" device="R0805" value="10kR"/>
 <part name="GND2" library="df4iah_supply" deviceset="GND" device=""/>
+<part name="F601" library="df4iah_fuse" deviceset="MCCQ-121" device="" value="15 A"/>
+<part name="F602" library="df4iah_fuse" deviceset="MCCQ-121" device="" value="500 mA"/>
 </parts>
 <sheets>
 <sheet>
@@ -17200,9 +17200,9 @@ X511-4 = N.C.</text>
 <instance part="C621" gate="G$1" x="177.8" y="86.36"/>
 <instance part="C601" gate="G$1" x="119.38" y="86.36"/>
 <instance part="SUPPLY_601" gate="G$1" x="53.34" y="111.76"/>
-<instance part="F602" gate="G$1" x="83.82" y="96.52"/>
 <instance part="D601" gate="G$1" x="106.68" y="83.82" rot="R90"/>
 <instance part="F601" gate="G$1" x="83.82" y="106.68"/>
+<instance part="F602" gate="G$1" x="83.82" y="96.52"/>
 </instances>
 <busses>
 </busses>
@@ -17242,8 +17242,8 @@ X511-4 = N.C.</text>
 <segment>
 <pinref part="P+12V_601" gate="1" pin="+12V"/>
 <wire x1="200.66" y1="106.68" x2="88.9" y2="106.68" width="0.1524" layer="91"/>
-<pinref part="F601" gate="G$1" pin="2"/>
 <label x="167.64" y="106.68" size="1.778" layer="95"/>
+<pinref part="F601" gate="G$1" pin="2"/>
 </segment>
 </net>
 <net name="+UB" class="1">
@@ -17252,11 +17252,11 @@ X511-4 = N.C.</text>
 <wire x1="53.34" y1="109.22" x2="53.34" y2="106.68" width="0.1524" layer="91"/>
 <wire x1="53.34" y1="106.68" x2="53.34" y2="96.52" width="0.1524" layer="91"/>
 <wire x1="53.34" y1="96.52" x2="78.74" y2="96.52" width="0.1524" layer="91"/>
-<pinref part="F602" gate="G$1" pin="1"/>
-<pinref part="F601" gate="G$1" pin="1"/>
 <junction x="53.34" y="106.68"/>
 <label x="60.96" y="106.68" size="1.778" layer="95"/>
 <wire x1="78.74" y1="106.68" x2="53.34" y2="106.68" width="0.1524" layer="91"/>
+<pinref part="F601" gate="G$1" pin="1"/>
+<pinref part="F602" gate="G$1" pin="1"/>
 </segment>
 </net>
 <net name="REGIN" class="2">
@@ -17271,8 +17271,8 @@ X511-4 = N.C.</text>
 <wire x1="106.68" y1="96.52" x2="106.68" y2="86.36" width="0.1524" layer="91"/>
 <junction x="106.68" y="96.52"/>
 <wire x1="88.9" y1="96.52" x2="106.68" y2="96.52" width="0.1524" layer="91"/>
-<pinref part="F602" gate="G$1" pin="2"/>
 <label x="124.46" y="96.52" size="1.778" layer="95"/>
+<pinref part="F602" gate="G$1" pin="2"/>
 </segment>
 </net>
 </nets>
