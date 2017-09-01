@@ -6,10 +6,10 @@
 <setting alwaysvectorfont="yes"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.05" unitdist="inch" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.025" altunitdist="inch" altunit="mm"/>
+<grid distance="0.05" unitdist="inch" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.635" altunitdist="mm" altunit="mm"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
-<layer number="2" name="Route2" color="1" fill="3" visible="yes" active="yes"/>
+<layer number="2" name="Route2" color="1" fill="3" visible="no" active="yes"/>
 <layer number="3" name="Route3" color="4" fill="3" visible="no" active="no"/>
 <layer number="4" name="Route4" color="1" fill="4" visible="no" active="no"/>
 <layer number="5" name="Route5" color="4" fill="4" visible="no" active="no"/>
@@ -22,7 +22,7 @@
 <layer number="12" name="Route12" color="1" fill="5" visible="no" active="no"/>
 <layer number="13" name="Route13" color="4" fill="5" visible="no" active="no"/>
 <layer number="14" name="Route14" color="1" fill="6" visible="no" active="no"/>
-<layer number="15" name="Route15" color="4" fill="6" visible="yes" active="yes"/>
+<layer number="15" name="Route15" color="4" fill="6" visible="no" active="yes"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
 <layer number="17" name="Pads" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="18" name="Vias" color="2" fill="1" visible="yes" active="yes"/>
@@ -156,33 +156,33 @@
 </layers>
 <board>
 <plain>
-<wire x1="0" y1="0" x2="99" y2="0" width="0" layer="20"/>
-<wire x1="99" y1="0" x2="99" y2="64.77" width="0" layer="20"/>
-<wire x1="99" y1="64.77" x2="0" y2="64.77" width="0" layer="20"/>
-<wire x1="0" y1="64.77" x2="0" y2="0" width="0" layer="20"/>
-<dimension x1="0" y1="0" x2="0" y2="64.77" x3="-2.15" y3="32.385" textsize="1.016" layer="47"/>
-<dimension x1="0" y1="64.77" x2="99" y2="64.77" x3="49.5" y3="67.125" textsize="1.016" layer="47"/>
-<text x="58.42" y="59.69" size="1.4224" layer="21" ratio="15">LandCruiser-Controller V1.0
+<wire x1="0" y1="0" x2="97.73" y2="0" width="0" layer="20"/>
+<wire x1="97.73" y1="0" x2="97.73" y2="62.865" width="0" layer="20"/>
+<wire x1="97.73" y1="62.865" x2="0" y2="62.865" width="0" layer="20"/>
+<wire x1="0" y1="62.865" x2="0" y2="0" width="0" layer="20"/>
+<dimension x1="0" y1="0" x2="0" y2="62.865" x3="-8.5" y3="31.4325" textsize="1.016" layer="47"/>
+<dimension x1="0" y1="62.865" x2="97.79" y2="62.865" x3="48.895" y3="70.935" textsize="1.016" layer="47"/>
+<text x="10.16" y="57.15" size="1.4224" layer="21" ratio="15">LandCruiser-Controller V1.0
 (c) 2017 by DF4IAH </text>
 <text x="64.77" y="53.975" size="1.016" layer="21" ratio="12">I2C</text>
 <polygon width="0.1" layer="21">
-<vertex x="88.13531875" y="57.8059625"/>
-<vertex x="88.13531875" y="58.120921875" curve="-197"/>
-<vertex x="88.13531875" y="59.50268125"/>
-<vertex x="88.13531875" y="59.817640625" curve="193"/>
+<vertex x="11.30031875" y="53.9959625"/>
+<vertex x="11.30031875" y="54.310921875" curve="-197"/>
+<vertex x="11.30031875" y="55.69268125"/>
+<vertex x="11.30031875" y="56.007640625" curve="193"/>
 </polygon>
 <polygon width="0.1" layer="21">
-<vertex x="89.852359375" y="57.7958"/>
-<vertex x="89.852359375" y="58.1006" curve="-80"/>
-<vertex x="89.059878125" y="58.649240625"/>
-<vertex x="89.649159375" y="58.649240625"/>
-<vertex x="89.649159375" y="58.9642"/>
-<vertex x="89.080196875" y="58.9642" curve="-90"/>
-<vertex x="89.872678125" y="59.49251875"/>
-<vertex x="89.872678125" y="59.827796875" curve="193"/>
+<vertex x="13.017359375" y="53.9858"/>
+<vertex x="13.017359375" y="54.2906" curve="-80"/>
+<vertex x="12.224878125" y="54.839240625"/>
+<vertex x="12.814159375" y="54.839240625"/>
+<vertex x="12.814159375" y="55.1542"/>
+<vertex x="12.245196875" y="55.1542" curve="-90"/>
+<vertex x="13.037678125" y="55.68251875"/>
+<vertex x="13.037678125" y="56.017796875" curve="193"/>
 </polygon>
 <text x="62.23" y="46.355" size="0.6096" layer="21" ratio="20">1</text>
-<text x="58.42" y="17.78" size="1.016" layer="21" ratio="12">X401-1 = GND
+<text x="59.69" y="17.78" size="1.016" layer="21" ratio="12">X401-1 = GND
 X401-2 = SCL
 X401-3 = VCC 5.0V
 X401-4 = SDA
@@ -197,7 +197,7 @@ X111-6 = GND</text>
 <text x="29.21" y="40.64" size="1.016" layer="21" ratio="12">PDI</text>
 <text x="34.29" y="38.735" size="0.6096" layer="21" ratio="20">1</text>
 <text x="26.67" y="32.385" size="1.016" layer="21" ratio="12">debugWIRE</text>
-<text x="1.27" y="52.705" size="1.016" layer="21" ratio="12">INPUT</text>
+<text x="1.27" y="9.525" size="1.016" layer="21" ratio="12">INPUT</text>
 <text x="7.62" y="48.26" size="1.016" layer="21" ratio="12" rot="R90">+Ub</text>
 <text x="7.62" y="43.18" size="1.016" layer="21" ratio="12" rot="R90">GND</text>
 <text x="28.575" y="48.26" size="1.016" layer="21" ratio="12">15 A</text>
@@ -208,8 +208,8 @@ X111-6 = GND</text>
 <text x="7.62" y="27.94" size="1.016" layer="21" ratio="12" rot="R90">SK_O</text>
 <text x="7.62" y="33.02" size="1.016" layer="21" ratio="12" rot="R90">SA_G</text>
 <text x="7.62" y="38.1" size="1.016" layer="21" ratio="12" rot="R90">SA_O</text>
-<text x="92.075" y="52.705" size="1.016" layer="21" ratio="12">OUTPUT</text>
-<text x="41.91" y="55.88" size="1.016" layer="21" ratio="12">X511-1 = TXD
+<text x="92.075" y="9.525" size="1.016" layer="21" ratio="12">OUTPUT</text>
+<text x="50.8" y="55.245" size="1.016" layer="21" ratio="12">X511-1 = TXD
 X511-2 = RXD
 X511-3 = N.C.
 X511-4 = N.C.</text>
@@ -221,6 +221,12 @@ X511-4 = N.C.</text>
 <text x="90.805" y="22.86" size="1.016" layer="21" ratio="12" rot="R90">GND</text>
 <text x="90.805" y="18.415" size="1.016" layer="21" ratio="12" rot="R90">GND</text>
 <text x="90.805" y="12.7" size="1.016" layer="21" ratio="12" rot="R90">GND</text>
+<text x="56.515" y="46.99" size="0.6096" layer="21" ratio="20">1</text>
+<dimension x1="4.5" y1="4.5" x2="4.445" y2="0" x3="-1.878546875" y3="2.25" textsize="0.8128" layer="47" dtype="vertical"/>
+<dimension x1="4.5" y1="58.5" x2="4.445" y2="0" x3="-5.06920625" y3="29.25896875" textsize="0.8128" layer="47"/>
+<dimension x1="4.5" y1="58.5" x2="0" y2="58.5" x3="2.25" y3="64.740084375" textsize="0.8128" layer="47"/>
+<dimension x1="93.5" y1="58.5" x2="0" y2="58.5" x3="46.75" y3="68.60478125" textsize="0.8128" layer="47"/>
+<text x="7.62" y="1.27" size="0.8128" layer="51">4x 2.8 mm</text>
 </plain>
 <libraries>
 <library name="df4iah_connector">
@@ -2024,16 +2030,16 @@ Your Eurocircuits Team
 <attribute name="VALUE" x="66.04" y="48.895" size="0.6096" layer="27"/>
 </element>
 <element name="R491" library="rcl" package="R0805" value="2k2R" x="60.325" y="50.165" smashed="yes" rot="R270">
-<attribute name="NAME" x="60.325" y="52.705" size="0.8128" layer="25" rot="R90"/>
+<attribute name="NAME" x="59.055" y="52.705" size="0.8128" layer="25"/>
 <attribute name="VALUE" x="57.785" y="50.8" size="1.27" layer="27" rot="R270"/>
 </element>
 <element name="R492" library="rcl" package="R0805" value="2k2R" x="67.945" y="44.45" smashed="yes" rot="R180">
 <attribute name="NAME" x="71.12" y="43.815" size="0.8128" layer="25" rot="R90"/>
 <attribute name="VALUE" x="68.58" y="46.99" size="1.27" layer="27" rot="R180"/>
 </element>
-<element name="C401" library="rcl" package="C0805" value="100nF" x="64.135" y="44.45" smashed="yes" rot="R180">
-<attribute name="NAME" x="59.055" y="43.815" size="0.8128" layer="25"/>
-<attribute name="VALUE" x="65.405" y="46.99" size="1.27" layer="27" rot="R180"/>
+<element name="C401" library="rcl" package="C0805" value="100nF" x="63.5" y="44.45" smashed="yes" rot="R180">
+<attribute name="NAME" x="58.42" y="43.815" size="0.8128" layer="25"/>
+<attribute name="VALUE" x="64.77" y="46.99" size="1.27" layer="27" rot="R180"/>
 </element>
 <element name="C101" library="rcl" package="C0805" value="100nF" x="46.355" y="20.955" smashed="yes" rot="MR180">
 <attribute name="NAME" x="47.625" y="22.225" size="0.8128" layer="26" rot="MR0"/>
@@ -2051,10 +2057,10 @@ Your Eurocircuits Team
 <attribute name="NAME" x="45.085" y="38.735" size="0.8128" layer="25" ratio="20"/>
 <attribute name="VALUE" x="45.72" y="28.575" size="1.27" layer="27" ratio="10" rot="R270"/>
 </element>
-<element name="H703" library="holes" package="2,8-PAD" value="MOUNT-PAD-ROUND2.8" x="4.96" y="4.96" smashed="yes"/>
-<element name="H701" library="holes" package="2,8-PAD" value="MOUNT-PAD-ROUND2.8" x="4.96" y="59.96"/>
-<element name="H702" library="holes" package="2,8-PAD" value="MOUNT-PAD-ROUND2.8" x="93.77" y="59.96"/>
-<element name="H704" library="holes" package="2,8-PAD" value="MOUNT-PAD-ROUND2.8" x="93.77" y="4.96" smashed="yes"/>
+<element name="H703" library="holes" package="2,8-PAD" value="MOUNT-PAD-ROUND2.8" x="4.5" y="4.5" smashed="yes"/>
+<element name="H701" library="holes" package="2,8-PAD" value="MOUNT-PAD-ROUND2.8" x="4.5" y="58.5"/>
+<element name="H702" library="holes" package="2,8-PAD" value="MOUNT-PAD-ROUND2.8" x="93.5" y="58.5"/>
+<element name="H704" library="holes" package="2,8-PAD" value="MOUNT-PAD-ROUND2.8" x="93.5" y="4.5" smashed="yes"/>
 <element name="R131" library="rcl" package="R0805" value="33kR" x="54.61" y="13.97" smashed="yes" rot="R180">
 <attribute name="NAME" x="52.705" y="15.24" size="0.8128" layer="25"/>
 <attribute name="VALUE" x="55.245" y="16.51" size="1.27" layer="27" rot="R180"/>
@@ -2092,7 +2098,7 @@ Your Eurocircuits Team
 <attribute name="VALUE" x="34.29" y="40.64" size="1.27" layer="27" rot="R180"/>
 </element>
 <element name="U611" library="df4iah_powersupply" package="TO220H" value="LM7805" x="29.21" y="22.86" smashed="yes">
-<attribute name="NAME" x="23.749" y="11.938" size="0.8128" layer="25" ratio="20" rot="R90"/>
+<attribute name="NAME" x="22.479" y="15.748" size="0.8128" layer="25" ratio="20" rot="R90"/>
 <attribute name="VALUE" x="36.576" y="11.811" size="1.778" layer="27" ratio="10" rot="R90"/>
 </element>
 <element name="C621" library="rcl" package="C0805" value="22uF" x="32.385" y="6.35" smashed="yes" rot="R270">
@@ -2104,7 +2110,7 @@ Your Eurocircuits Team
 <attribute name="VALUE" x="23.495" y="3.302" size="1.27" layer="27" ratio="10" rot="R270"/>
 </element>
 <element name="X201" library="df4iah_connector" package="WIRE-TO-BOARD_5MM08_1X08" value="WEIDMUELLER 1234600000" x="3.81" y="31.75" smashed="yes" rot="R180">
-<attribute name="NAME" x="1.27" y="54.61" size="0.8128" layer="25" ratio="20"/>
+<attribute name="NAME" x="1.27" y="52.705" size="0.8128" layer="25" ratio="20"/>
 <attribute name="VALUE" x="6.35" y="53.975" size="1.27" layer="27" rot="R180"/>
 </element>
 <element name="R216" library="rcl" package="R0805" value="56R" x="10.16" y="39.37" smashed="yes" rot="MR180">
@@ -2128,7 +2134,7 @@ Your Eurocircuits Team
 <attribute name="VALUE" x="9.525" y="21.59" size="1.27" layer="28" rot="MR180"/>
 </element>
 <element name="X321" library="df4iah_connector" package="WIRE-TO-BOARD_5MM08_1X08" value="WEIDMUELLER 1234600000" x="93.98" y="31.75" smashed="yes">
-<attribute name="NAME" x="92.075" y="54.61" size="0.8128" layer="25" ratio="20"/>
+<attribute name="NAME" x="92.075" y="52.705" size="0.8128" layer="25" ratio="20"/>
 <attribute name="VALUE" x="91.44" y="9.525" size="1.27" layer="27"/>
 </element>
 <element name="D601" library="df4iah_diode" package="SOD80C" value="CRS08" x="24.765" y="36.195" smashed="yes" rot="R270">
@@ -2215,7 +2221,7 @@ Your Eurocircuits Team
 <attribute name="VALUE" x="36.83" y="43.18" size="1.27" layer="27" rot="R270"/>
 </element>
 <element name="C511" library="rcl" package="C0805" value="1uF" x="53.34" y="50.8" smashed="yes" rot="R270">
-<attribute name="NAME" x="53.975" y="53.34" size="0.8128" layer="25" rot="R90"/>
+<attribute name="NAME" x="51.435" y="48.895" size="0.8128" layer="25" rot="R90"/>
 <attribute name="VALUE" x="50.8" y="52.07" size="1.27" layer="27" rot="R270"/>
 </element>
 <element name="X511" library="df4iah_connector" package="2X02" value="" x="53.975" y="44.45" smashed="yes" rot="R180">
@@ -2254,6 +2260,14 @@ Your Eurocircuits Team
 <attribute name="NAME" x="14.605" y="30.48" size="0.8128" layer="26" rot="MR0"/>
 <attribute name="VALUE" x="14.605" y="26.67" size="1.27" layer="28" rot="MR0"/>
 </element>
+<element name="C602" library="rcl" package="C0805" value="100nF" x="22.86" y="11.43" smashed="yes" rot="R180">
+<attribute name="NAME" x="21.59" y="12.7" size="0.8128" layer="25"/>
+<attribute name="VALUE" x="24.13" y="13.97" size="1.27" layer="27" rot="R180"/>
+</element>
+<element name="C301" library="rcl" package="C0805" value="100nF" x="72.39" y="3.81" smashed="yes" rot="R90">
+<attribute name="NAME" x="71.12" y="2.54" size="0.8128" layer="25" rot="R90"/>
+<attribute name="VALUE" x="74.93" y="2.54" size="1.27" layer="27" rot="R90"/>
+</element>
 </elements>
 <signals>
 <signal name="GND">
@@ -2261,15 +2275,15 @@ Your Eurocircuits Team
 <contactref element="X401" pad="6"/>
 <polygon width="0.3" layer="16">
 <vertex x="0" y="0"/>
-<vertex x="0" y="64.77"/>
-<vertex x="99.06" y="64.77"/>
-<vertex x="99.06" y="0"/>
+<vertex x="0" y="62.865"/>
+<vertex x="97.79" y="62.865"/>
+<vertex x="97.79" y="0"/>
 </polygon>
 <polygon width="0.3" layer="1">
 <vertex x="0" y="0"/>
-<vertex x="0" y="64.77"/>
-<vertex x="99.06" y="64.77"/>
-<vertex x="99.06" y="0"/>
+<vertex x="0" y="62.865"/>
+<vertex x="97.79" y="62.865"/>
+<vertex x="97.79" y="0"/>
 </polygon>
 <contactref element="U101" pad="8"/>
 <contactref element="C102" pad="1"/>
@@ -2311,13 +2325,34 @@ Your Eurocircuits Team
 <contactref element="U501" pad="8"/>
 <contactref element="U501" pad="10"/>
 <contactref element="R231" pad="1"/>
-<wire x1="17.125" y1="28.2131" x2="18.425" y2="28.2131" width="0" layer="19" extent="16-16"/>
-<wire x1="17.775" y1="22.5869" x2="18.425" y2="28.2131" width="0" layer="19" extent="16-16"/>
-<wire x1="19.075" y1="22.5869" x2="17.775" y2="22.5869" width="0" layer="19" extent="16-16"/>
-<wire x1="48.32" y1="50.165" x2="46.67" y2="49.53" width="0" layer="19" extent="1-16"/>
-<wire x1="55.56" y1="6.35" x2="55.56" y2="2.54" width="0" layer="19" extent="1-1"/>
-<wire x1="55.56" y1="10.16" x2="55.56" y2="6.35" width="0" layer="19" extent="1-1"/>
-<wire x1="55.56" y1="13.97" x2="55.56" y2="10.16" width="0" layer="19" extent="1-1"/>
+<via x="32.385" y="3.81" extent="1-16" drill="0.6" shape="octagon"/>
+<wire x1="24.765" y1="34.495" x2="27.51" y2="34.495" width="1.016" layer="1"/>
+<wire x1="27.51" y1="34.495" x2="27.94" y2="34.925" width="1.016" layer="1"/>
+<via x="17.145" y="33.655" extent="1-16" drill="0.6" shape="octagon"/>
+<via x="20.32" y="24.511" extent="1-16" drill="0.6" shape="octagon"/>
+<via x="15.24" y="11.43" extent="1-16" drill="0.6" shape="octagon"/>
+<via x="41.91" y="40.64" extent="1-16" drill="0.6" shape="octagon"/>
+<via x="45.085" y="52.705" extent="1-16" drill="0.6" shape="octagon"/>
+<via x="53.34" y="24.13" extent="1-16" drill="0.6" shape="octagon"/>
+<via x="54.61" y="34.29" extent="1-16" drill="0.6" shape="octagon"/>
+<via x="56.515" y="13.97" extent="1-16" drill="0.6" shape="octagon"/>
+<via x="56.515" y="10.16" extent="1-16" drill="0.6" shape="octagon"/>
+<via x="56.515" y="6.35" extent="1-16" drill="0.6" shape="octagon"/>
+<via x="71.755" y="6.35" extent="1-16" drill="0.6" shape="octagon"/>
+<via x="19.685" y="19.685" extent="1-16" drill="0.6" shape="octagon"/>
+<via x="16.51" y="30.734" extent="1-16" drill="0.6" shape="octagon"/>
+<wire x1="17.775" y1="22.5869" x2="17.78" y2="22.5869" width="0.3048" layer="16"/>
+<wire x1="17.78" y1="22.5869" x2="17.78" y2="20.955" width="0.3048" layer="16"/>
+<wire x1="17.78" y1="20.955" x2="19.05" y2="19.685" width="0.3048" layer="16"/>
+<wire x1="19.05" y1="19.685" x2="19.685" y2="19.685" width="0.3048" layer="16"/>
+<wire x1="18.425" y1="28.2131" x2="18.425" y2="29.2" width="0.3048" layer="16"/>
+<wire x1="18.425" y1="29.2" x2="18.415" y2="29.21" width="0.3048" layer="16"/>
+<wire x1="18.415" y1="29.21" x2="18.415" y2="31.115" width="0.3048" layer="16"/>
+<wire x1="18.415" y1="31.115" x2="19.05" y2="32.385" width="0.3048" layer="16"/>
+<wire x1="19.05" y1="32.385" x2="18.415" y2="32.385" width="0.3048" layer="16"/>
+<wire x1="18.415" y1="32.385" x2="17.145" y2="33.655" width="0.3048" layer="16"/>
+<contactref element="C602" pad="2"/>
+<contactref element="C301" pad="2"/>
 </signal>
 <signal name="+5V" class="2">
 <contactref element="X401" pad="3"/>
@@ -2346,19 +2381,20 @@ Your Eurocircuits Team
 <wire x1="31.75" y1="8.255" x2="32.04278125" y2="7.814675" width="0.6096" layer="1"/>
 <wire x1="32.04278125" y1="7.814675" x2="32.385" y2="7.3" width="0.6096" layer="1"/>
 <wire x1="42.545" y1="21.59" x2="41.275" y2="21.59" width="0.3048" layer="1"/>
-<wire x1="41.275" y1="21.59" x2="35.56" y2="15.875" width="0.6096" layer="1"/>
-<wire x1="35.56" y1="15.875" x2="35.56" y2="10.16" width="0.6096" layer="1"/>
-<wire x1="35.56" y1="10.16" x2="33.02" y2="7.62" width="0.6096" layer="1"/>
+<wire x1="41.275" y1="21.59" x2="37.465" y2="17.78" width="0.6096" layer="1"/>
+<wire x1="37.465" y1="17.78" x2="37.465" y2="12.065" width="0.6096" layer="1"/>
+<wire x1="37.465" y1="12.065" x2="33.02" y2="7.62" width="0.6096" layer="1"/>
 <wire x1="33.02" y1="7.62" x2="32.385" y2="7.3" width="0.6096" layer="1"/>
-<via x="17.145" y="19.05" extent="1-16" drill="0.6" shape="octagon"/>
-<wire x1="17.145" y1="19.05" x2="24.13" y2="12.065" width="0.3048" layer="1"/>
-<wire x1="24.13" y1="12.065" x2="24.13" y2="5.08" width="0.3048" layer="1"/>
-<wire x1="24.13" y1="5.08" x2="26.035" y2="3.175" width="0.3048" layer="1"/>
+<via x="16.51" y="19.05" extent="1-16" drill="0.6" shape="octagon"/>
+<wire x1="16.51" y1="19.05" x2="16.51" y2="12.7" width="0.3048" layer="1"/>
+<wire x1="16.51" y1="12.7" x2="26.035" y2="3.175" width="0.3048" layer="1"/>
 <wire x1="26.035" y1="3.175" x2="27.305" y2="3.175" width="0.3048" layer="1"/>
 <wire x1="27.305" y1="3.175" x2="30.48" y2="6.35" width="0.3048" layer="1"/>
 <wire x1="30.48" y1="6.35" x2="32.04278125" y2="7.814675" width="0.3048" layer="1"/>
-<wire x1="41.275" y1="21.59" x2="35.56" y2="27.305" width="0.6096" layer="1"/>
-<wire x1="35.56" y1="27.305" x2="35.56" y2="34.29" width="0.6096" layer="1"/>
+<wire x1="41.275" y1="21.59" x2="40.005" y2="22.86" width="0.6096" layer="1"/>
+<wire x1="40.005" y1="22.86" x2="40.005" y2="32.385" width="0.6096" layer="1"/>
+<wire x1="40.005" y1="32.385" x2="38.1" y2="34.29" width="0.6096" layer="1"/>
+<wire x1="38.1" y1="34.29" x2="35.56" y2="34.29" width="0.6096" layer="1"/>
 <wire x1="35.56" y1="34.29" x2="36.83" y2="35.56" width="0.3048" layer="1"/>
 <wire x1="36.83" y1="35.56" x2="36.83" y2="36.195" width="0.3048" layer="1"/>
 <wire x1="36.83" y1="36.195" x2="37.15" y2="36.83" width="0.3048" layer="1"/>
@@ -2366,9 +2402,9 @@ Your Eurocircuits Team
 <wire x1="33.655" y1="34.29" x2="33.02" y2="34.925" width="0.6096" layer="1"/>
 <wire x1="66.675" y1="48.26" x2="66.675" y2="46.355" width="0.3048" layer="1"/>
 <wire x1="66.675" y1="46.355" x2="65.405" y2="46.355" width="0.3048" layer="1"/>
-<wire x1="65.405" y1="46.355" x2="65.405" y2="45.085" width="0.3048" layer="1"/>
-<wire x1="65.405" y1="45.085" x2="65.085" y2="44.45" width="0.3048" layer="1"/>
-<wire x1="66.995" y1="44.45" x2="65.085" y2="44.45" width="0.3048" layer="1"/>
+<wire x1="65.405" y1="46.355" x2="65.405" y2="44.45" width="0.3048" layer="1"/>
+<wire x1="66.995" y1="44.45" x2="65.405" y2="44.45" width="0.3048" layer="1"/>
+<wire x1="65.405" y1="44.45" x2="64.45" y2="44.45" width="0.3048" layer="1"/>
 <wire x1="53.34" y1="51.75" x2="52.705" y2="51.435" width="0.3048" layer="1"/>
 <wire x1="52.705" y1="51.435" x2="56.515" y2="51.435" width="0.3048" layer="1"/>
 <wire x1="56.515" y1="51.435" x2="59.055" y2="48.895" width="0.3048" layer="1"/>
@@ -2384,7 +2420,7 @@ Your Eurocircuits Team
 <wire x1="34.29" y1="34.925" x2="33.02" y2="34.925" width="0.6096" layer="16"/>
 <contactref element="R124" pad="1"/>
 <contactref element="R123" pad="1"/>
-<wire x1="17.145" y1="19.05" x2="14.92" y2="19.05" width="0.3048" layer="16"/>
+<wire x1="16.51" y1="19.05" x2="14.92" y2="19.05" width="0.3048" layer="16"/>
 <wire x1="14.92" y1="19.05" x2="14.92" y2="24.13" width="0.3048" layer="16"/>
 <wire x1="14.92" y1="24.13" x2="14.92" y2="29.21" width="0.3048" layer="16"/>
 <wire x1="14.92" y1="29.21" x2="14.92" y2="34.29" width="0.3048" layer="16"/>
@@ -2476,14 +2512,16 @@ Your Eurocircuits Team
 <wire x1="13.335" y1="21.59" x2="12.7" y2="22.225" width="0.3048" layer="16"/>
 <wire x1="12.7" y1="22.225" x2="12.7" y2="23.495" width="0.3048" layer="16"/>
 <wire x1="12.7" y1="23.495" x2="13.02" y2="24.13" width="0.3048" layer="16"/>
-<wire x1="17.145" y1="22.225" x2="17.145" y2="20.955" width="0.3048" layer="16"/>
-<wire x1="17.145" y1="20.955" x2="18.415" y2="19.685" width="0.3048" layer="16"/>
-<wire x1="18.415" y1="19.685" x2="27.94" y2="19.685" width="0.3048" layer="16"/>
-<wire x1="27.94" y1="19.685" x2="33.02" y2="24.765" width="0.3048" layer="16"/>
-<via x="33.02" y="24.765" extent="1-16" drill="0.6" shape="octagon"/>
-<wire x1="33.02" y1="24.765" x2="34.925" y2="22.86" width="0.3048" layer="1"/>
-<via x="34.925" y="22.86" extent="1-16" drill="0.6" shape="octagon"/>
-<wire x1="34.925" y1="22.86" x2="41.275" y2="16.51" width="0.3048" layer="16"/>
+<wire x1="17.145" y1="22.225" x2="17.145" y2="20.32" width="0.3048" layer="16"/>
+<wire x1="17.145" y1="20.32" x2="19.05" y2="18.415" width="0.3048" layer="16"/>
+<wire x1="19.05" y1="18.415" x2="19.685" y2="18.415" width="0.3048" layer="16"/>
+<wire x1="19.685" y1="18.415" x2="26.035" y2="24.765" width="0.3048" layer="16"/>
+<wire x1="26.035" y1="24.765" x2="38.735" y2="24.765" width="0.3048" layer="16"/>
+<via x="38.735" y="24.765" extent="1-16" drill="0.6" shape="octagon"/>
+<wire x1="38.735" y1="24.765" x2="38.735" y2="21.59" width="0.3048" layer="1"/>
+<via x="38.735" y="21.59" extent="1-16" drill="0.6" shape="octagon"/>
+<wire x1="38.735" y1="21.59" x2="38.735" y2="19.05" width="0.3048" layer="16"/>
+<wire x1="38.735" y1="19.05" x2="41.275" y2="16.51" width="0.3048" layer="16"/>
 <wire x1="41.275" y1="16.51" x2="42.545" y2="16.51" width="0.3048" layer="16"/>
 </signal>
 <signal name="MP_FB">
@@ -2493,9 +2531,10 @@ Your Eurocircuits Team
 <wire x1="11.11" y1="19.05" x2="13.02" y2="19.05" width="0.3048" layer="16"/>
 <wire x1="13.02" y1="19.05" x2="13.02" y2="17.46" width="0.3048" layer="16"/>
 <wire x1="13.02" y1="17.46" x2="13.335" y2="17.145" width="0.3048" layer="16"/>
-<wire x1="13.335" y1="17.145" x2="27.305" y2="17.145" width="0.3048" layer="16"/>
-<wire x1="27.305" y1="17.145" x2="34.29" y2="24.13" width="0.3048" layer="16"/>
-<wire x1="34.29" y1="24.13" x2="42.545" y2="24.13" width="0.3048" layer="16"/>
+<wire x1="13.335" y1="17.145" x2="19.685" y2="17.145" width="0.3048" layer="16"/>
+<wire x1="19.685" y1="17.145" x2="26.035" y2="23.495" width="0.3048" layer="16"/>
+<wire x1="26.035" y1="23.495" x2="41.275" y2="23.495" width="0.3048" layer="16"/>
+<wire x1="41.275" y1="23.495" x2="42.545" y2="24.13" width="0.3048" layer="16"/>
 </signal>
 <signal name="MP_SK_O">
 <contactref element="U101" pad="10"/>
@@ -2513,17 +2552,19 @@ Your Eurocircuits Team
 <wire x1="12.7" y1="27.305" x2="12.7" y2="28.575" width="0.3048" layer="16"/>
 <wire x1="12.7" y1="28.575" x2="13.02" y2="29.21" width="0.3048" layer="16"/>
 <wire x1="42.545" y1="13.97" x2="41.91" y2="13.97" width="0.3048" layer="16"/>
-<wire x1="41.91" y1="13.97" x2="36.195" y2="19.685" width="0.3048" layer="16"/>
+<wire x1="41.91" y1="13.97" x2="37.465" y2="18.415" width="0.3048" layer="16"/>
+<wire x1="37.465" y1="18.415" x2="37.465" y2="22.225" width="0.3048" layer="16"/>
 <wire x1="18.425" y1="22.5869" x2="18.425" y2="21.6" width="0.3048" layer="16"/>
 <wire x1="18.425" y1="21.6" x2="18.415" y2="21.59" width="0.3048" layer="16"/>
 <wire x1="18.415" y1="21.59" x2="19.05" y2="20.955" width="0.3048" layer="16"/>
-<wire x1="19.05" y1="20.955" x2="24.765" y2="20.955" width="0.3048" layer="16"/>
-<wire x1="24.765" y1="20.955" x2="25.4" y2="21.59" width="0.3048" layer="16"/>
-<via x="25.4" y="21.59" extent="1-16" drill="0.6" shape="octagon"/>
-<wire x1="25.4" y1="21.59" x2="29.845" y2="17.145" width="0.3048" layer="1"/>
-<wire x1="29.845" y1="17.145" x2="33.655" y2="17.145" width="0.3048" layer="1"/>
-<wire x1="33.655" y1="17.145" x2="36.195" y2="19.685" width="0.3048" layer="1"/>
-<via x="36.195" y="19.685" extent="1-16" drill="0.6" shape="octagon"/>
+<wire x1="19.05" y1="20.955" x2="19.685" y2="20.955" width="0.3048" layer="16"/>
+<wire x1="19.685" y1="20.955" x2="22.225" y2="23.495" width="0.3048" layer="16"/>
+<wire x1="22.225" y1="23.495" x2="22.225" y2="26.67" width="0.3048" layer="16"/>
+<wire x1="22.225" y1="26.67" x2="26.035" y2="30.48" width="0.3048" layer="16"/>
+<wire x1="26.035" y1="30.48" x2="37.465" y2="30.48" width="0.3048" layer="16"/>
+<via x="37.465" y="30.48" extent="1-16" drill="0.6" shape="octagon"/>
+<wire x1="37.465" y1="30.48" x2="37.465" y2="22.225" width="0.3048" layer="1"/>
+<via x="37.465" y="22.225" extent="1-16" drill="0.6" shape="octagon"/>
 </signal>
 <signal name="MP_SA_G">
 <contactref element="U101" pad="12"/>
@@ -2531,7 +2572,8 @@ Your Eurocircuits Team
 <contactref element="U221" pad="2"/>
 <contactref element="R125" pad="1"/>
 <wire x1="11.11" y1="34.29" x2="13.02" y2="34.29" width="0.3048" layer="16"/>
-<wire x1="17.775" y1="28.2131" x2="17.78" y2="31.75" width="0.3048" layer="16"/>
+<wire x1="17.775" y1="28.2131" x2="17.78" y2="31.115" width="0.3048" layer="16"/>
+<wire x1="17.78" y1="31.115" x2="17.78" y2="31.75" width="0.3048" layer="16"/>
 <via x="17.78" y="31.75" extent="1-16" drill="0.6" shape="octagon"/>
 <wire x1="17.78" y1="31.75" x2="13.335" y2="31.75" width="0.3048" layer="1"/>
 <via x="13.335" y="31.75" extent="1-16" drill="0.6" shape="octagon"/>
@@ -2540,14 +2582,15 @@ Your Eurocircuits Team
 <wire x1="12.7" y1="33.655" x2="13.02" y2="34.29" width="0.3048" layer="16"/>
 <wire x1="17.775" y1="28.2131" x2="17.775" y2="27.31" width="0.3048" layer="16"/>
 <wire x1="17.775" y1="27.31" x2="18.415" y2="26.67" width="0.3048" layer="16"/>
-<wire x1="18.415" y1="26.67" x2="22.86" y2="26.67" width="0.3048" layer="16"/>
-<wire x1="22.86" y1="26.67" x2="26.035" y2="23.495" width="0.3048" layer="16"/>
-<wire x1="26.035" y1="23.495" x2="29.21" y2="23.495" width="0.3048" layer="16"/>
-<wire x1="29.21" y1="23.495" x2="29.845" y2="24.13" width="0.3048" layer="16"/>
-<via x="29.845" y="24.13" extent="1-16" drill="0.6" shape="octagon"/>
-<wire x1="29.845" y1="24.13" x2="33.02" y2="20.955" width="0.3048" layer="1"/>
-<via x="33.02" y="20.955" extent="1-16" drill="0.6" shape="octagon"/>
-<wire x1="33.02" y1="20.955" x2="38.735" y2="15.24" width="0.3048" layer="16"/>
+<wire x1="18.415" y1="26.67" x2="19.685" y2="26.67" width="0.3048" layer="16"/>
+<wire x1="19.685" y1="26.67" x2="24.765" y2="31.115" width="0.3048" layer="16"/>
+<wire x1="24.765" y1="31.115" x2="35.56" y2="31.115" width="0.3048" layer="16"/>
+<wire x1="35.56" y1="31.115" x2="36.195" y2="31.75" width="0.3048" layer="16"/>
+<via x="36.195" y="31.75" extent="1-16" drill="0.6" shape="octagon"/>
+<wire x1="36.195" y1="31.75" x2="36.195" y2="21.59" width="0.3048" layer="1"/>
+<via x="36.195" y="21.59" extent="1-16" drill="0.6" shape="octagon"/>
+<wire x1="36.195" y1="21.59" x2="36.195" y2="17.78" width="0.3048" layer="16"/>
+<wire x1="36.195" y1="17.78" x2="38.735" y2="15.24" width="0.3048" layer="16"/>
 <wire x1="38.735" y1="15.24" x2="38.735" y2="10.16" width="0.3048" layer="16"/>
 <wire x1="38.735" y1="10.16" x2="40.005" y2="8.89" width="0.3048" layer="16"/>
 <wire x1="40.005" y1="8.89" x2="42.545" y2="8.89" width="0.3048" layer="16"/>
@@ -2562,20 +2605,16 @@ Your Eurocircuits Team
 <wire x1="13.335" y1="40.005" x2="13.335" y2="40.64" width="0.3048" layer="16"/>
 <wire x1="13.335" y1="40.64" x2="13.97" y2="41.275" width="0.3048" layer="16"/>
 <wire x1="13.97" y1="41.275" x2="15.875" y2="41.275" width="0.3048" layer="16"/>
-<wire x1="15.875" y1="41.275" x2="19.05" y2="38.1" width="0.3048" layer="16"/>
-<wire x1="19.05" y1="38.1" x2="19.05" y2="31.75" width="0.3048" layer="16"/>
-<wire x1="19.05" y1="31.75" x2="19.075" y2="28.2131" width="0.3048" layer="16"/>
-<wire x1="19.075" y1="28.2131" x2="19.3231" y2="28.2131" width="0.3048" layer="16"/>
-<wire x1="19.3231" y1="28.2131" x2="19.685" y2="28.575" width="0.3048" layer="16"/>
-<wire x1="19.685" y1="28.575" x2="23.495" y2="28.575" width="0.3048" layer="16"/>
-<wire x1="23.495" y1="28.575" x2="26.67" y2="25.4" width="0.3048" layer="16"/>
-<via x="26.67" y="25.4" extent="1-16" drill="0.6" shape="octagon"/>
-<wire x1="26.67" y1="25.4" x2="33.02" y2="19.05" width="0.3048" layer="1"/>
-<via x="33.02" y="19.05" extent="1-16" drill="0.6" shape="octagon"/>
-<wire x1="33.02" y1="19.05" x2="37.465" y2="14.605" width="0.3048" layer="16"/>
-<wire x1="37.465" y1="14.605" x2="37.465" y2="8.255" width="0.3048" layer="16"/>
-<wire x1="37.465" y1="8.255" x2="39.37" y2="6.35" width="0.3048" layer="16"/>
-<wire x1="39.37" y1="6.35" x2="42.545" y2="6.35" width="0.3048" layer="16"/>
+<wire x1="15.875" y1="41.275" x2="19.685" y2="37.465" width="0.3048" layer="16"/>
+<wire x1="19.685" y1="37.465" x2="19.685" y2="32.385" width="0.3048" layer="16"/>
+<wire x1="19.685" y1="32.385" x2="19.075" y2="29.21" width="0.3048" layer="16"/>
+<wire x1="19.075" y1="29.21" x2="19.075" y2="28.2131" width="0.3048" layer="16"/>
+<wire x1="19.685" y1="32.385" x2="34.925" y2="32.385" width="0.3048" layer="16"/>
+<via x="34.925" y="32.385" extent="1-16" drill="0.6" shape="octagon"/>
+<wire x1="34.925" y1="32.385" x2="34.925" y2="12.065" width="0.3048" layer="1"/>
+<via x="34.925" y="12.065" extent="1-16" drill="0.6" shape="octagon"/>
+<wire x1="34.925" y1="12.065" x2="40.64" y2="6.35" width="0.3048" layer="16"/>
+<wire x1="40.64" y1="6.35" x2="42.545" y2="6.35" width="0.3048" layer="16"/>
 </signal>
 <signal name="MP_M2">
 <contactref element="U101" pad="16"/>
@@ -2666,7 +2705,8 @@ Your Eurocircuits Team
 <contactref element="F601" pad="4"/>
 <wire x1="59.9821" y1="3.81" x2="60.96" y2="3.81" width="0.6096" layer="1"/>
 <wire x1="60.96" y1="3.81" x2="62.865" y2="1.905" width="0.6096" layer="1"/>
-<wire x1="62.865" y1="1.905" x2="81.28" y2="1.905" width="0.6096" layer="1"/>
+<wire x1="62.865" y1="1.905" x2="72.39" y2="1.905" width="0.6096" layer="1"/>
+<wire x1="72.39" y1="1.905" x2="81.28" y2="1.905" width="0.6096" layer="1"/>
 <wire x1="81.28" y1="1.905" x2="83.25" y2="4.76" width="0.6096" layer="1"/>
 <wire x1="77.47" y1="10.59" x2="78.105" y2="11.43" width="0.4064" layer="16"/>
 <wire x1="78.105" y1="11.43" x2="82.55" y2="11.43" width="0.4064" layer="16"/>
@@ -2685,7 +2725,8 @@ Your Eurocircuits Team
 <wire x1="24.78" y1="49.53" x2="37.465" y2="49.53" width="1.4224" layer="16"/>
 <wire x1="37.465" y1="49.53" x2="46.99" y2="40.005" width="1.4224" layer="16"/>
 <wire x1="46.99" y1="40.005" x2="62.23" y2="40.005" width="1.4224" layer="16"/>
-<wire x1="67.105" y1="40.005" x2="62.23" y2="40.005" width="1.4224" layer="16"/>
+<wire x1="67.105" y1="40.005" x2="66.6" y2="40.005" width="1.4224" layer="16"/>
+<wire x1="66.6" y1="40.005" x2="62.23" y2="40.005" width="1.4224" layer="16"/>
 <wire x1="62.23" y1="40.005" x2="62.23" y2="38.53" width="1.4224" layer="16"/>
 <wire x1="68.01" y1="32.7" x2="68.01" y2="32.75" width="1.4224" layer="16"/>
 <wire x1="68.01" y1="32.75" x2="67.31" y2="33.02" width="1.4224" layer="16"/>
@@ -2714,7 +2755,10 @@ Your Eurocircuits Team
 <wire x1="67.615" y1="39.7" x2="69.215" y2="38.1" width="1.4224" layer="16"/>
 <wire x1="69.215" y1="38.1" x2="77.04" y2="38.1" width="1.4224" layer="16"/>
 <wire x1="77.04" y1="38.1" x2="77.47" y2="38.53" width="1.4224" layer="16"/>
-<wire x1="67.31" y1="40.005" x2="67.105" y2="40.005" width="0" layer="19" extent="16-16"/>
+<wire x1="66.6" y1="40.05" x2="66.6" y2="40.005" width="1.5" layer="16"/>
+<wire x1="66.6" y1="40.05" x2="67.31" y2="40.005" width="1.5" layer="16"/>
+<contactref element="C301" pad="1"/>
+<wire x1="72.39" y1="2.86" x2="72.39" y2="1.905" width="0.6096" layer="1"/>
 </signal>
 <signal name="ECU_FB">
 <contactref element="R212" pad="1"/>
@@ -2757,10 +2801,10 @@ Your Eurocircuits Team
 <contactref element="K311" pad="4"/>
 <wire x1="93.98" y1="49.53" x2="93.345" y2="49.53" width="1.5" layer="1"/>
 <wire x1="93.345" y1="49.53" x2="92.075" y2="50.8" width="1.5" layer="1"/>
-<wire x1="92.075" y1="50.8" x2="92.075" y2="53.975" width="1.5" layer="1"/>
-<wire x1="92.075" y1="53.975" x2="88.265" y2="57.785" width="1.5" layer="1"/>
-<wire x1="88.265" y1="57.785" x2="77.47" y2="57.785" width="1.5" layer="1"/>
-<wire x1="77.47" y1="57.785" x2="73.66" y2="54.61" width="1.5" layer="1"/>
+<wire x1="92.075" y1="50.8" x2="92.075" y2="52.705" width="1.5" layer="1"/>
+<wire x1="92.075" y1="52.705" x2="87.63" y2="57.785" width="1.5" layer="1"/>
+<wire x1="87.63" y1="57.785" x2="76.835" y2="57.785" width="1.5" layer="1"/>
+<wire x1="76.835" y1="57.785" x2="73.66" y2="54.61" width="1.5" layer="1"/>
 <wire x1="73.66" y1="54.61" x2="73.66" y2="46.99" width="1.5" layer="1"/>
 <wire x1="73.66" y1="46.99" x2="71.755" y2="45.085" width="1.5" layer="1"/>
 <wire x1="71.755" y1="45.085" x2="71.12" y2="41.275" width="1.5" layer="1"/>
@@ -2877,6 +2921,9 @@ Your Eurocircuits Team
 <wire x1="24.13" y1="38.1" x2="24.13" y2="43.18" width="0.6096" layer="1"/>
 <wire x1="24.13" y1="43.18" x2="24.78" y2="44.45" width="0.6096" layer="1"/>
 <wire x1="24.78" y1="44.45" x2="19.78" y2="44.45" width="0.6096" layer="16"/>
+<contactref element="C602" pad="1"/>
+<wire x1="23.81" y1="11.43" x2="24.13" y2="11.43" width="0.3048" layer="1"/>
+<wire x1="24.13" y1="11.43" x2="25.4" y2="12.7" width="0.6096" layer="1"/>
 </signal>
 <signal name="MX_C2M">
 <contactref element="C502" pad="2"/>
@@ -3142,6 +3189,67 @@ Your Eurocircuits Team
 <approved hash="3,1,b9ce2ad22d63be7f"/>
 <approved hash="3,16,a0831d9f1995a489"/>
 <approved hash="3,1,07ab2e452175089b"/>
+<approved hash="3,1,c76833880e603c65"/>
+<approved hash="3,1,6ed0713e71796e97"/>
+<approved hash="3,1,4c0fb220424fda41"/>
+<approved hash="3,1,4f63ff5be73b646e"/>
+<approved hash="3,1,f5678281839bf47d"/>
+<approved hash="3,1,0feac8c90faf4700"/>
+<approved hash="3,1,f818ca1676f98076"/>
+<approved hash="3,1,b6d629382fd9b037"/>
+<approved hash="5,16,20399b8b8fac0875"/>
+<approved hash="5,16,046cd354c722d149"/>
+<approved hash="3,16,33a4ddb8a1cc4fd0"/>
+<approved hash="5,1,9e089b4e9b49a899"/>
+<approved hash="5,2,37069918aeaaf7be"/>
+<approved hash="5,2,218eb34e83f0f43e"/>
+<approved hash="5,15,37069918aeaaf7be"/>
+<approved hash="5,15,218eb34e83f0f43e"/>
+<approved hash="5,16,7e4d118e83636de9"/>
+<approved hash="5,16,0ca809974ddf62ed"/>
+<approved hash="5,16,244fe38dba1b5fbb"/>
+<approved hash="3,1,665f5b395bf76691"/>
+<approved hash="3,1,b5713540ebd5d691"/>
+<approved hash="3,16,de63398539fcde1a"/>
+<approved hash="3,1,ce6005060370c816"/>
+<approved hash="3,1,37033a5fda48acdc"/>
+<approved hash="3,1,f864e602e693f8f5"/>
+<approved hash="7,40,1dd8f420f5cb1c33"/>
+<approved hash="7,40,c84fbbe498830e50"/>
+<approved hash="7,40,8108f1c337f5a246"/>
+<approved hash="7,40,1d18f4e0f4d61d2e"/>
+<approved hash="7,40,1d00f4f8f4d31d2b"/>
+<approved hash="7,40,c897ec98cfef0e98"/>
+<approved hash="7,40,81186c9baa8da276"/>
+<approved hash="7,40,1df8f400f4761d8e"/>
+<approved hash="7,40,1decf414f4331dcb"/>
+<approved hash="7,40,c873d32af0550e74"/>
+<approved hash="7,40,1df8f400f45b1da3"/>
+<approved hash="7,40,c84f1ebc3deb0e60"/>
+<approved hash="7,40,1dfcf404f4c61d3e"/>
+<approved hash="7,40,811875d5b3e3a256"/>
+<approved hash="7,40,1ddcf424f4461dbe"/>
+<approved hash="7,40,8128963d502ba246"/>
+<approved hash="7,40,1dfcf404f4fb1d03"/>
+<approved hash="7,40,c873054e26210e64"/>
+<approved hash="7,40,8108bf6f7969a276"/>
+<approved hash="7,40,1dd0f428f4361dce"/>
+<approved hash="7,40,c84337e214bd0e64"/>
+<approved hash="7,40,1decf414f4331dcb"/>
+<approved hash="7,40,1d8cf474f4561dae"/>
+<approved hash="7,40,816847d981dfa216"/>
+<approved hash="7,40,6473b14f1c20bc64"/>
+<approved hash="7,40,6473672bca54bc74"/>
+<approved hash="7,40,35283a3ce22a9846"/>
+<approved hash="7,40,3508136ecb689876"/>
+<approved hash="7,40,3568ebd833de9816"/>
+<approved hash="7,40,64975899f5eebc98"/>
+<approved hash="7,40,35085dc285f49846"/>
+<approved hash="7,40,644383e32ebcbc64"/>
+<approved hash="7,40,644f0fe5a282bc50"/>
+<approved hash="7,40,3518d9d401e29856"/>
+<approved hash="7,40,644faabd07eabc60"/>
+<approved hash="7,40,3518c09a188c9876"/>
 <approved hash="3,16,3cfd940794163cec"/>
 <approved hash="3,16,7dfdb007b0167dec"/>
 <approved hash="3,16,f8fdb807b816f8ec"/>
@@ -3160,18 +3268,19 @@ Your Eurocircuits Team
 <approved hash="3,1,531e7590c096a66e"/>
 <approved hash="3,1,9488d70181eb3150"/>
 <approved hash="3,1,747bb81dba8676e0"/>
-<approved hash="3,1,c76833880e603c65"/>
-<approved hash="3,1,6ed0713e71796e97"/>
-<approved hash="3,1,4c0fb220424fda41"/>
+<approved hash="3,1,353027052cf014ae"/>
+<approved hash="3,1,9221ba4fbb42932c"/>
+<approved hash="3,1,723a6cac9c4a0819"/>
 <approved hash="3,1,a397ce3cb498ab15"/>
-<approved hash="3,1,4f63ff5be73b646e"/>
-<approved hash="3,1,f5678281839bf47d"/>
-<approved hash="3,1,0feac8c90faf4700"/>
+<approved hash="3,1,53e60200027b539d"/>
+<approved hash="3,1,d9ef0e000978d08d"/>
 <approved hash="3,1,7c6ee408e4027c64"/>
 <approved hash="3,1,8f61020707768c1b"/>
 <approved hash="3,1,7b03630e597d2cf2"/>
-<approved hash="3,1,f818ca1676f98076"/>
-<approved hash="3,1,b6d629382fd9b037"/>
+<approved hash="3,1,aa9ae921193d840f"/>
+<approved hash="3,1,6533195d185b6435"/>
+<approved hash="3,1,8b7e509ea5732a71"/>
+<approved hash="3,1,7571b89fb84a75a4"/>
 <approved hash="3,1,d0a20700cb1fe23d"/>
 <approved hash="3,1,f22e83c88285f363"/>
 <approved hash="3,1,723b16649ecc93e4"/>
@@ -3179,9 +3288,9 @@ Your Eurocircuits Team
 <approved hash="3,1,ed5e09bdcafc41bf"/>
 <approved hash="3,1,658186e781376251"/>
 <approved hash="3,1,5b8365e564825ae4"/>
-<approved hash="3,1,ce6005060370c816"/>
-<approved hash="3,1,37033a5fda48acdc"/>
-<approved hash="3,1,f864e602e693f8f5"/>
+<approved hash="3,1,ce0085668462cf04"/>
+<approved hash="3,1,d86406020692d8f4"/>
+<approved hash="3,1,fc67e581e56ffc89"/>
 <approved hash="3,1,ff5499351f498431"/>
 <approved hash="3,1,f8669a009bb5f9d3"/>
 <approved hash="3,1,126e46020151fc16"/>
@@ -3194,7 +3303,7 @@ Your Eurocircuits Team
 <approved hash="3,16,7251edbff17a6e94"/>
 <approved hash="3,16,7fa6864ea9bd3378"/>
 <approved hash="3,16,cd1573fb74e4ca0a"/>
-<approved hash="3,16,de63398539fcde1a"/>
+<approved hash="3,16,d1e4f802f87ad19c"/>
 <approved hash="3,16,5044fea2fd1253f4"/>
 <approved hash="3,16,500cfeeaff0a51ec"/>
 <approved hash="3,16,508cfe6afd0a53ec"/>
@@ -3223,7 +3332,8 @@ Your Eurocircuits Team
 <approved hash="3,16,5870e96ceedb5fc7"/>
 <approved hash="3,16,dd675fa120d9a1cb"/>
 <approved hash="3,16,da26f33a8f40a65c"/>
-<approved hash="3,16,33a4ddb8a1cc4fd0"/>
+<approved hash="3,16,49a67aba06cf35d3"/>
+<approved hash="3,16,bc299c35e04fc053"/>
 <approved hash="3,16,261c5b005ac827d4"/>
 <approved hash="3,16,ae1b1d071cc7afdb"/>
 <approved hash="3,16,5d5ca40332f5e6de"/>
@@ -3267,23 +3377,24 @@ Your Eurocircuits Team
 <approved hash="3,1,2997fb79fbbd2953"/>
 <approved hash="3,1,556495b443f55bef"/>
 <approved hash="3,16,07ab2e452175089b"/>
-<approved hash="5,2,218eb34e83f0f43e"/>
-<approved hash="5,2,37069918aeaaf7be"/>
-<approved hash="5,15,218eb34e83f0f43e"/>
-<approved hash="5,15,37069918aeaaf7be"/>
 <approved hash="5,16,e0bbf1006444966a"/>
 <approved hash="5,16,dbf69e25f433191d"/>
 <approved hash="5,16,a9df4590c120cd3c"/>
-<approved hash="5,16,7e4d118e83636de9"/>
 <approved hash="5,16,8c44e9781beacaad"/>
-<approved hash="5,16,0ca809974ddf62ed"/>
+<approved hash="5,16,8b1bae96fa1146fd"/>
+<approved hash="5,16,06ad5a8095b7f5c1"/>
+<approved hash="5,16,04eecf7c8d7679f0"/>
 <approved hash="5,16,d2d346409a7b0ad9"/>
+<approved hash="5,16,60563b821346a4b0"/>
+<approved hash="5,16,08c8d4dd759f15de"/>
+<approved hash="5,16,f75ba599c38d5195"/>
+<approved hash="5,16,39fd42ec220968bd"/>
 <approved hash="5,16,498afe96ae013b5d"/>
 <approved hash="5,16,b862517d487d873c"/>
 <approved hash="5,16,144c5114372fc28a"/>
+<approved hash="5,16,9f4419e53d800ac1"/>
 <approved hash="5,16,a9de065aecc9e556"/>
-<approved hash="5,16,046cd354c722d149"/>
-<approved hash="5,16,20399b8b8fac0875"/>
+<approved hash="5,16,557e6e6f1e895abe"/>
 </errors>
 </board>
 </drawing>
