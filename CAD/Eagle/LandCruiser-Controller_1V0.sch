@@ -16105,6 +16105,8 @@ www.schrackrelays.com/pdf/UUB.pdf</description>
 <part name="F602" library="df4iah_fuse" deviceset="MCCQ-121" device="" value="500 mA"/>
 <part name="R123" library="rcl" deviceset="R-EU_" device="R0805" value="4k7R"/>
 <part name="R124" library="rcl" deviceset="R-EU_" device="R0805" value="4k7R"/>
+<part name="C602" library="rcl" deviceset="C-EU" device="C0805" value="100nF"/>
+<part name="C301" library="rcl" deviceset="C-EU" device="C0805" value="100nF"/>
 </parts>
 <sheets>
 <sheet>
@@ -16666,6 +16668,7 @@ X111-6 = GND</text>
 <instance part="D315" gate="G$1" x="132.08" y="50.8" rot="R90"/>
 <instance part="GND314" gate="1" x="175.26" y="73.66"/>
 <instance part="GND315" gate="1" x="175.26" y="50.8"/>
+<instance part="C301" gate="G$1" x="40.64" y="134.62"/>
 </instances>
 <busses>
 </busses>
@@ -16758,6 +16761,9 @@ X111-6 = GND</text>
 <pinref part="U301" gate="G$1" pin="IN8"/>
 <wire x1="40.64" y1="73.66" x2="55.88" y2="73.66" width="0.1524" layer="91"/>
 <junction x="40.64" y="73.66"/>
+<pinref part="C301" gate="G$1" pin="2"/>
+<wire x1="40.64" y1="129.54" x2="40.64" y2="83.82" width="0.1524" layer="91"/>
+<junction x="40.64" y="83.82"/>
 </segment>
 <segment>
 <pinref part="GND314" gate="1" pin="GND"/>
@@ -16959,6 +16965,9 @@ X111-6 = GND</text>
 <wire x1="154.94" y1="55.88" x2="154.94" y2="58.42" width="0.1524" layer="91"/>
 <wire x1="154.94" y1="58.42" x2="142.24" y2="58.42" width="0.1524" layer="91"/>
 <junction x="142.24" y="58.42"/>
+<pinref part="C301" gate="G$1" pin="1"/>
+<wire x1="40.64" y1="137.16" x2="40.64" y2="152.4" width="0.1524" layer="91"/>
+<wire x1="40.64" y1="152.4" x2="48.26" y2="152.4" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
@@ -17221,6 +17230,7 @@ X511-4 = N.C.</text>
 <instance part="D601" gate="G$1" x="106.68" y="83.82" rot="R90"/>
 <instance part="F601" gate="G$1" x="83.82" y="106.68"/>
 <instance part="F602" gate="G$1" x="83.82" y="96.52"/>
+<instance part="C602" gate="G$1" x="132.08" y="86.36"/>
 </instances>
 <busses>
 </busses>
@@ -17234,14 +17244,18 @@ X511-4 = N.C.</text>
 <wire x1="177.8" y1="73.66" x2="177.8" y2="81.28" width="0.1524" layer="91"/>
 <wire x1="149.86" y1="73.66" x2="177.8" y2="73.66" width="0.1524" layer="91"/>
 <junction x="149.86" y="73.66"/>
-<wire x1="149.86" y1="73.66" x2="119.38" y2="73.66" width="0.1524" layer="91"/>
+<wire x1="149.86" y1="73.66" x2="132.08" y2="73.66" width="0.1524" layer="91"/>
 <pinref part="C601" gate="G$1" pin="-"/>
+<wire x1="132.08" y1="73.66" x2="119.38" y2="73.66" width="0.1524" layer="91"/>
 <wire x1="119.38" y1="73.66" x2="119.38" y2="81.28" width="0.1524" layer="91"/>
 <pinref part="D601" gate="G$1" pin="A"/>
 <wire x1="119.38" y1="73.66" x2="106.68" y2="73.66" width="0.1524" layer="91"/>
 <wire x1="106.68" y1="73.66" x2="106.68" y2="81.28" width="0.1524" layer="91"/>
 <junction x="119.38" y="73.66"/>
 <pinref part="U611" gate="A1" pin="GND"/>
+<pinref part="C602" gate="G$1" pin="2"/>
+<wire x1="132.08" y1="73.66" x2="132.08" y2="81.28" width="0.1524" layer="91"/>
+<junction x="132.08" y="73.66"/>
 </segment>
 </net>
 <net name="+5V" class="2">
@@ -17282,15 +17296,19 @@ X511-4 = N.C.</text>
 <pinref part="D601" gate="G$1" pin="C"/>
 <pinref part="C601" gate="G$1" pin="+"/>
 <pinref part="U611" gate="A1" pin="VI"/>
-<wire x1="119.38" y1="96.52" x2="139.7" y2="96.52" width="0.1524" layer="91"/>
+<wire x1="119.38" y1="96.52" x2="132.08" y2="96.52" width="0.1524" layer="91"/>
+<wire x1="132.08" y1="96.52" x2="139.7" y2="96.52" width="0.1524" layer="91"/>
 <wire x1="119.38" y1="96.52" x2="119.38" y2="88.9" width="0.1524" layer="91"/>
 <junction x="119.38" y="96.52"/>
 <wire x1="106.68" y1="96.52" x2="119.38" y2="96.52" width="0.1524" layer="91"/>
 <wire x1="106.68" y1="96.52" x2="106.68" y2="86.36" width="0.1524" layer="91"/>
 <junction x="106.68" y="96.52"/>
 <wire x1="88.9" y1="96.52" x2="106.68" y2="96.52" width="0.1524" layer="91"/>
-<label x="124.46" y="96.52" size="1.778" layer="95"/>
+<label x="121.92" y="96.52" size="1.778" layer="95"/>
 <pinref part="F602" gate="G$1" pin="2"/>
+<pinref part="C602" gate="G$1" pin="1"/>
+<wire x1="132.08" y1="96.52" x2="132.08" y2="88.9" width="0.1524" layer="91"/>
+<junction x="132.08" y="96.52"/>
 </segment>
 </net>
 </nets>
