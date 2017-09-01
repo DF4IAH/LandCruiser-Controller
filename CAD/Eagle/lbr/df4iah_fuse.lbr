@@ -1277,10 +1277,10 @@ Source: http://www.farnell.com/datasheets/716597.pdf</description>
 </package>
 <package name="MCCQ-121">
 <description>&lt;b&gt;minicomp Automotive Fuse-Holder MCCQ-121&lt;/b&gt;</description>
-<pad name="P$1" x="-7" y="0" drill="2.5" diameter="3"/>
-<pad name="P$2" x="-2" y="0" drill="2.5" diameter="3"/>
-<pad name="P$3" x="2" y="0" drill="2.5" diameter="3"/>
-<pad name="P$4" x="7" y="0" drill="2.5" diameter="3"/>
+<pad name="1" x="-7" y="0" drill="2.5" diameter="2.8" thermals="no" first="yes"/>
+<pad name="2" x="-2" y="0" drill="2.5" diameter="2.8" thermals="no"/>
+<pad name="3" x="2" y="0" drill="2.5" diameter="2.8" thermals="no"/>
+<pad name="4" x="7" y="0" drill="2.5" diameter="2.8" thermals="no"/>
 <wire x1="-9.5" y1="2" x2="9.5" y2="2" width="0.127" layer="21"/>
 <wire x1="-9.5" y1="-2.3" x2="9.5" y2="-2.3" width="0.127" layer="21"/>
 <wire x1="-9.5" y1="-2.3" x2="-9.5" y2="2" width="0.127" layer="21"/>
@@ -2167,8 +2167,8 @@ CS, Schukat</description>
 </device>
 <device name="MCCQ-121" package="MCCQ-121">
 <connects>
-<connect gate="G$1" pin="1" pad="P$1 P$2"/>
-<connect gate="G$1" pin="2" pad="P$3 P$4"/>
+<connect gate="G$1" pin="1" pad="1 2"/>
+<connect gate="G$1" pin="2" pad="3 4"/>
 </connects>
 <technologies>
 <technology name="">
@@ -2233,8 +2233,8 @@ Source: http://www.farnell.com/datasheets/716597.pdf</description>
 <devices>
 <device name="" package="MCCQ-121">
 <connects>
-<connect gate="G$1" pin="1" pad="P$1 P$2"/>
-<connect gate="G$1" pin="2" pad="P$3 P$4"/>
+<connect gate="G$1" pin="1" pad="1 2"/>
+<connect gate="G$1" pin="2" pad="3 4"/>
 </connects>
 <technologies>
 <technology name="">
