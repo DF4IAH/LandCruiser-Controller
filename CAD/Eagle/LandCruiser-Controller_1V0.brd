@@ -52,7 +52,7 @@
 <layer number="42" name="bRestrict" color="1" fill="10" visible="no" active="yes"/>
 <layer number="43" name="vRestrict" color="2" fill="10" visible="no" active="yes"/>
 <layer number="44" name="Drills" color="7" fill="1" visible="no" active="yes"/>
-<layer number="45" name="Holes" color="7" fill="1" visible="no" active="yes"/>
+<layer number="45" name="Holes" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="46" name="Milling" color="3" fill="1" visible="no" active="yes"/>
 <layer number="47" name="Measures" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="48" name="Document" color="7" fill="1" visible="yes" active="yes"/>
@@ -188,14 +188,14 @@ X401-3 = VCC 5.0V
 X401-4 = SDA
 X401-5 = VCC 3.3V
 X401-6 = GND</text>
-<text x="10.16" y="29.21" size="1.016" layer="21" ratio="12">X111-1 = N.C.
+<text x="10.16" y="32.385" size="1.016" layer="21" ratio="12">X111-1 = N.C.
 X111-2 = VTG
 X111-3 = N.C.
 X111-4 = N.C.
 X111-5 = dW
 X111-6 = GND</text>
 <text x="29.21" y="40.64" size="1.016" layer="21" ratio="12">PDI</text>
-<text x="34.29" y="38.735" size="0.6096" layer="21" ratio="20">1</text>
+<text x="34.925" y="39.37" size="0.6096" layer="21" ratio="20" rot="R180">1</text>
 <text x="26.67" y="32.385" size="1.016" layer="21" ratio="12">debugWIRE</text>
 <text x="1.27" y="9.525" size="1.016" layer="21" ratio="12">INPUT</text>
 <text x="7.62" y="48.26" size="1.016" layer="21" ratio="12" rot="R90">+12V</text>
@@ -221,7 +221,7 @@ X511-4 = N.C.</text>
 <text x="90.805" y="22.86" size="1.016" layer="21" ratio="12" rot="R90">GND</text>
 <text x="90.805" y="18.415" size="1.016" layer="21" ratio="12" rot="R90">GND</text>
 <text x="90.805" y="12.7" size="1.016" layer="21" ratio="12" rot="R90">GND</text>
-<text x="56.515" y="46.99" size="0.6096" layer="21" ratio="20">1</text>
+<text x="57.15" y="47.625" size="0.6096" layer="21" ratio="20" rot="R180">1</text>
 <dimension x1="4.5" y1="4.5" x2="4.445" y2="0" x3="-1.878546875" y3="2.25" textsize="0.8128" layer="47" dtype="vertical"/>
 <dimension x1="4.5" y1="58.5" x2="4.445" y2="0" x3="-5.06920625" y3="29.25896875" textsize="0.8128" layer="47"/>
 <dimension x1="4.5" y1="58.5" x2="0" y2="58.5" x3="2.25" y3="64.740084375" textsize="0.8128" layer="47"/>
@@ -232,6 +232,22 @@ X511-4 = N.C.</text>
 <vertex x="34.925" y="31.75"/>
 <vertex x="34.925" y="14.605"/>
 <vertex x="23.495" y="14.605"/>
+</polygon>
+<hole x="15.78" y="49.53" drill="2.5"/>
+<hole x="15.78" y="44.45" drill="2.5"/>
+<hole x="19.78" y="44.45" drill="2.5"/>
+<hole x="19.78" y="49.53" drill="2.5"/>
+<polygon width="0.3048" layer="41">
+<vertex x="7.62" y="52.07"/>
+<vertex x="27.94" y="52.07"/>
+<vertex x="27.94" y="41.91"/>
+<vertex x="7.62" y="41.91"/>
+</polygon>
+<polygon width="0.3048" layer="42">
+<vertex x="7.62" y="52.07"/>
+<vertex x="27.94" y="52.07"/>
+<vertex x="27.94" y="41.91"/>
+<vertex x="7.62" y="41.91"/>
 </polygon>
 </plain>
 <libraries>
@@ -1808,10 +1824,10 @@ www.schrackrelays.com/pdf/UUB.pdf</description>
 <packages>
 <package name="MCCQ-121">
 <description>&lt;b&gt;minicomp Automotive Fuse-Holder MCCQ-121&lt;/b&gt;</description>
-<pad name="1" x="-7" y="0" drill="2.5" diameter="2.8" thermals="no" first="yes"/>
-<pad name="2" x="-2" y="0" drill="2.5" diameter="2.8" thermals="no"/>
-<pad name="3" x="2" y="0" drill="2.5" diameter="2.8" thermals="no"/>
-<pad name="4" x="7" y="0" drill="2.5" diameter="2.8" thermals="no"/>
+<pad name="1" x="-7" y="0" drill="2.5" diameter="2.8" shape="octagon" first="yes"/>
+<pad name="2" x="-2" y="0" drill="2" diameter="2.5" shape="octagon"/>
+<pad name="3" x="2" y="0" drill="2" diameter="2.5" shape="octagon"/>
+<pad name="4" x="7" y="0" drill="2.5" diameter="2.8" shape="octagon"/>
 <wire x1="-9.5" y1="2" x2="9.5" y2="2" width="0.127" layer="21"/>
 <wire x1="-9.5" y1="-2.3" x2="9.5" y2="-2.3" width="0.127" layer="21"/>
 <wire x1="-9.5" y1="-2.3" x2="-9.5" y2="2" width="0.127" layer="21"/>
@@ -2064,11 +2080,11 @@ Your Eurocircuits Team
 <attribute name="VALUE" x="66.04" y="48.895" size="0.6096" layer="27"/>
 </element>
 <element name="R491" library="rcl" package="R0805" value="2k2R" x="60.325" y="50.165" smashed="yes" rot="R270">
-<attribute name="NAME" x="59.055" y="52.705" size="0.8128" layer="25"/>
+<attribute name="NAME" x="59.055" y="48.895" size="0.8128" layer="25" rot="R90"/>
 <attribute name="VALUE" x="57.785" y="50.8" size="1.27" layer="27" rot="R270"/>
 </element>
 <element name="R492" library="rcl" package="R0805" value="2k2R" x="67.945" y="44.45" smashed="yes" rot="R180">
-<attribute name="NAME" x="71.12" y="43.815" size="0.8128" layer="25" rot="R90"/>
+<attribute name="NAME" x="70.485" y="43.815" size="0.8128" layer="25"/>
 <attribute name="VALUE" x="68.58" y="46.99" size="1.27" layer="27" rot="R180"/>
 </element>
 <element name="C401" library="rcl" package="C0805" value="100nF" x="63.5" y="44.45" smashed="yes" rot="R180">
@@ -2076,15 +2092,15 @@ Your Eurocircuits Team
 <attribute name="VALUE" x="64.77" y="46.99" size="1.27" layer="27" rot="R180"/>
 </element>
 <element name="C101" library="rcl" package="C0805" value="100nF" x="46.355" y="20.955" smashed="yes" rot="MR180">
-<attribute name="NAME" x="47.625" y="22.225" size="0.8128" layer="26" rot="MR0"/>
+<attribute name="NAME" x="47.625" y="23.495" size="0.8128" layer="26" rot="MR0"/>
 <attribute name="VALUE" x="45.085" y="23.495" size="1.27" layer="28" rot="MR180"/>
 </element>
 <element name="C102" library="rcl" package="C0805" value="100pF" x="46.355" y="18.415" smashed="yes" rot="MR180">
-<attribute name="NAME" x="47.625" y="15.875" size="0.8128" layer="26" rot="MR0"/>
+<attribute name="NAME" x="45.72" y="16.51" size="0.8128" layer="26" rot="MR270"/>
 <attribute name="VALUE" x="45.085" y="20.955" size="1.27" layer="28" rot="MR180"/>
 </element>
 <element name="R101" library="rcl" package="R0805" value="12kR" x="38.1" y="36.83" smashed="yes">
-<attribute name="NAME" x="36.83" y="38.735" size="0.8128" layer="25"/>
+<attribute name="NAME" x="36.83" y="38.1" size="0.8128" layer="25"/>
 <attribute name="VALUE" x="37.465" y="34.29" size="1.27" layer="27"/>
 </element>
 <element name="U101" library="df4iah_processors" package="DIL28-3" value="MEGA8-P" x="46.355" y="20.32" smashed="yes" rot="R270">
@@ -2096,23 +2112,23 @@ Your Eurocircuits Team
 <element name="H702" library="holes" package="2,8-PAD" value="MOUNT-PAD-ROUND2.8" x="93.5" y="58.5"/>
 <element name="H704" library="holes" package="2,8-PAD" value="MOUNT-PAD-ROUND2.8" x="93.5" y="4.5" smashed="yes"/>
 <element name="R131" library="rcl" package="R0805" value="33kR" x="54.61" y="13.97" smashed="yes" rot="R180">
-<attribute name="NAME" x="52.705" y="15.24" size="0.8128" layer="25"/>
+<attribute name="NAME" x="53.34" y="15.24" size="0.8128" layer="25"/>
 <attribute name="VALUE" x="55.245" y="16.51" size="1.27" layer="27" rot="R180"/>
 </element>
 <element name="R133" library="rcl" package="R0805" value="33kR" x="54.61" y="6.35" smashed="yes" rot="R180">
-<attribute name="NAME" x="57.785" y="5.08" size="0.8128" layer="25" rot="R90"/>
+<attribute name="NAME" x="53.34" y="7.62" size="0.8128" layer="25"/>
 <attribute name="VALUE" x="55.245" y="8.89" size="1.27" layer="27" rot="R180"/>
 </element>
 <element name="R135" library="rcl" package="R0805" value="33kR" x="53.34" y="33.02" smashed="yes" rot="R270">
-<attribute name="NAME" x="53.975" y="27.94" size="0.8128" layer="25" rot="R90"/>
+<attribute name="NAME" x="55.88" y="31.75" size="0.8128" layer="25" rot="R90"/>
 <attribute name="VALUE" x="50.8" y="33.655" size="1.27" layer="27" rot="R270"/>
 </element>
 <element name="R132" library="rcl" package="R0805" value="33kR" x="54.61" y="10.16" smashed="yes" rot="R180">
-<attribute name="NAME" x="57.785" y="9.525" size="0.8128" layer="25" rot="R90"/>
+<attribute name="NAME" x="53.34" y="11.43" size="0.8128" layer="25"/>
 <attribute name="VALUE" x="55.245" y="12.7" size="1.27" layer="27" rot="R180"/>
 </element>
 <element name="R134" library="rcl" package="R0805" value="33kR" x="54.61" y="2.54" smashed="yes" rot="R180">
-<attribute name="NAME" x="49.53" y="1.27" size="0.8128" layer="25"/>
+<attribute name="NAME" x="53.34" y="3.81" size="0.8128" layer="25"/>
 <attribute name="VALUE" x="55.245" y="5.08" size="1.27" layer="27" rot="R180"/>
 </element>
 <element name="R122" library="rcl" package="R0805" value="4k7R" x="13.97" y="19.05" smashed="yes" rot="MR180">
@@ -2131,12 +2147,12 @@ Your Eurocircuits Team
 <attribute name="NAME" x="29.21" y="39.37" size="0.8128" layer="25" ratio="20"/>
 <attribute name="VALUE" x="34.29" y="40.64" size="1.27" layer="27" rot="R180"/>
 </element>
-<element name="U611" library="df4iah_powersupply" package="TO220H" value="LM7805" x="29.21" y="22.86" smashed="yes">
+<element name="IC611" library="df4iah_powersupply" package="TO220H" value="LM7805" x="29.21" y="22.86" smashed="yes">
 <attribute name="NAME" x="22.479" y="15.748" size="0.8128" layer="25" ratio="20" rot="R90"/>
 <attribute name="VALUE" x="36.576" y="11.811" size="1.778" layer="27" ratio="10" rot="R90"/>
 </element>
 <element name="C621" library="rcl" package="C0805" value="22uF" x="32.385" y="6.35" smashed="yes" rot="R270">
-<attribute name="NAME" x="33.02" y="1.27" size="0.8128" layer="25" rot="R90"/>
+<attribute name="NAME" x="34.925" y="5.08" size="0.8128" layer="25" rot="R90"/>
 <attribute name="VALUE" x="29.845" y="7.62" size="1.27" layer="27" rot="R270"/>
 </element>
 <element name="C601" library="rcl" package="E2,5-7" value="22uF" x="26.67" y="6.35" smashed="yes" rot="R270">
@@ -2239,23 +2255,23 @@ Your Eurocircuits Team
 <attribute name="VALUE" x="45.085" y="51.435" size="1.27" layer="27" rot="R270"/>
 </element>
 <element name="C501" library="rcl" package="C0805" value="1uF" x="39.37" y="52.07" smashed="yes" rot="R270">
-<attribute name="NAME" x="37.465" y="50.8" size="0.8128" layer="25" rot="R90"/>
+<attribute name="NAME" x="38.1" y="50.8" size="0.8128" layer="25" rot="R90"/>
 <attribute name="VALUE" x="36.83" y="53.34" size="1.27" layer="27" rot="R270"/>
 </element>
 <element name="C502" library="rcl" package="C0805" value="1uF" x="39.37" y="46.99" smashed="yes" rot="R270">
-<attribute name="NAME" x="37.465" y="45.72" size="0.8128" layer="25" rot="R90"/>
+<attribute name="NAME" x="38.1" y="45.72" size="0.8128" layer="25" rot="R90"/>
 <attribute name="VALUE" x="36.83" y="48.26" size="1.27" layer="27" rot="R270"/>
 </element>
 <element name="C503" library="rcl" package="C0805" value="1uF" x="45.72" y="49.53" smashed="yes" rot="MR180">
-<attribute name="NAME" x="46.99" y="50.8" size="0.8128" layer="26" rot="MR0"/>
+<attribute name="NAME" x="46.99" y="46.99" size="0.8128" layer="26" rot="MR0"/>
 <attribute name="VALUE" x="44.45" y="52.07" size="1.27" layer="28" rot="MR180"/>
 </element>
 <element name="C504" library="rcl" package="C0805" value="1uF" x="39.37" y="41.91" smashed="yes" rot="R270">
-<attribute name="NAME" x="37.465" y="40.64" size="0.8128" layer="25" rot="R90"/>
+<attribute name="NAME" x="38.1" y="40.64" size="0.8128" layer="25" rot="R90"/>
 <attribute name="VALUE" x="36.83" y="43.18" size="1.27" layer="27" rot="R270"/>
 </element>
 <element name="C511" library="rcl" package="C0805" value="1uF" x="53.34" y="50.8" smashed="yes" rot="R270">
-<attribute name="NAME" x="51.435" y="48.895" size="0.8128" layer="25" rot="R90"/>
+<attribute name="NAME" x="52.07" y="49.53" size="0.8128" layer="25" rot="R90"/>
 <attribute name="VALUE" x="50.8" y="52.07" size="1.27" layer="27" rot="R270"/>
 </element>
 <element name="X511" library="df4iah_connector" package="2X02" value="" x="53.975" y="44.45" smashed="yes" rot="R180">
@@ -2263,7 +2279,7 @@ Your Eurocircuits Team
 <attribute name="VALUE" x="57.785" y="48.895" size="1.27" layer="27" rot="R180"/>
 </element>
 <element name="R211" library="rcl" package="R0805" value="22kR" x="10.16" y="13.97" smashed="yes" rot="MR0">
-<attribute name="NAME" x="11.811" y="15.24" size="0.8128" layer="26" rot="MR0"/>
+<attribute name="NAME" x="11.43" y="15.24" size="0.8128" layer="26" rot="MR0"/>
 <attribute name="VALUE" x="13.335" y="13.2842" size="1.27" layer="28" ratio="10" rot="MR0"/>
 </element>
 <element name="R231" library="rcl" package="R0805" value="10kR" x="13.97" y="13.97" smashed="yes" rot="MR0">
@@ -2287,11 +2303,11 @@ Your Eurocircuits Team
 <attribute name="VALUE" x="12.78" y="39.45" size="1.27" layer="27"/>
 </element>
 <element name="R123" library="rcl" package="R0805" value="4k7R" x="13.97" y="24.13" smashed="yes" rot="MR0">
-<attribute name="NAME" x="14.605" y="25.4" size="0.8128" layer="26" rot="MR0"/>
+<attribute name="NAME" x="15.24" y="25.4" size="0.8128" layer="26" rot="MR0"/>
 <attribute name="VALUE" x="14.605" y="21.59" size="1.27" layer="28" rot="MR0"/>
 </element>
 <element name="R124" library="rcl" package="R0805" value="4k7R" x="13.97" y="29.21" smashed="yes" rot="MR0">
-<attribute name="NAME" x="14.605" y="30.48" size="0.8128" layer="26" rot="MR0"/>
+<attribute name="NAME" x="15.24" y="30.48" size="0.8128" layer="26" rot="MR0"/>
 <attribute name="VALUE" x="14.605" y="26.67" size="1.27" layer="28" rot="MR0"/>
 </element>
 <element name="C602" library="rcl" package="C0805" value="100nF" x="22.86" y="11.43" smashed="yes" rot="R180">
@@ -2303,23 +2319,23 @@ Your Eurocircuits Team
 <attribute name="VALUE" x="74.93" y="2.54" size="1.27" layer="27" rot="R90"/>
 </element>
 <element name="R141" library="rcl" package="R0805" value="330R" x="45.72" y="27.94" smashed="yes" rot="MR90">
-<attribute name="NAME" x="46.99" y="26.67" size="0.8128" layer="26" rot="MR90"/>
+<attribute name="NAME" x="45.085" y="30.48" size="0.8128" layer="26" rot="MR90"/>
 <attribute name="VALUE" x="43.18" y="27.305" size="1.27" layer="28" rot="MR90"/>
 </element>
 <element name="D141" library="df4iah_diode" package="LED_2PIN-TTH" value="red" x="58.42" y="25.4" smashed="yes" rot="R270">
-<attribute name="NAME" x="56.3118" y="28.6512" size="0.8128" layer="25" ratio="10" rot="R270"/>
+<attribute name="NAME" x="56.7182" y="25.3238" size="0.8128" layer="25" ratio="10" rot="R90"/>
 <attribute name="VALUE" x="54.229" y="29.21" size="1.27" layer="27" ratio="10" rot="R270"/>
 </element>
 <element name="R631" library="rcl" package="R0805" value="18kR" x="31.75" y="41.91" smashed="yes" rot="MR90">
-<attribute name="NAME" x="33.02" y="41.275" size="0.8128" layer="26" rot="MR90"/>
+<attribute name="NAME" x="33.02" y="40.64" size="0.8128" layer="26" rot="MR90"/>
 <attribute name="VALUE" x="29.21" y="41.275" size="1.27" layer="28" rot="MR90"/>
 </element>
 <element name="R632" library="rcl" package="R0805" value="247kR" x="31.75" y="45.72" smashed="yes" rot="MR90">
-<attribute name="NAME" x="33.02" y="45.085" size="0.8128" layer="26" rot="MR90"/>
+<attribute name="NAME" x="33.02" y="44.45" size="0.8128" layer="26" rot="MR90"/>
 <attribute name="VALUE" x="29.21" y="45.085" size="1.27" layer="28" rot="MR90"/>
 </element>
 <element name="C631" library="rcl" package="C0805" value="1nF" x="53.34" y="22.86" smashed="yes" rot="R270">
-<attribute name="NAME" x="54.61" y="24.13" size="0.8128" layer="25" rot="R270"/>
+<attribute name="NAME" x="55.88" y="21.59" size="0.8128" layer="25" rot="R90"/>
 <attribute name="VALUE" x="50.8" y="24.13" size="1.27" layer="27" rot="R270"/>
 </element>
 </elements>
@@ -2363,7 +2379,7 @@ Your Eurocircuits Team
 <contactref element="U221" pad="1"/>
 <contactref element="U221" pad="5"/>
 <contactref element="U221" pad="7"/>
-<contactref element="U611" pad="2"/>
+<contactref element="IC611" pad="2"/>
 <contactref element="U301" pad="10"/>
 <contactref element="U301" pad="6"/>
 <contactref element="U301" pad="7"/>
@@ -2430,7 +2446,7 @@ Your Eurocircuits Team
 <contactref element="R122" pad="2"/>
 <contactref element="R125" pad="2"/>
 <contactref element="X111" pad="2"/>
-<contactref element="U611" pad="3"/>
+<contactref element="IC611" pad="3"/>
 <contactref element="C621" pad="1"/>
 <contactref element="C101" pad="1"/>
 <contactref element="L101" pad="2"/>
@@ -2973,7 +2989,7 @@ Your Eurocircuits Team
 <wire x1="53.34" y1="16.51" x2="54.61" y2="17.735" width="0.3048" layer="16"/>
 </signal>
 <signal name="REGIN" class="2">
-<contactref element="U611" pad="1"/>
+<contactref element="IC611" pad="1"/>
 <contactref element="C601" pad="+"/>
 <contactref element="D601" pad="C"/>
 <contactref element="F602" pad="3"/>
