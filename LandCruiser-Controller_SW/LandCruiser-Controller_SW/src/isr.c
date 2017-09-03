@@ -47,7 +47,9 @@
 /* External vars */
 
 extern uint_fast64_t		g_timer_abs_msb;
-//extern uint8_t			g_adc_state;
+extern uint8_t				g_adc_state;
+extern float				g_adc_12v;
+extern float				g_adc_temp;
 extern showData_t			g_showData;
 extern uint8_t				g_SmartLCD_mode;
 //extern uint8_t			g_lcd_contrast_pm;
@@ -269,54 +271,64 @@ ISR(__vector_20, ISR_BLOCK)
 
 ISR(__vector_21, ISR_BLOCK)
 {	/* ADC */
-	#if 0
+	static uint8_t cntr = 0;
 	uint16_t adc_val = ADCL | (ADCH << 8);
 	uint8_t  reason  = g_adc_state;
+
+	/* Every 10th of a second */
+	if (++cntr >= 100) {
+		cntr = 0;
+	}
 
 	//TIFR1 |= _BV(TOV1);							// Reset Timer1 overflow status bit (when no ISR for TOV1 activated!)
 
 	switch (reason) {
-		case ADC_STATE_PRE_LDR:
+		case C_ADC_STATE_PRE_12V:
 			// drop one ADC value after switching MUX
-			g_adc_state = ADC_STATE_VLD_LDR;
+			g_adc_state = C_ADC_STATE_VLD_12V;
 		break;
 
-		case ADC_STATE_VLD_LDR:
+		case C_ADC_STATE_VLD_12V:
 		{
-			/* Low pass filtering and enhancing the data depth */
-			float l_adc_light = g_adc_light;
-			cpu_irq_enable();
-			float calc = l_adc_light ?  0.980f * l_adc_light + 0.020f * adc_val : adc_val;	// load with initial value if none is set before
-			cpu_irq_disable();
-			g_adc_light = calc;
+			if (!cntr) {
+				/* Low pass filtering and enhancing the data depth */
+				float l_adc_12v = g_adc_12v;
+				cpu_irq_enable();
+				float calc = l_adc_12v ?  (0.980f * l_adc_12v + 0.020f * adc_val) : adc_val;	// load with initial value if none is set before
+				cpu_irq_disable();
+				g_adc_12v = calc;
 
-			adc_set_admux(ADC_MUX_TEMPSENSE | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
-			g_adc_state = ADC_STATE_PRE_TEMP;
+				adc_set_admux(ADC_MUX_TEMPSENSE | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
+				g_adc_state = C_ADC_STATE_PRE_TEMP;
+			}
 		}
 		break;
 
-		case ADC_STATE_PRE_TEMP:
+		case C_ADC_STATE_PRE_TEMP:
 			// drop one ADC value after switching MUX
-			g_adc_state = ADC_STATE_VLD_TEMP;
+			g_adc_state = C_ADC_STATE_VLD_TEMP;
 		break;
 
-		case ADC_STATE_VLD_TEMP:
+		case C_ADC_STATE_VLD_TEMP:
 		{
-			/* Low pass filtering and enhancing the data depth */
-			float l_adc_temp  = g_adc_temp;
-			cpu_irq_enable();
-			float calc = l_adc_temp ?  0.998f * l_adc_temp  + 0.002f * adc_val : adc_val;	// load with initial value if none is set before
-			cpu_irq_disable();
-			g_adc_temp = calc;
+			if (!cntr) {
+				/* Low pass filtering and enhancing the data depth */
+				float l_adc_temp  = g_adc_temp;
+				cpu_irq_enable();
+				float calc = l_adc_temp ?  0.998f * l_adc_temp  + 0.002f * adc_val : adc_val;	// load with initial value if none is set before
+				cpu_irq_disable();
+				g_adc_temp = calc;
+
+				adc_set_admux(ADC_MUX_ADC0 | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
+				g_adc_state = C_ADC_STATE_PRE_12V;
+			}
 		}
-			// fall-through.
+		break;
+
 		default:
 			adc_set_admux(ADC_MUX_ADC0 | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
-			g_adc_state = ADC_STATE_PRE_LDR;
+			g_adc_state = C_ADC_STATE_PRE_12V;
 	}
-	#else
-	s_bad_interrupt();
-	#endif
 }
 
 ISR(__vector_22, ISR_BLOCK)

@@ -44,7 +44,9 @@
 /* GLOBAL section */
 
 uint_fast64_t		g_timer_abs_msb						= 0ULL;
-//uint8_t			g_adc_state							= 0;
+uint8_t				g_adc_state							= 0;
+float				g_adc_12v							= 0.f;
+float				g_adc_temp							= 0.f;
 //bool				g_lcdbl_auto						= true;
 //uint8_t			g_lcdbl_dimmer						= 0;
 //uint8_t			g_lcd_contrast_pm					= 0;
@@ -69,9 +71,9 @@ static void s_reset_global_vars(void)
 {
 	irqflags_t flags	= cpu_irq_save();
 	g_timer_abs_msb		= 0ULL;
+	g_adc_state			= 0;
 
 	#if 0
-	g_adc_state			= ADC_STATE_PRE_LDR;
 	g_lcdbl_dimmer		= 64;
 	#endif
 	cpu_irq_restore(flags);
@@ -90,13 +92,15 @@ static void s_io_preinit(void)
 	PORTB = 0b11000011;								// in:  PB0: NC, PB1: NC, PB6: MP_SK_G, PB7: MP_SK_O
 
 	DDRC  = 0b00101000;								// out: PC3: MP_KL, PC5: SCL
-	PORTC = 0b11110111;								// in:  PC0: NC, PC1: NC, PC2: NC, PC4: SDA, PC6: NC, PC7: NC
+	PORTC = 0b00110000;								// in:  PC0: MP_ADC0, PC1: MP_ADC1, PC2: MP_TACHO, PC4: SDA
 
-	DDRD  = 0b00000010;								// out: PD1: MP_TXD
-	PORTD = 0b11111111;								// in:  PD0: MP_RXD, PD2: MP_INT, PD3: NC, PD4: MP_FB, PD5: NC, PD6: MP_SA_G, PD7: MP_SA_O
+	DDRD  = 0b00001010;								// out: PD1: MP_TXD, PD3: MP_LED
+	PORTD = 0b11110111;								// in:  PD0: MP_RXD, PD2: MP_INT, PD4: MP_FB, PD5: NC, PD6: MP_SA_G, PD7: MP_SA_O
 
-	// Analog input: Digital Disable Register
-	DIDR0 = 0b00000111;								// PC0: NC_A, PC1: NC_A, PC2: NC_A
+	#if 0
+	// Analog input: Digital Disable Register  --> see s_adc_init()
+	DIDR0 = 0b00000011;								// PC0: MP_ADC0, PC1: MP_ADC1
+	#endif
 }
 
 static void s_tc_init(void)
@@ -111,7 +115,7 @@ static void s_tc_init(void)
 	#endif
 
 	#if 0
-	/* TC0 - Overflows with about 122 Hz for the ADC convertion */
+	/* TC0 - OC0x: N/A */
 	{
 		sysclk_enable_module(POWER_RED_REG0, PRTIM0_bm);
 
@@ -153,7 +157,7 @@ static void s_tc_init(void)
 	}
 
 	#if 0
-	/* TC2 - OC2A: LCD backlight w/ 8-bit resolution - overflows with abt. 61 Hz */
+	/* TC2 - OC2A: N/A */
 	{
 		sysclk_enable_module(POWER_RED_REG0, PRTIM2_bm);
 
@@ -178,9 +182,9 @@ static void s_tc_init(void)
 static void s_tc_start(void)
 {
 	#if 0
-	/* TC0: Overflows with about 30 Hz for the ADC convertion */
+	/* TC0: N/A */
 	/* TC1: Audio output @ 16-bit counter PWM, used: 10-bit resolution */
-	/* TC2: LCD backlight w/ 8-bit resolution */
+	/* TC2: N/A */
 	{
 		/* Timer Synchronous Mode - trigger */
 		GTCCR = 0;								// trigger the sync for all counters
@@ -242,19 +246,19 @@ static void s_tc_disable(void)
 }
 
 
-#if 0
 static void s_adc_init(void)
 {
 	sysclk_enable_module(POWER_RED_REG0, PRADC_bm);	// enable ADC sub-module
 
 	adc_disable_digital_inputs(_BV(ADC0D));		// disable the digital input on the ADC0 port
+	adc_disable_digital_inputs(_BV(ADC1D));		// disable the digital input on the ADC1 port
 
 	adc_init(ADC_PRESCALER_DIV64);
 	adc_set_admux(ADC_MUX_ADC0 | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
 
 	#if 1
 	/* ADC is started by TC0 timer directly - disadvantage: lower amplitude precision */
-	adc_set_autotrigger_source(ADC_AUTOTRIGGER_SOURCE_TC0_OVERFLOW);
+	adc_set_autotrigger_source(ADC_AUTOTRIGGER_SOURCE_TC1_OVERFLOW);
 	adc_enable_autotrigger();
 	#else
 	adc_disable_autotrigger();
@@ -272,11 +276,10 @@ static void s_adc_disable(void)
 	adc_disable_autotrigger();
 	adc_set_autotrigger_source(0);
 	adc_set_admux(0);
-	//adc_disable_digital_inputs(0);
 
 	sysclk_disable_module(POWER_RED_REG0, PRADC_bm);	// disable ADC sub-module
 }
-#endif
+
 
 #if 0
 static void s_twi_init(uint8_t twi_addr, uint8_t twi_addr_bm)
@@ -851,7 +854,7 @@ int main (void)
 	/* Init of sub-modules */
 	sysclk_init();	PRR = 0b11101011;			// For debugging this module has to be powered on, again
 	ioport_init();
-//	s_adc_init();
+	s_adc_init();
 	s_tc_init();
 
 	/* I/O pins go active here */
@@ -890,7 +893,10 @@ int main (void)
 	runmode = 1;
     while (runmode) {
 	    task(get_abs_time_ms());
+
+		ioport_set_pin_level(LED_GPIO, IOPORT_PIN_LEVEL_LOW);
 	    enter_sleep(SLEEP_MODE_IDLE);
+		ioport_set_pin_level(LED_GPIO, IOPORT_PIN_LEVEL_HIGH);
     }
 
 
@@ -906,7 +912,7 @@ int main (void)
 //	sysclk_disable_module(POWER_RED_REG0, PRUSART0_bm);
 
 //	s_twi_disable();
-//	s_adc_disable();
+	s_adc_disable();
 	s_tc_disable();
 
     enter_sleep(SLEEP_MODE_PWR_DOWN);
