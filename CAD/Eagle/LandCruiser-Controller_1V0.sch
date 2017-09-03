@@ -16005,10 +16005,10 @@ www.schrackrelays.com/pdf/UUB.pdf</description>
 <packages>
 <package name="MCCQ-121">
 <description>&lt;b&gt;minicomp Automotive Fuse-Holder MCCQ-121&lt;/b&gt;</description>
-<pad name="1" x="-7" y="0" drill="2.5" diameter="2.8" thermals="no" first="yes"/>
-<pad name="2" x="-2" y="0" drill="2.5" diameter="2.8" thermals="no"/>
-<pad name="3" x="2" y="0" drill="2.5" diameter="2.8" thermals="no"/>
-<pad name="4" x="7" y="0" drill="2.5" diameter="2.8" thermals="no"/>
+<pad name="1" x="-7" y="0" drill="2.5" diameter="2.8" shape="octagon" first="yes"/>
+<pad name="2" x="-2" y="0" drill="2" diameter="2.5" shape="octagon"/>
+<pad name="3" x="2" y="0" drill="2" diameter="2.5" shape="octagon"/>
+<pad name="4" x="7" y="0" drill="2.5" diameter="2.8" shape="octagon"/>
 <wire x1="-9.5" y1="2" x2="9.5" y2="2" width="0.127" layer="21"/>
 <wire x1="-9.5" y1="-2.3" x2="9.5" y2="-2.3" width="0.127" layer="21"/>
 <wire x1="-9.5" y1="-2.3" x2="-9.5" y2="2" width="0.127" layer="21"/>
@@ -16121,7 +16121,7 @@ www.schrackrelays.com/pdf/UUB.pdf</description>
 <part name="GND111" library="df4iah_supply" deviceset="GND" device=""/>
 <part name="P+12V_601" library="df4iah_supply" deviceset="+12V" device=""/>
 <part name="+5V_611" library="df4iah_supply" deviceset="+5V" device=""/>
-<part name="U611" library="df4iah_powersupply" deviceset="78*" device="T" technology="05" value="LM7805"/>
+<part name="IC611" library="df4iah_powersupply" deviceset="78*" device="T" technology="05" value="LM7805"/>
 <part name="GND601" library="df4iah_supply" deviceset="GND" device=""/>
 <part name="C621" library="rcl" deviceset="C-EU" device="C0805" value="22uF"/>
 <part name="C601" library="rcl" deviceset="CPOL-EU" device="E2.5-7" value="22uF"/>
@@ -17338,7 +17338,7 @@ X511-4 = N.C.</text>
 <instance part="FRAME2" gate="G$1" x="0" y="0"/>
 <instance part="P+12V_601" gate="1" x="203.2" y="106.68" rot="R270"/>
 <instance part="+5V_611" gate="G$1" x="203.2" y="96.52" rot="R270"/>
-<instance part="U611" gate="A1" x="149.86" y="96.52"/>
+<instance part="IC611" gate="A1" x="149.86" y="96.52"/>
 <instance part="GND601" gate="1" x="149.86" y="68.58"/>
 <instance part="C621" gate="G$1" x="177.8" y="86.36"/>
 <instance part="C601" gate="G$1" x="119.38" y="86.36"/>
@@ -17373,7 +17373,7 @@ X511-4 = N.C.</text>
 <wire x1="119.38" y1="73.66" x2="106.68" y2="73.66" width="0.1524" layer="91"/>
 <wire x1="106.68" y1="73.66" x2="106.68" y2="81.28" width="0.1524" layer="91"/>
 <junction x="119.38" y="73.66"/>
-<pinref part="U611" gate="A1" pin="GND"/>
+<pinref part="IC611" gate="A1" pin="GND"/>
 <pinref part="C602" gate="G$1" pin="2"/>
 <wire x1="132.08" y1="73.66" x2="132.08" y2="81.28" width="0.1524" layer="91"/>
 <junction x="132.08" y="73.66"/>
@@ -17392,7 +17392,7 @@ X511-4 = N.C.</text>
 <net name="+5V" class="2">
 <segment>
 <pinref part="+5V_611" gate="G$1" pin="+5V"/>
-<pinref part="U611" gate="A1" pin="VO"/>
+<pinref part="IC611" gate="A1" pin="VO"/>
 <wire x1="200.66" y1="96.52" x2="177.8" y2="96.52" width="0.1524" layer="91"/>
 <pinref part="C621" gate="G$1" pin="1"/>
 <wire x1="177.8" y1="96.52" x2="160.02" y2="96.52" width="0.1524" layer="91"/>
@@ -17432,7 +17432,7 @@ X511-4 = N.C.</text>
 <segment>
 <pinref part="D601" gate="G$1" pin="C"/>
 <pinref part="C601" gate="G$1" pin="+"/>
-<pinref part="U611" gate="A1" pin="VI"/>
+<pinref part="IC611" gate="A1" pin="VI"/>
 <wire x1="119.38" y1="96.52" x2="132.08" y2="96.52" width="0.1524" layer="91"/>
 <wire x1="132.08" y1="96.52" x2="139.7" y2="96.52" width="0.1524" layer="91"/>
 <wire x1="119.38" y1="96.52" x2="119.38" y2="88.9" width="0.1524" layer="91"/>
