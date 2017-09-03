@@ -162,7 +162,7 @@
 <wire x1="0" y1="63" x2="0" y2="0" width="0" layer="20"/>
 <dimension x1="0" y1="0" x2="0" y2="63" x3="-8.5" y3="31.5" textsize="1.016" layer="47"/>
 <dimension x1="0" y1="62.865" x2="98" y2="62.865" x3="49" y3="70.935" textsize="1.016" layer="47"/>
-<text x="10.16" y="57.15" size="1.4224" layer="21" ratio="15">LandCruiser-Controller V1.0
+<text x="10.16" y="57.15" size="1.4224" layer="21" ratio="15">LandCruiser-Controller V1.1
 (c) 2017 by DF4IAH </text>
 <text x="64.77" y="53.975" size="1.016" layer="21" ratio="12">I2C</text>
 <polygon width="0.1" layer="21">
