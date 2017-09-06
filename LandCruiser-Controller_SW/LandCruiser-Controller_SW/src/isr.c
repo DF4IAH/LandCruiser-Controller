@@ -49,7 +49,9 @@
 extern uint_fast64_t		g_timer_abs_msb;
 extern uint8_t				g_adc_state;
 extern float				g_adc_12v;
+extern uint16_t				g_adc_12v_1000;
 extern float				g_adc_temp;
+extern int32_t				g_adc_temp_100;
 extern showData_t			g_showData;
 extern uint8_t				g_SmartLCD_mode;
 //extern uint8_t			g_lcd_contrast_pm;
@@ -271,13 +273,20 @@ ISR(__vector_20, ISR_BLOCK)
 
 ISR(__vector_21, ISR_BLOCK)
 {	/* ADC */
-	static uint8_t cntr = 0;
+	static uint8_t s_cntr = 1;
 	uint16_t adc_val = ADCL | (ADCH << 8);
-	uint8_t  reason  = g_adc_state;
+	uint8_t reason  = g_adc_state;
+
+	/* Remove ADC offset */
+	if (adc_val > 60) {
+		adc_val -= 60;
+	} else {
+		adc_val = 0;
+	}
 
 	/* Every 10th of a second */
-	if (++cntr >= 100) {
-		cntr = 0;
+	if (++s_cntr >= 100) {
+		s_cntr = 0;
 	}
 
 	//TIFR1 |= _BV(TOV1);							// Reset Timer1 overflow status bit (when no ISR for TOV1 activated!)
@@ -290,13 +299,16 @@ ISR(__vector_21, ISR_BLOCK)
 
 		case C_ADC_STATE_VLD_12V:
 		{
-			if (!cntr) {
+			if (!s_cntr) {
 				/* Low pass filtering and enhancing the data depth */
 				float l_adc_12v = g_adc_12v;
 				cpu_irq_enable();
-				float calc = l_adc_12v ?  (0.980f * l_adc_12v + 0.020f * adc_val) : adc_val;	// load with initial value if none is set before
+				float i_adc_12v = l_adc_12v ?  (0.980f * l_adc_12v + 0.020f * adc_val) : adc_val;	// load with initial value if none is set before
+				uint16_t i_adc_12v_1000 = (uint16_t) (((uint32_t)l_adc_12v * 11013UL * 265) / (10240UL * 18));  // Uref = 1.1 V
 				cpu_irq_disable();
-				g_adc_12v = calc;
+
+				g_adc_12v		= i_adc_12v;
+				g_adc_12v_1000	= i_adc_12v_1000;
 
 				adc_set_admux(ADC_MUX_TEMPSENSE | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
 				g_adc_state = C_ADC_STATE_PRE_TEMP;
@@ -311,13 +323,20 @@ ISR(__vector_21, ISR_BLOCK)
 
 		case C_ADC_STATE_VLD_TEMP:
 		{
-			if (!cntr) {
+			if (!s_cntr) {
+				const float C_temp_coef_k			= 1.0595703f;
+				const float C_temp_coef_ofs_atmel	= 1024 * 0.314f / 1.1f;
+				const float C_temp_coef_ofs			= -6.20f - C_temp_coef_ofs_atmel;
+
 				/* Low pass filtering and enhancing the data depth */
 				float l_adc_temp  = g_adc_temp;
 				cpu_irq_enable();
-				float calc = l_adc_temp ?  0.998f * l_adc_temp  + 0.002f * adc_val : adc_val;	// load with initial value if none is set before
+				float i_adc_temp = l_adc_temp ?  0.998f * l_adc_temp  + 0.002f * adc_val : adc_val;	// load with initial value if none is set before
+				float i_adc_temp_100 = 100.f * (25.f + (i_adc_temp + C_temp_coef_ofs) * C_temp_coef_k);
 				cpu_irq_disable();
-				g_adc_temp = calc;
+
+				g_adc_temp = i_adc_temp;
+				g_adc_temp_100 = (int32_t)i_adc_temp_100;
 
 				adc_set_admux(ADC_MUX_ADC0 | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
 				g_adc_state = C_ADC_STATE_PRE_12V;

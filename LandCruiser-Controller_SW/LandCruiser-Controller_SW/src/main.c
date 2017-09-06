@@ -46,7 +46,9 @@
 uint_fast64_t		g_timer_abs_msb						= 0ULL;
 uint8_t				g_adc_state							= 0;
 float				g_adc_12v							= 0.f;
+uint16_t			g_adc_12v_1000						= 0;
 float				g_adc_temp							= 0.f;
+int32_t				g_adc_temp_100						= 0;
 //bool				g_lcdbl_auto						= true;
 //uint8_t			g_lcdbl_dimmer						= 0;
 //uint8_t			g_lcd_contrast_pm					= 0;
@@ -250,8 +252,7 @@ static void s_adc_init(void)
 {
 	sysclk_enable_module(POWER_RED_REG0, PRADC_bm);	// enable ADC sub-module
 
-	adc_disable_digital_inputs(_BV(ADC0D));		// disable the digital input on the ADC0 port
-	adc_disable_digital_inputs(_BV(ADC1D));		// disable the digital input on the ADC1 port
+	adc_disable_digital_inputs(_BV(ADC1D) | _BV(ADC0D));	// MP_ADC0, MP_ADC1: disable the digital input on the ADC0 and ADC1 port
 
 	adc_init(ADC_PRESCALER_DIV64);
 	adc_set_admux(ADC_MUX_ADC0 | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
