@@ -50,6 +50,7 @@ extern uint_fast64_t		g_timer_abs_msb;
 extern uint8_t				g_adc_state;
 extern float				g_adc_12v;
 extern uint16_t				g_adc_12v_1000;
+extern bool					g_adc_12v_under;
 extern float				g_adc_temp;
 extern int32_t				g_adc_temp_100;
 extern showData_t			g_showData;
@@ -309,6 +310,7 @@ ISR(__vector_21, ISR_BLOCK)
 
 				g_adc_12v		= i_adc_12v;
 				g_adc_12v_1000	= i_adc_12v_1000;
+				g_adc_12v_under = i_adc_12v_1000 < 10500U ?  true : false;
 
 				adc_set_admux(ADC_MUX_TEMPSENSE | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
 				g_adc_state = C_ADC_STATE_PRE_TEMP;

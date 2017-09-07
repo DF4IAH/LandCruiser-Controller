@@ -31,6 +31,7 @@
  */
 #include <asf.h>
 #include <stdio.h>
+#include <string.h>
 #include <avr/eeprom.h>
 
 #include "isr.h"
@@ -47,6 +48,7 @@ uint_fast64_t		g_timer_abs_msb						= 0ULL;
 uint8_t				g_adc_state							= 0;
 float				g_adc_12v							= 0.f;
 uint16_t			g_adc_12v_1000						= 0;
+bool				g_adc_12v_under						= false;
 float				g_adc_temp							= 0.f;
 int32_t				g_adc_temp_100						= 0;
 //bool				g_lcdbl_auto						= true;
@@ -72,12 +74,35 @@ static uint8_t		runmode								= 0;
 static void s_reset_global_vars(void)
 {
 	irqflags_t flags	= cpu_irq_save();
-	g_timer_abs_msb		= 0ULL;
-	g_adc_state			= 0;
+
+	runmode								= 0;
+
+	g_timer_abs_msb						= 0ULL;
+	g_adc_state							= 0;
+	g_adc_12v							= 0.f;
+	g_adc_12v_1000						= 0;
+	g_adc_12v_under						= false;
+	g_adc_temp							= 0.f;
+	g_adc_temp_100						= 0;
 
 	#if 0
-	g_lcdbl_dimmer		= 64;
+	g_lcdbl_auto						= true;
+	g_lcdbl_dimmer						= 64;
+	g_lcd_contrast_pm					= 0;
 	#endif
+
+	memset(&g_showData, 0, sizeof(g_showData));
+
+	g_SmartLCD_mode						= C_SMART_LCD_MODE_UNIQUE;
+
+	#if 0
+	g_lcd_pixel_type					= GFX_PIXEL_CLR;
+	g_lcd_pencil_x						= 0;
+	g_lcd_pencil_y						= 0;
+	#endif
+
+	g_resetCause						= 0;
+
 	cpu_irq_restore(flags);
 }
 
@@ -395,33 +420,37 @@ void task(uint64_t now)
 	static uint8_t s_fsm_state			= 0;
 	static bool s_change_dir			= false;
 
-	static bool s_i_fb					= false;
+	static bool s_i_fb					= false;	// FB
 	static bool s_i_fb_t0				= false;
 	static bool s_i_fb_t1				= false;
 	static bool s_i_fb_t2				= false;
 	static bool s_i_fb_t3				= false;
-	static bool s_i_sk_g				= false;
+	static bool s_i_uv					= false;	// ADC0 12V under-voltage
+	static bool s_i_uv_t0				= false;
+	static bool s_i_uv_t1				= false;
+	static bool s_i_uv_t2				= false;
+	static bool s_i_sk_g				= false;	// SK_G
 	static bool s_i_sk_g_t0				= false;
 	static bool s_i_sk_g_t1				= false;
 	static bool s_i_sk_g_t2				= false;
-	static bool s_i_sk_o				= false;
+	static bool s_i_sk_o				= false;	// SK_O
 	static bool s_i_sk_o_t0				= false;
 	static bool s_i_sk_o_t1				= false;
 	static bool s_i_sk_o_t2				= false;
-	static bool s_i_sa_g				= false;
+	static bool s_i_sa_g				= false;	// SA_G
 	static bool s_i_sa_g_t0				= false;
 	static bool s_i_sa_g_t1				= false;
 	static bool s_i_sa_g_t2				= false;
-	static bool s_i_sa_o				= false;
+	static bool s_i_sa_o				= false;	// SA_O
 	static bool s_i_sa_o_t0				= false;
 	static bool s_i_sa_o_t1				= false;
 	static bool s_i_sa_o_t2				= false;
 
-	static bool s_o_kl					= false;
-	static bool s_o_pv_g				= false;
-	static bool s_o_pv_o				= false;
-	static bool s_o_m1					= false;
-	static bool s_o_m2					= false;
+	static bool s_o_kl					= false;	// KL
+	static bool s_o_pv_g				= false;	// PV_G
+	static bool s_o_pv_o				= false;	// PV_O
+	static bool s_o_m1					= false;	// M1
+	static bool s_o_m2					= false;	// M2
 
 	/* Running every C_TASK_TIMESPAN milliseconds */
 	if (s_timer_task_next <= now) {
@@ -442,12 +471,19 @@ void task(uint64_t now)
 		s_i_fb_t3	= s_i_fb_t2;
 		s_i_fb_t2	= s_i_fb_t1;
 		s_i_fb_t1	= s_i_fb_t0;
+
+		s_i_uv_t2	= s_i_uv_t1;
+		s_i_uv_t1	= s_i_uv_t0;
+
 		s_i_sk_g_t2	= s_i_sk_g_t1;
 		s_i_sk_g_t1	= s_i_sk_g_t0;
+
 		s_i_sk_o_t2	= s_i_sk_o_t1;
 		s_i_sk_o_t1	= s_i_sk_o_t0;
+
 		s_i_sa_g_t2	= s_i_sa_g_t1;
 		s_i_sa_g_t1	= s_i_sa_g_t0;
+
 		s_i_sa_o_t2	= s_i_sa_o_t1;
 		s_i_sa_o_t1	= s_i_sa_o_t0;
 	}
@@ -455,6 +491,7 @@ void task(uint64_t now)
 	/* Break up into single input signals */
 	{
 		s_i_fb_t0	= (l_pin_d & _BV(4)) ?  false : true;
+		s_i_uv_t0	= g_adc_12v_under;
 		s_i_sk_g_t0	= (l_pin_b & _BV(6)) ?  false : true;
 		s_i_sk_o_t0	= (l_pin_b & _BV(7)) ?  false : true;
 		s_i_sa_g_t0	= (l_pin_d & _BV(6)) ?  false : true;
@@ -469,9 +506,15 @@ void task(uint64_t now)
 			s_i_fb = false;
 		}
 
+		if (s_i_uv_t2 && s_i_uv_t1 && s_i_uv_t0) {
+			s_i_uv = true;
+		} else if (!s_i_uv_t2 && !s_i_uv_t1 && !s_i_uv_t0) {
+			s_i_uv = false;
+		}
+
 		if (s_i_sk_g_t2 && s_i_sk_g_t1 && s_i_sk_g_t0) {
 			s_i_sk_g = true;
-		} else if (!s_i_sk_g_t2 && !s_i_sk_g_t1 && !s_i_sk_g_t0) {
+			} else if (!s_i_sk_g_t2 && !s_i_sk_g_t1 && !s_i_sk_g_t0) {
 			s_i_sk_g = false;
 		}
 
@@ -507,7 +550,7 @@ void task(uint64_t now)
 				s_o_m2		= false;
 
 				/* Input vector correct */
-				if (!s_i_fb && s_i_sa_g && !s_i_sa_o && s_i_sk_g && !s_i_sk_o) {
+				if (!s_i_fb && !s_i_uv && s_i_sa_g && !s_i_sa_o && s_i_sk_g && !s_i_sk_o) {
 					s_fsm_state = 0x01;
 				}
 			}
@@ -517,16 +560,16 @@ void task(uint64_t now)
 			{
 				/* STANDBY CLOSED: Tailgate closed, normal LandCruiser driving state, KL dark */
 
-				/* Dropping the button allowance */
-				if (!s_i_fb) {
+				/* Dropping the button (or under-voltage) allowance */
+				if (!s_i_fb || s_i_uv) {
 					s_timer_fb = 0ULL;
-				} else if (!s_i_fb_t3) {
+				} else if ((s_i_fb && !s_i_uv) && (!s_i_fb_t3 || s_i_uv_t2)) {
 					/* Button just pressed - after repressing the button, wait until low-pass filtering time is over */
 					s_timer_fb = now + C_FB_PRESS_SHORT_TIME;  // Short time is enough for the end points
 				}
 
-				/* Remote control button pressed */
-				if (s_i_fb && s_i_sa_g && !s_i_sa_o && s_i_sk_g && !s_i_sk_o) {
+				/* Remote control button pressed and no under-voltage detected */
+				if (s_i_fb && !s_i_uv && s_i_sa_g && !s_i_sa_o && s_i_sk_g && !s_i_sk_o) {
 					s_o_kl = true;
 
 					/* Button pressed long enough, open valve for unlocking */
@@ -637,23 +680,23 @@ void task(uint64_t now)
 			{
 				/* STANDBY OPENED: wait for close command */
 
-				/* Reset timer when released within low-pass filtering time */
-				if (!s_i_fb) {
+				/* Reset timer when button released or under-voltage detected within low-pass filtering time */
+				if (!s_i_fb || s_i_uv) {
 					s_timer_fb = 0ULL;
 				} else {
-					if (!s_i_fb_t3) {
+					if ((s_i_fb && !s_i_uv) && (!s_i_fb_t3 || s_i_uv_t2)) {
 						/* Button just pressed - after repressing the button, wait until low-pass filtering time is over */
 						s_timer_fb = now + C_FB_PRESS_SHORT_TIME;
 					}
 				}
 
 				/* When S-K.O has opened due to pressure release, re-open PV_O until contact is made again */
-				if (s_i_fb && !s_i_sk_o) {
+				if (s_i_fb && !s_i_uv && !s_i_sk_o) {
 					s_o_pv_o = true;
 				}
 
-				/* Remote control button pressed */
-				if (s_i_fb && !s_i_sa_g && s_i_sa_o && !s_i_sk_g && s_i_sk_o) {
+				/* Remote control button pressed and no under-voltage detected */
+				if (s_i_fb && !s_i_uv && !s_i_sa_g && s_i_sa_o && !s_i_sk_g && s_i_sk_o) {
 					/* Button pressed long enough, move wings back to lock position */
 					if (s_timer_fb && (s_timer_fb <= now)) {
 						s_o_m1		= false;
