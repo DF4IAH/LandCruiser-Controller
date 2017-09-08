@@ -38,6 +38,9 @@
 /* Securing valve timer */
 #define C_PV_ACTION_TIME											1000
 
+/* Minimum period = maximum speed to allow FSM to proceed */
+#define C_TICKS_MAXSPEED											100
+
 
 typedef enum C_ADC_STATE__ENUM {
 	C_ADC_STATE_PRE_12V												= 1,

@@ -51,6 +51,7 @@ uint16_t			g_adc_12v_1000						= 0;
 bool				g_adc_12v_under						= false;
 float				g_adc_temp							= 0.f;
 int32_t				g_adc_temp_100						= 0;
+bool				g_speed_over						= false;
 //bool				g_lcdbl_auto						= true;
 //uint8_t			g_lcdbl_dimmer						= 0;
 //uint8_t			g_lcd_contrast_pm					= 0;
@@ -84,6 +85,7 @@ static void s_reset_global_vars(void)
 	g_adc_12v_under						= false;
 	g_adc_temp							= 0.f;
 	g_adc_temp_100						= 0;
+	g_speed_over						= false;
 
 	#if 0
 	g_lcdbl_auto						= true;
@@ -119,15 +121,15 @@ static void s_io_preinit(void)
 	PORTB = 0b11000011;								// in:  PB0: NC, PB1: NC, PB6: MP_SK_G, PB7: MP_SK_O
 
 	DDRC  = 0b00101000;								// out: PC3: MP_KL, PC5: SCL
-	PORTC = 0b00110000;								// in:  PC0: MP_ADC0, PC1: MP_ADC1, PC2: MP_TACHO, PC4: SDA
+	PORTC = 0b00110000;								// in:  PC0: MP_ADC0, PC1: MP_ADC1, PC2: MP_TACHO (PCINT10), PC4: SDA
 
 	DDRD  = 0b00001010;								// out: PD1: MP_TXD, PD3: MP_LED
 	PORTD = 0b11110111;								// in:  PD0: MP_RXD, PD2: MP_INT, PD4: MP_FB, PD5: NC, PD6: MP_SA_G, PD7: MP_SA_O
 
-	#if 0
-	// Analog input: Digital Disable Register  --> see s_adc_init()
-	DIDR0 = 0b00000011;								// PC0: MP_ADC0, PC1: MP_ADC1
-	#endif
+	/* Connect PCINT10 = Pin PC2 to PCI1 */
+	PCMSK1	= _BV(PCINT10);
+	PCIFR	= _BV(PCIF1);
+	PCICR	= _BV(PCIE1);
 }
 
 static void s_tc_init(void)
@@ -429,6 +431,10 @@ void task(uint64_t now)
 	static bool s_i_uv_t0				= false;
 	static bool s_i_uv_t1				= false;
 	static bool s_i_uv_t2				= false;
+	static bool s_i_os					= false;	// Over-speed
+	static bool s_i_os_t0				= false;
+	static bool s_i_os_t1				= false;
+	static bool s_i_os_t2				= false;
 	static bool s_i_sk_g				= false;	// SK_G
 	static bool s_i_sk_g_t0				= false;
 	static bool s_i_sk_g_t1				= false;
@@ -472,6 +478,9 @@ void task(uint64_t now)
 		s_i_fb_t2	= s_i_fb_t1;
 		s_i_fb_t1	= s_i_fb_t0;
 
+		s_i_os_t2	= s_i_os_t1;
+		s_i_os_t1	= s_i_os_t0;
+
 		s_i_uv_t2	= s_i_uv_t1;
 		s_i_uv_t1	= s_i_uv_t0;
 
@@ -492,6 +501,7 @@ void task(uint64_t now)
 	{
 		s_i_fb_t0	= (l_pin_d & _BV(4)) ?  false : true;
 		s_i_uv_t0	= g_adc_12v_under;
+		s_i_os_t0	= g_speed_over;
 		s_i_sk_g_t0	= (l_pin_b & _BV(6)) ?  false : true;
 		s_i_sk_o_t0	= (l_pin_b & _BV(7)) ?  false : true;
 		s_i_sa_g_t0	= (l_pin_d & _BV(6)) ?  false : true;
@@ -510,6 +520,12 @@ void task(uint64_t now)
 			s_i_uv = true;
 		} else if (!s_i_uv_t2 && !s_i_uv_t1 && !s_i_uv_t0) {
 			s_i_uv = false;
+		}
+
+		if (s_i_os_t2 && s_i_os_t1 && s_i_os_t0) {
+			s_i_os = true;
+		} else if (!s_i_os_t2 && !s_i_os_t1 && !s_i_os_t0) {
+			s_i_os = false;
 		}
 
 		if (s_i_sk_g_t2 && s_i_sk_g_t1 && s_i_sk_g_t0) {
@@ -550,7 +566,7 @@ void task(uint64_t now)
 				s_o_m2		= false;
 
 				/* Input vector correct */
-				if (!s_i_fb && !s_i_uv && s_i_sa_g && !s_i_sa_o && s_i_sk_g && !s_i_sk_o) {
+				if (!s_i_fb && !s_i_uv && !s_i_os && s_i_sa_g && !s_i_sa_o && s_i_sk_g && !s_i_sk_o) {
 					s_fsm_state = 0x01;
 				}
 			}
@@ -561,15 +577,15 @@ void task(uint64_t now)
 				/* STANDBY CLOSED: Tailgate closed, normal LandCruiser driving state, KL dark */
 
 				/* Dropping the button (or under-voltage) allowance */
-				if (!s_i_fb || s_i_uv) {
+				if (!s_i_fb || s_i_uv || s_i_os) {
 					s_timer_fb = 0ULL;
-				} else if ((s_i_fb && !s_i_uv) && (!s_i_fb_t3 || s_i_uv_t2)) {
+				} else if ((s_i_fb && !s_i_uv && !s_i_os) && (!s_i_fb_t3 || s_i_uv_t2 || s_i_os_t2)) {
 					/* Button just pressed - after repressing the button, wait until low-pass filtering time is over */
 					s_timer_fb = now + C_FB_PRESS_SHORT_TIME;  // Short time is enough for the end points
 				}
 
-				/* Remote control button pressed and no under-voltage detected */
-				if (s_i_fb && !s_i_uv && s_i_sa_g && !s_i_sa_o && s_i_sk_g && !s_i_sk_o) {
+				/* Remote control button pressed and no under-voltage or over-speed detected */
+				if (s_i_fb && !s_i_uv && !s_i_os && s_i_sa_g && !s_i_sa_o && s_i_sk_g && !s_i_sk_o) {
 					s_o_kl = true;
 
 					/* Button pressed long enough, open valve for unlocking */

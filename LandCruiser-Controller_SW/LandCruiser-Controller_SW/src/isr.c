@@ -53,6 +53,7 @@ extern uint16_t				g_adc_12v_1000;
 extern bool					g_adc_12v_under;
 extern float				g_adc_temp;
 extern int32_t				g_adc_temp_100;
+extern bool					g_speed_over;
 extern showData_t			g_showData;
 extern uint8_t				g_SmartLCD_mode;
 //extern uint8_t			g_lcd_contrast_pm;
@@ -97,7 +98,21 @@ ISR(__vector_3, ISR_BLOCK)
 
 ISR(__vector_4, ISR_BLOCK)
 {	/* PCINT1 */
-	s_bad_interrupt();
+	static uint64_t s_last = 0ULL;
+
+	/* Pin PCINT10 has triggered - check for rising signal */
+	if (ioport_get_pin_level(TACHO_GPIO)) {
+		uint64_t i_now = ((uint64_t)TCNT1H) << 8;
+		barrier();
+		i_now |= (uint64_t)TCNT1L;
+		i_now |= g_timer_abs_msb << 16;
+
+		if (i_now) {
+			uint64_t diff = i_now - s_last;
+			g_speed_over = diff <= C_TICKS_MAXSPEED ?  true : false;
+			s_last = i_now;
+		}
+	}
 }
 
 ISR(__vector_5, ISR_BLOCK)
