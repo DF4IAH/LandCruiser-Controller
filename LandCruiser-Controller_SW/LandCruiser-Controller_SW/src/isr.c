@@ -47,7 +47,13 @@
 /* External vars */
 
 extern uint_fast64_t		g_timer_abs_msb;
-//extern uint8_t			g_adc_state;
+extern uint8_t				g_adc_state;
+extern float				g_adc_12v;
+extern uint16_t				g_adc_12v_1000;
+extern bool					g_adc_12v_under;
+extern float				g_adc_temp;
+extern int32_t				g_adc_temp_100;
+extern bool					g_speed_over;
 extern showData_t			g_showData;
 extern uint8_t				g_SmartLCD_mode;
 //extern uint8_t			g_lcd_contrast_pm;
@@ -92,7 +98,18 @@ ISR(__vector_3, ISR_BLOCK)
 
 ISR(__vector_4, ISR_BLOCK)
 {	/* PCINT1 */
-	s_bad_interrupt();
+	static uint64_t s_last = 0ULL;
+
+	/* Pin PCINT10 has triggered - check for rising signal */
+	if (ioport_get_pin_level(TACHO_GPIO)) {
+		uint16_t i_now  = g_timer_abs_msb;
+
+		if (i_now) {
+			uint64_t diff = i_now - s_last;
+			g_speed_over = diff <= C_TICKS_MAXSPEED ?  true : false;
+			s_last = i_now;
+		}
+	}
 }
 
 ISR(__vector_5, ISR_BLOCK)
@@ -269,54 +286,82 @@ ISR(__vector_20, ISR_BLOCK)
 
 ISR(__vector_21, ISR_BLOCK)
 {	/* ADC */
-	#if 0
+	static uint8_t s_cntr = 1;
 	uint16_t adc_val = ADCL | (ADCH << 8);
-	uint8_t  reason  = g_adc_state;
+	uint8_t reason  = g_adc_state;
+
+	/* Remove ADC offset */
+	if (adc_val > 60) {
+		adc_val -= 60;
+	} else {
+		adc_val = 0;
+	}
+
+	/* Every 10th of a second */
+	if (++s_cntr >= 100) {
+		s_cntr = 0;
+	}
 
 	//TIFR1 |= _BV(TOV1);							// Reset Timer1 overflow status bit (when no ISR for TOV1 activated!)
 
 	switch (reason) {
-		case ADC_STATE_PRE_LDR:
+		case C_ADC_STATE_PRE_12V:
 			// drop one ADC value after switching MUX
-			g_adc_state = ADC_STATE_VLD_LDR;
+			g_adc_state = C_ADC_STATE_VLD_12V;
 		break;
 
-		case ADC_STATE_VLD_LDR:
+		case C_ADC_STATE_VLD_12V:
 		{
-			/* Low pass filtering and enhancing the data depth */
-			float l_adc_light = g_adc_light;
-			cpu_irq_enable();
-			float calc = l_adc_light ?  0.980f * l_adc_light + 0.020f * adc_val : adc_val;	// load with initial value if none is set before
-			cpu_irq_disable();
-			g_adc_light = calc;
+			if (!s_cntr) {
+				/* Low pass filtering and enhancing the data depth */
+				float l_adc_12v = g_adc_12v;
+				cpu_irq_enable();
+				float i_adc_12v = l_adc_12v ?  (0.980f * l_adc_12v + 0.020f * adc_val) : adc_val;	// load with initial value if none is set before
+				uint16_t i_adc_12v_1000 = (uint16_t) (((uint32_t)l_adc_12v * 11013UL * 265) / (10240UL * 18));  // Uref = 1.1 V
+				cpu_irq_disable();
 
-			adc_set_admux(ADC_MUX_TEMPSENSE | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
-			g_adc_state = ADC_STATE_PRE_TEMP;
+				g_adc_12v		= i_adc_12v;
+				g_adc_12v_1000	= i_adc_12v_1000;
+				g_adc_12v_under = i_adc_12v_1000 < 10500U ?  true : false;
+
+				adc_set_admux(ADC_MUX_TEMPSENSE | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
+				g_adc_state = C_ADC_STATE_PRE_TEMP;
+			}
 		}
 		break;
 
-		case ADC_STATE_PRE_TEMP:
+		case C_ADC_STATE_PRE_TEMP:
 			// drop one ADC value after switching MUX
-			g_adc_state = ADC_STATE_VLD_TEMP;
+			g_adc_state = C_ADC_STATE_VLD_TEMP;
 		break;
 
-		case ADC_STATE_VLD_TEMP:
+		case C_ADC_STATE_VLD_TEMP:
 		{
-			/* Low pass filtering and enhancing the data depth */
-			float l_adc_temp  = g_adc_temp;
-			cpu_irq_enable();
-			float calc = l_adc_temp ?  0.998f * l_adc_temp  + 0.002f * adc_val : adc_val;	// load with initial value if none is set before
-			cpu_irq_disable();
-			g_adc_temp = calc;
+			if (!s_cntr) {
+				const float C_temp_coef_k			= 1.0595703f;
+				const float C_temp_coef_ofs_atmel	= 1024 * 0.314f / 1.1f;
+				const float C_temp_coef_ofs			= -6.20f - C_temp_coef_ofs_atmel;
+
+				/* Low pass filtering and enhancing the data depth */
+				float l_adc_temp  = g_adc_temp;
+				cpu_irq_enable();
+				float i_adc_temp = l_adc_temp ?  0.998f * l_adc_temp  + 0.002f * adc_val : adc_val;	// load with initial value if none is set before
+				float i_adc_temp_100 = 100.f * (25.f + (i_adc_temp + C_temp_coef_ofs) * C_temp_coef_k);
+				cpu_irq_disable();
+
+				g_adc_temp = i_adc_temp;
+				g_adc_temp_100 = (int32_t)i_adc_temp_100;
+
+				adc_set_admux(ADC_MUX_ADC0 | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
+				g_adc_state = C_ADC_STATE_PRE_12V;
+			}
 		}
-			// fall-through.
+		break;
+
 		default:
 			adc_set_admux(ADC_MUX_ADC0 | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
-			g_adc_state = ADC_STATE_PRE_LDR;
+			g_adc_state = C_ADC_STATE_PRE_12V;
 	}
-	#else
-	s_bad_interrupt();
-	#endif
 }
 
 ISR(__vector_22, ISR_BLOCK)

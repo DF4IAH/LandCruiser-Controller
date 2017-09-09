@@ -19,7 +19,7 @@
 
 /* VERSION: YYM, MDD */
 #define VERSION_HIGH												170
-#define VERSION_LOW													827
+#define VERSION_LOW													907
 
 /* I2C-Version V1.1 */
 #define I2C_VERSION													0x11
@@ -37,6 +37,17 @@
 
 /* Securing valve timer */
 #define C_PV_ACTION_TIME											1000
+
+/* Minimum period = maximum speed to allow FSM to proceed */
+#define C_TICKS_MAXSPEED											100
+
+
+typedef enum C_ADC_STATE__ENUM {
+	C_ADC_STATE_PRE_12V												= 1,
+	C_ADC_STATE_VLD_12V,
+	C_ADC_STATE_PRE_TEMP,
+	C_ADC_STATE_VLD_TEMP,
+} C_ADC_STATE__ENUM_t;
 
 
 enum C_SMART_LCD_MODE__ENUM {

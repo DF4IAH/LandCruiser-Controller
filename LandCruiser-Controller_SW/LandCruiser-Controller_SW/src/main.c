@@ -31,6 +31,7 @@
  */
 #include <asf.h>
 #include <stdio.h>
+#include <string.h>
 #include <avr/eeprom.h>
 
 #include "isr.h"
@@ -44,7 +45,13 @@
 /* GLOBAL section */
 
 uint_fast64_t		g_timer_abs_msb						= 0ULL;
-//uint8_t			g_adc_state							= 0;
+uint8_t				g_adc_state							= 0;
+float				g_adc_12v							= 0.f;
+uint16_t			g_adc_12v_1000						= 0;
+bool				g_adc_12v_under						= false;
+float				g_adc_temp							= 0.f;
+int32_t				g_adc_temp_100						= 0;
+bool				g_speed_over						= false;
 //bool				g_lcdbl_auto						= true;
 //uint8_t			g_lcdbl_dimmer						= 0;
 //uint8_t			g_lcd_contrast_pm					= 0;
@@ -68,12 +75,36 @@ static uint8_t		runmode								= 0;
 static void s_reset_global_vars(void)
 {
 	irqflags_t flags	= cpu_irq_save();
-	g_timer_abs_msb		= 0ULL;
+
+	runmode								= 0;
+
+	g_timer_abs_msb						= 0ULL;
+	g_adc_state							= 0;
+	g_adc_12v							= 0.f;
+	g_adc_12v_1000						= 0;
+	g_adc_12v_under						= false;
+	g_adc_temp							= 0.f;
+	g_adc_temp_100						= 0;
+	g_speed_over						= false;
 
 	#if 0
-	g_adc_state			= ADC_STATE_PRE_LDR;
-	g_lcdbl_dimmer		= 64;
+	g_lcdbl_auto						= true;
+	g_lcdbl_dimmer						= 64;
+	g_lcd_contrast_pm					= 0;
 	#endif
+
+	memset(&g_showData, 0, sizeof(g_showData));
+
+	g_SmartLCD_mode						= C_SMART_LCD_MODE_UNIQUE;
+
+	#if 0
+	g_lcd_pixel_type					= GFX_PIXEL_CLR;
+	g_lcd_pencil_x						= 0;
+	g_lcd_pencil_y						= 0;
+	#endif
+
+	g_resetCause						= 0;
+
 	cpu_irq_restore(flags);
 }
 
@@ -90,13 +121,15 @@ static void s_io_preinit(void)
 	PORTB = 0b11000011;								// in:  PB0: NC, PB1: NC, PB6: MP_SK_G, PB7: MP_SK_O
 
 	DDRC  = 0b00101000;								// out: PC3: MP_KL, PC5: SCL
-	PORTC = 0b11110111;								// in:  PC0: NC, PC1: NC, PC2: NC, PC4: SDA, PC6: NC, PC7: NC
+	PORTC = 0b00110000;								// in:  PC0: MP_ADC0, PC1: MP_ADC1, PC2: MP_TACHO (PCINT10), PC4: SDA
 
-	DDRD  = 0b00000010;								// out: PD1: MP_TXD
-	PORTD = 0b11111111;								// in:  PD0: MP_RXD, PD2: MP_INT, PD3: NC, PD4: MP_FB, PD5: NC, PD6: MP_SA_G, PD7: MP_SA_O
+	DDRD  = 0b00001010;								// out: PD1: MP_TXD, PD3: MP_LED
+	PORTD = 0b11110111;								// in:  PD0: MP_RXD, PD2: MP_INT, PD4: MP_FB, PD5: NC, PD6: MP_SA_G, PD7: MP_SA_O
 
-	// Analog input: Digital Disable Register
-	DIDR0 = 0b00000111;								// PC0: NC_A, PC1: NC_A, PC2: NC_A
+	/* Connect PCINT10 = Pin PC2 to PCI1 */
+	PCMSK1	= _BV(PCINT10);
+	PCIFR	= _BV(PCIF1);
+	PCICR	= _BV(PCIE1);
 }
 
 static void s_tc_init(void)
@@ -111,7 +144,7 @@ static void s_tc_init(void)
 	#endif
 
 	#if 0
-	/* TC0 - Overflows with about 122 Hz for the ADC convertion */
+	/* TC0 - OC0x: N/A */
 	{
 		sysclk_enable_module(POWER_RED_REG0, PRTIM0_bm);
 
@@ -153,7 +186,7 @@ static void s_tc_init(void)
 	}
 
 	#if 0
-	/* TC2 - OC2A: LCD backlight w/ 8-bit resolution - overflows with abt. 61 Hz */
+	/* TC2 - OC2A: N/A */
 	{
 		sysclk_enable_module(POWER_RED_REG0, PRTIM2_bm);
 
@@ -178,9 +211,9 @@ static void s_tc_init(void)
 static void s_tc_start(void)
 {
 	#if 0
-	/* TC0: Overflows with about 30 Hz for the ADC convertion */
+	/* TC0: N/A */
 	/* TC1: Audio output @ 16-bit counter PWM, used: 10-bit resolution */
-	/* TC2: LCD backlight w/ 8-bit resolution */
+	/* TC2: N/A */
 	{
 		/* Timer Synchronous Mode - trigger */
 		GTCCR = 0;								// trigger the sync for all counters
@@ -242,19 +275,18 @@ static void s_tc_disable(void)
 }
 
 
-#if 0
 static void s_adc_init(void)
 {
 	sysclk_enable_module(POWER_RED_REG0, PRADC_bm);	// enable ADC sub-module
 
-	adc_disable_digital_inputs(_BV(ADC0D));		// disable the digital input on the ADC0 port
+	adc_disable_digital_inputs(_BV(ADC1D) | _BV(ADC0D));	// MP_ADC0, MP_ADC1: disable the digital input on the ADC0 and ADC1 port
 
 	adc_init(ADC_PRESCALER_DIV64);
 	adc_set_admux(ADC_MUX_ADC0 | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
 
 	#if 1
 	/* ADC is started by TC0 timer directly - disadvantage: lower amplitude precision */
-	adc_set_autotrigger_source(ADC_AUTOTRIGGER_SOURCE_TC0_OVERFLOW);
+	adc_set_autotrigger_source(ADC_AUTOTRIGGER_SOURCE_TC1_OVERFLOW);
 	adc_enable_autotrigger();
 	#else
 	adc_disable_autotrigger();
@@ -272,11 +304,10 @@ static void s_adc_disable(void)
 	adc_disable_autotrigger();
 	adc_set_autotrigger_source(0);
 	adc_set_admux(0);
-	//adc_disable_digital_inputs(0);
 
 	sysclk_disable_module(POWER_RED_REG0, PRADC_bm);	// disable ADC sub-module
 }
-#endif
+
 
 #if 0
 static void s_twi_init(uint8_t twi_addr, uint8_t twi_addr_bm)
@@ -391,33 +422,41 @@ void task(uint64_t now)
 	static uint8_t s_fsm_state			= 0;
 	static bool s_change_dir			= false;
 
-	static bool s_i_fb					= false;
+	static bool s_i_fb					= false;	// FB
 	static bool s_i_fb_t0				= false;
 	static bool s_i_fb_t1				= false;
 	static bool s_i_fb_t2				= false;
 	static bool s_i_fb_t3				= false;
-	static bool s_i_sk_g				= false;
+	static bool s_i_uv					= false;	// ADC0 12V under-voltage
+	static bool s_i_uv_t0				= false;
+	static bool s_i_uv_t1				= false;
+	static bool s_i_uv_t2				= false;
+	static bool s_i_os					= false;	// Over-speed
+	static bool s_i_os_t0				= false;
+	static bool s_i_os_t1				= false;
+	static bool s_i_os_t2				= false;
+	static bool s_i_sk_g				= false;	// SK_G
 	static bool s_i_sk_g_t0				= false;
 	static bool s_i_sk_g_t1				= false;
 	static bool s_i_sk_g_t2				= false;
-	static bool s_i_sk_o				= false;
+	static bool s_i_sk_o				= false;	// SK_O
 	static bool s_i_sk_o_t0				= false;
 	static bool s_i_sk_o_t1				= false;
 	static bool s_i_sk_o_t2				= false;
-	static bool s_i_sa_g				= false;
+	static bool s_i_sa_g				= false;	// SA_G
 	static bool s_i_sa_g_t0				= false;
 	static bool s_i_sa_g_t1				= false;
 	static bool s_i_sa_g_t2				= false;
-	static bool s_i_sa_o				= false;
+	static bool s_i_sa_o				= false;	// SA_O
 	static bool s_i_sa_o_t0				= false;
 	static bool s_i_sa_o_t1				= false;
 	static bool s_i_sa_o_t2				= false;
 
-	static bool s_o_kl					= false;
-	static bool s_o_pv_g				= false;
-	static bool s_o_pv_o				= false;
-	static bool s_o_m1					= false;
-	static bool s_o_m2					= false;
+	static bool s_o_kl					= false;	// KL
+	static bool s_o_pv_g				= false;	// PV_G
+	static bool s_o_pv_o				= false;	// PV_O
+	static bool s_o_m1					= false;	// M1
+	static bool s_o_m2					= false;	// M2
 
 	/* Running every C_TASK_TIMESPAN milliseconds */
 	if (s_timer_task_next <= now) {
@@ -438,12 +477,22 @@ void task(uint64_t now)
 		s_i_fb_t3	= s_i_fb_t2;
 		s_i_fb_t2	= s_i_fb_t1;
 		s_i_fb_t1	= s_i_fb_t0;
+
+		s_i_os_t2	= s_i_os_t1;
+		s_i_os_t1	= s_i_os_t0;
+
+		s_i_uv_t2	= s_i_uv_t1;
+		s_i_uv_t1	= s_i_uv_t0;
+
 		s_i_sk_g_t2	= s_i_sk_g_t1;
 		s_i_sk_g_t1	= s_i_sk_g_t0;
+
 		s_i_sk_o_t2	= s_i_sk_o_t1;
 		s_i_sk_o_t1	= s_i_sk_o_t0;
+
 		s_i_sa_g_t2	= s_i_sa_g_t1;
 		s_i_sa_g_t1	= s_i_sa_g_t0;
+
 		s_i_sa_o_t2	= s_i_sa_o_t1;
 		s_i_sa_o_t1	= s_i_sa_o_t0;
 	}
@@ -451,6 +500,8 @@ void task(uint64_t now)
 	/* Break up into single input signals */
 	{
 		s_i_fb_t0	= (l_pin_d & _BV(4)) ?  false : true;
+		s_i_uv_t0	= g_adc_12v_under;
+		s_i_os_t0	= g_speed_over;
 		s_i_sk_g_t0	= (l_pin_b & _BV(6)) ?  false : true;
 		s_i_sk_o_t0	= (l_pin_b & _BV(7)) ?  false : true;
 		s_i_sa_g_t0	= (l_pin_d & _BV(6)) ?  false : true;
@@ -465,9 +516,21 @@ void task(uint64_t now)
 			s_i_fb = false;
 		}
 
+		if (s_i_uv_t2 && s_i_uv_t1 && s_i_uv_t0) {
+			s_i_uv = true;
+		} else if (!s_i_uv_t2 && !s_i_uv_t1 && !s_i_uv_t0) {
+			s_i_uv = false;
+		}
+
+		if (s_i_os_t2 && s_i_os_t1 && s_i_os_t0) {
+			s_i_os = true;
+		} else if (!s_i_os_t2 && !s_i_os_t1 && !s_i_os_t0) {
+			s_i_os = false;
+		}
+
 		if (s_i_sk_g_t2 && s_i_sk_g_t1 && s_i_sk_g_t0) {
 			s_i_sk_g = true;
-		} else if (!s_i_sk_g_t2 && !s_i_sk_g_t1 && !s_i_sk_g_t0) {
+			} else if (!s_i_sk_g_t2 && !s_i_sk_g_t1 && !s_i_sk_g_t0) {
 			s_i_sk_g = false;
 		}
 
@@ -503,7 +566,7 @@ void task(uint64_t now)
 				s_o_m2		= false;
 
 				/* Input vector correct */
-				if (!s_i_fb && s_i_sa_g && !s_i_sa_o && s_i_sk_g && !s_i_sk_o) {
+				if (!s_i_fb && !s_i_uv && !s_i_os && s_i_sa_g && !s_i_sa_o && s_i_sk_g && !s_i_sk_o) {
 					s_fsm_state = 0x01;
 				}
 			}
@@ -513,16 +576,16 @@ void task(uint64_t now)
 			{
 				/* STANDBY CLOSED: Tailgate closed, normal LandCruiser driving state, KL dark */
 
-				/* Dropping the button allowance */
-				if (!s_i_fb) {
+				/* Dropping the button (or under-voltage) allowance */
+				if (!s_i_fb || s_i_uv || s_i_os) {
 					s_timer_fb = 0ULL;
-				} else if (!s_i_fb_t3) {
+				} else if ((s_i_fb && !s_i_uv && !s_i_os) && (!s_i_fb_t3 || s_i_uv_t2 || s_i_os_t2)) {
 					/* Button just pressed - after repressing the button, wait until low-pass filtering time is over */
 					s_timer_fb = now + C_FB_PRESS_SHORT_TIME;  // Short time is enough for the end points
 				}
 
-				/* Remote control button pressed */
-				if (s_i_fb && s_i_sa_g && !s_i_sa_o && s_i_sk_g && !s_i_sk_o) {
+				/* Remote control button pressed and no under-voltage or over-speed detected */
+				if (s_i_fb && !s_i_uv && !s_i_os && s_i_sa_g && !s_i_sa_o && s_i_sk_g && !s_i_sk_o) {
 					s_o_kl = true;
 
 					/* Button pressed long enough, open valve for unlocking */
@@ -633,23 +696,23 @@ void task(uint64_t now)
 			{
 				/* STANDBY OPENED: wait for close command */
 
-				/* Reset timer when released within low-pass filtering time */
-				if (!s_i_fb) {
+				/* Reset timer when button released or under-voltage detected within low-pass filtering time */
+				if (!s_i_fb || s_i_uv) {
 					s_timer_fb = 0ULL;
 				} else {
-					if (!s_i_fb_t3) {
+					if ((s_i_fb && !s_i_uv) && (!s_i_fb_t3 || s_i_uv_t2)) {
 						/* Button just pressed - after repressing the button, wait until low-pass filtering time is over */
 						s_timer_fb = now + C_FB_PRESS_SHORT_TIME;
 					}
 				}
 
 				/* When S-K.O has opened due to pressure release, re-open PV_O until contact is made again */
-				if (s_i_fb && !s_i_sk_o) {
+				if (s_i_fb && !s_i_uv && !s_i_sk_o) {
 					s_o_pv_o = true;
 				}
 
-				/* Remote control button pressed */
-				if (s_i_fb && !s_i_sa_g && s_i_sa_o && !s_i_sk_g && s_i_sk_o) {
+				/* Remote control button pressed and no under-voltage detected */
+				if (s_i_fb && !s_i_uv && !s_i_sa_g && s_i_sa_o && !s_i_sk_g && s_i_sk_o) {
 					/* Button pressed long enough, move wings back to lock position */
 					if (s_timer_fb && (s_timer_fb <= now)) {
 						s_o_m1		= false;
@@ -851,7 +914,7 @@ int main (void)
 	/* Init of sub-modules */
 	sysclk_init();	PRR = 0b11101011;			// For debugging this module has to be powered on, again
 	ioport_init();
-//	s_adc_init();
+	s_adc_init();
 	s_tc_init();
 
 	/* I/O pins go active here */
@@ -890,7 +953,9 @@ int main (void)
 	runmode = 1;
     while (runmode) {
 	    task(get_abs_time_ms());
+
 	    enter_sleep(SLEEP_MODE_IDLE);
+		ioport_set_pin_level(LED_GPIO, g_speed_over);
     }
 
 
@@ -906,7 +971,7 @@ int main (void)
 //	sysclk_disable_module(POWER_RED_REG0, PRUSART0_bm);
 
 //	s_twi_disable();
-//	s_adc_disable();
+	s_adc_disable();
 	s_tc_disable();
 
     enter_sleep(SLEEP_MODE_PWR_DOWN);
