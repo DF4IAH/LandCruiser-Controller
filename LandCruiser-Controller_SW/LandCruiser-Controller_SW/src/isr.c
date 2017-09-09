@@ -102,10 +102,7 @@ ISR(__vector_4, ISR_BLOCK)
 
 	/* Pin PCINT10 has triggered - check for rising signal */
 	if (ioport_get_pin_level(TACHO_GPIO)) {
-		uint64_t i_now = ((uint64_t)TCNT1H) << 8;
-		barrier();
-		i_now |= (uint64_t)TCNT1L;
-		i_now |= g_timer_abs_msb << 16;
+		uint16_t i_now  = g_timer_abs_msb;
 
 		if (i_now) {
 			uint64_t diff = i_now - s_last;

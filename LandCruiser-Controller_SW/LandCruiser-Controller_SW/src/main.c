@@ -954,9 +954,8 @@ int main (void)
     while (runmode) {
 	    task(get_abs_time_ms());
 
-		ioport_set_pin_level(LED_GPIO, IOPORT_PIN_LEVEL_LOW);
 	    enter_sleep(SLEEP_MODE_IDLE);
-		ioport_set_pin_level(LED_GPIO, IOPORT_PIN_LEVEL_HIGH);
+		ioport_set_pin_level(LED_GPIO, g_speed_over);
     }
 
 
