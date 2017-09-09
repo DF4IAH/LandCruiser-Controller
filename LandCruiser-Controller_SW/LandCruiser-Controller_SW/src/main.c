@@ -565,10 +565,7 @@ void task(uint64_t now)
 				s_o_m1		= false;
 				s_o_m2		= false;
 
-				/* Input vector correct */
-				if (!s_i_fb && !s_i_uv && !s_i_os && s_i_sa_g && !s_i_sa_o && s_i_sk_g && !s_i_sk_o) {
-					s_fsm_state = 0x01;
-				}
+				s_fsm_state = 0x01;
 			}
 			break;
 
@@ -955,7 +952,7 @@ int main (void)
 	    task(get_abs_time_ms());
 
 	    enter_sleep(SLEEP_MODE_IDLE);
-		ioport_set_pin_level(LED_GPIO, g_speed_over);
+		ioport_set_pin_level(LED_GPIO, g_speed_over | g_adc_12v_under);
     }
 
 
