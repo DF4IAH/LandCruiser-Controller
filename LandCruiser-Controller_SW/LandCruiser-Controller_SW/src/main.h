@@ -19,14 +19,14 @@
 
 /* VERSION: YYM, MDD */
 #define VERSION_HIGH												170
-#define VERSION_LOW													907
+#define VERSION_LOW													915
 
 /* I2C-Version V1.1 */
 #define I2C_VERSION													0x11
 
 
-/* TC1 timer runs @ 8 MHz / overflows every 1 ms */
-#define C_TC1_TOP_VAL												4000
+/* TC1 timer runs @ 8MHz/DIV8 = overflows every 1 ms */
+#define C_TC1_TOP_VAL												(500 - 1)
 
 /* Task runs with this intervals */
 #define C_TASK_TIMESPAN												50
@@ -114,6 +114,7 @@ typedef struct showData {
 
 
 /* UTILITIES section */
+void led_set(bool isOutput, bool setHigh);
 uint64_t get_abs_time_ms(void);
 void mem_set(uint8_t* buf, uint8_t count, uint8_t val);
 void eeprom_nvm_settings_write(uint8_t flags);

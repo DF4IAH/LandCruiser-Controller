@@ -45,6 +45,7 @@
 /* GLOBAL section */
 
 uint_fast64_t		g_timer_abs_msb						= 0ULL;
+bool				g_led								= false;
 uint8_t				g_adc_state							= 0;
 float				g_adc_12v							= 0.f;
 uint16_t			g_adc_12v_1000						= 0;
@@ -52,6 +53,7 @@ bool				g_adc_12v_under						= false;
 float				g_adc_temp							= 0.f;
 int32_t				g_adc_temp_100						= 0;
 bool				g_speed_over						= false;
+bool				g_o_kl								= false;
 //bool				g_lcdbl_auto						= true;
 //uint8_t			g_lcdbl_dimmer						= 0;
 //uint8_t			g_lcd_contrast_pm					= 0;
@@ -79,6 +81,7 @@ static void s_reset_global_vars(void)
 	runmode								= 0;
 
 	g_timer_abs_msb						= 0ULL;
+	g_led								= false;
 	g_adc_state							= 0;
 	g_adc_12v							= 0.f;
 	g_adc_12v_1000						= 0;
@@ -86,6 +89,7 @@ static void s_reset_global_vars(void)
 	g_adc_temp							= 0.f;
 	g_adc_temp_100						= 0;
 	g_speed_over						= false;
+	g_o_kl								= false;
 
 	#if 0
 	g_lcdbl_auto						= true;
@@ -132,6 +136,32 @@ static void s_io_preinit(void)
 	PCICR	= _BV(PCIE1);
 }
 
+void led_set(bool doOutput, bool setHigh)
+{
+	static bool s_isOutput	= false;
+	static bool s_isHigh	= false;
+
+	if (doOutput) {
+		if (!s_isOutput) {
+			ioport_set_pin_dir(LED_GPIO, IOPORT_DIR_OUTPUT);
+			s_isOutput = true;
+		}
+
+		if (s_isHigh != setHigh) {
+			ioport_set_pin_level(LED_GPIO, setHigh);
+			s_isHigh = setHigh;
+		}
+
+	} else {
+		if (s_isOutput) {
+			ioport_set_pin_dir(LED_GPIO, IOPORT_DIR_INPUT);
+			ioport_set_pin_mode(LED_GPIO, IOPORT_MODE_PULLDOWN);
+			s_isOutput = false;
+		}
+	}
+}
+
+
 static void s_tc_init(void)
 {
 	/* This function is called prior enabled interrupts and thus does not lock interrupts. */
@@ -168,10 +198,10 @@ static void s_tc_init(void)
 		sysclk_enable_module(POWER_RED_REG0, PRTIM1_bm);
 
 		TCCR1A  = (0b00  << COM1A0)		 			// OC1A: disconnected - normal port function
-				| (0b01  << WGM10);					// WGM: 0b1001 = PWM, Phase and Frequency Correct / Update on BOTTOM / TOP @ OCR1A
+				| (0b01  << WGM10);					// WGM: 0b0100 = PWM, Phase and Frequency Correct / Update on BOTTOM, TOP @ OCR1A
 
 		TCCR1B  = ( 0b10 << WGM12)
-				| (0b001 << CS10);					// CLKio DIV1, no prescaling --> 8 MHz
+				| (0b010 << CS10);					// CLKio DIV=8 --> 1 MHz
 
 		TCNT1H  = 0b00000000           ;			// Clear current value for synchronous start (when restarting without reset)
 		barrier();
@@ -832,6 +862,7 @@ void task(uint64_t now)
 	PORTB = l_port_b;
 	PORTC = l_port_c;
 	PORTD = l_port_d;
+	g_o_kl = s_o_kl;
 	cpu_irq_restore(flags);
 
 
@@ -951,8 +982,15 @@ int main (void)
     while (runmode) {
 	    task(get_abs_time_ms());
 
+		//led_enable(IOPORT_PIN_LEVEL_LOW);
+		if (!g_led) {
+			led_set(false, false);
+		}
 	    enter_sleep(SLEEP_MODE_IDLE);
-		ioport_set_pin_level(LED_GPIO, g_speed_over | g_adc_12v_under);
+		led_set(true, g_led);
+		//led_enable(IOPORT_PIN_LEVEL_HIGH);
+		//led_enable(g_speed_over | g_adc_12v_under);
+		//led_enable(g_o_kl);
     }
 
 
@@ -968,6 +1006,7 @@ int main (void)
 //	sysclk_disable_module(POWER_RED_REG0, PRUSART0_bm);
 
 //	s_twi_disable();
+	led_set(false, false);
 	s_adc_disable();
 	s_tc_disable();
 
