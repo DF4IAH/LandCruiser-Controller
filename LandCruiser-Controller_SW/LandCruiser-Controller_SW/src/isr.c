@@ -47,6 +47,7 @@
 /* External vars */
 
 extern uint_fast64_t		g_timer_abs_msb;
+extern bool					g_led;
 extern uint8_t				g_adc_state;
 extern float				g_adc_12v;
 extern uint16_t				g_adc_12v_1000;
@@ -221,6 +222,99 @@ ISR(__vector_12, ISR_BLOCK)
 ISR(__vector_13, ISR_BLOCK)
 {	/* TIMER 1 OVF - Overflow */
 	++g_timer_abs_msb;
+
+	cpu_irq_enable();
+
+	/* Show 1 sec LED activity */
+	{
+		volatile uint16_t mod	= (uint16_t)  ((uint32_t)g_timer_abs_msb % 1000);
+		volatile uint8_t  sec	= (uint8_t)  (((uint32_t)g_timer_abs_msb / 1000) % 10);
+		volatile bool	 led	= false;
+
+		switch (mod) {
+			case   0:
+				{
+				}
+			break;
+
+			case  50:
+				if (sec >= 1) {
+					led = true;
+				}
+			break;
+
+			case 100:
+				if (sec >= 2) {
+					led = true;
+				}
+			break;
+
+			case 150:
+				if (sec >= 3) {
+					led = true;
+				}
+			break;
+
+			case 200:
+				if (sec >= 4) {
+					led = true;
+				}
+			break;
+
+			case 250:
+				if (sec >= 5) {
+					led = true;
+				}
+			break;
+
+			case 300:
+				if (sec >= 6) {
+					led = true;
+				}
+			break;
+
+			case 350:
+				if (sec >= 7) {
+					led = true;
+				}
+			break;
+
+			case 400:
+				if (sec >= 8) {
+					led = true;
+				}
+			break;
+
+			case 450:
+				if (sec == 9) {
+					led = true;
+				}
+			break;
+
+			/* Turn off short time after activation */
+			case  21:
+			case  71:
+			case 121:
+			case 171:
+			case 221:
+			case 271:
+			case 321:
+			case 371:
+			case 421:
+			case 471:
+				{
+					g_led = false;
+					led_set(true, g_led);
+				}
+			break;
+		}
+
+		/* Turn on when selected for blinking */
+		if (led) {
+			g_led = true;
+			led_set(true, g_led);
+		}
+	}
 
 	#if 0
 	/* Start A/D convertion by entering ADC sleep-mode */
