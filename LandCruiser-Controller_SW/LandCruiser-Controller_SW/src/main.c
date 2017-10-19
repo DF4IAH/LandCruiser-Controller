@@ -46,6 +46,10 @@
 
 uint_fast64_t		g_timer_abs_msb						= 0ULL;
 bool				g_led								= false;
+uint8_t				g_led_digits[C_BC_DIGITS]			= { 0 };
+led_bc_q_entry_t	g_led_blink_code_table[C_BC_T_LEN]	= { 0 };
+uint8_t				g_led_blink_code_idx				= 0;
+uint64_t			g_led_blink_code_last_ts			= 0;
 uint8_t				g_adc_state							= 0;
 float				g_adc_12v							= 0.f;
 uint16_t			g_adc_12v_1000						= 0;
@@ -121,14 +125,14 @@ static void s_io_preinit(void)
 	 * most critical pins are handled first.
 	 */
 
-	DDRB  = 0b00111100;								// out: PB2: MP_M2, PB3: MP_M1, PB4: MP_PV_O, PB5: MP_PV_G
-	PORTB = 0b11000011;								// in:  PB0: NC, PB1: NC, PB6: MP_SK_G, PB7: MP_SK_O
+	DDRB  = 0b00111100;								// out: PB5: MP_PV_G, PB4: MP_PV_O, PB3: MP_M1, PB2: MP_M2
+	PORTB = 0b11000011;								// in:  PB7: MP_SK_O, PB6: MP_SK_G, PB1: NC, PB0: SH_G
 
-	DDRC  = 0b00101000;								// out: PC3: MP_KL, PC5: SCL
-	PORTC = 0b00110000;								// in:  PC0: MP_ADC0, PC1: MP_ADC1, PC2: MP_TACHO (PCINT10), PC4: SDA
+	DDRC  = 0b00101000;								// out: PC5: SCL, PC3: MP_KL
+	PORTC = 0b00110000;								// in:  PC4: SDA, PC2: MP_TACHO (PCINT10), PC1: MP_ADC1, PC0: MP_ADC0
 
-	DDRD  = 0b00001010;								// out: PD1: MP_TXD, PD3: MP_LED
-	PORTD = 0b11110111;								// in:  PD0: MP_RXD, PD2: MP_INT, PD4: MP_FB, PD5: NC, PD6: MP_SA_G, PD7: MP_SA_O
+	DDRD  = 0b00001010;								// out: PD3: MP_LED, PD1: MP_TXD
+	PORTD = 0b11110111;								// in:  PD7: MP_SA_O, PD6: MP_SA_G, PD5: NC, PD4: MP_FB, PD2: MP_INT, PD0: MP_RXD
 
 	/* Connect PCINT10 = Pin PC2 to PCI1 */
 	PCMSK1	= _BV(PCINT10);
@@ -159,6 +163,66 @@ void led_set(bool doOutput, bool setHigh)
 			s_isOutput = false;
 		}
 	}
+}
+
+void led_blink_code_set(uint32_t code)
+{
+	irqflags_t flags = cpu_irq_save();
+
+	for (int idx = 0; idx < C_LED_DIGITS; idx++, code >>= 8) {
+		uint8_t digit = 0;
+
+		if (code) {
+			digit = code & 0x07;
+			if (!digit || (digit > 5)) {
+				digit = 5;
+			}
+		}
+		g_led_digits[idx] = digit;
+	}
+
+	cpu_irq_restore(flags);
+}
+
+uint8_t led_blink_code_enqueue(void)
+{
+	uint8_t idx_old, idx_new;
+
+	/* IRQ disabled section */
+	{
+		irqflags_t flags = cpu_irq_save();
+
+		idx_old = g_led_blink_code_idx;
+
+		for (int idx = 0; idx < C_LED_DIGITS; idx++) {
+			uint8_t digit = g_led_digits[idx];
+			for (int dot = 0; dot < digit; dot++) {
+				g_led_blink_code_table[g_led_blink_code_idx]  .op		= LED_ON;
+				g_led_blink_code_table[g_led_blink_code_idx++].delta_ms = C_LED_DOT_ON_TIME_MS;
+
+				g_led_blink_code_table[g_led_blink_code_idx]  .op		= LED_OFF;
+				g_led_blink_code_table[g_led_blink_code_idx++].delta_ms = C_LED_DOT_OFF_TIME_MS;
+			}
+
+			/* Additional time between each digit */
+			g_led_blink_code_table[g_led_blink_code_idx]  .op		= LED_OFF;
+			g_led_blink_code_table[g_led_blink_code_idx++].delta_ms = (C_LED_INTERDOT_TIME_MS - C_LED_DOT_OFF_TIME_MS);
+		}
+
+		/* Additional time between each code */
+		g_led_blink_code_table[g_led_blink_code_idx]  .op		= LED_OFF;
+		g_led_blink_code_table[g_led_blink_code_idx++].delta_ms = (C_LED_CODEEND_TIME_MS - (C_LED_INTERDOT_TIME_MS + C_LED_DOT_OFF_TIME_MS));
+
+		/* End of message */
+		g_led_blink_code_table[g_led_blink_code_idx]  .op		= LED_LIST_END;
+		g_led_blink_code_table[g_led_blink_code_idx++].delta_ms = 0;
+
+		idx_new = g_led_blink_code_idx;
+
+		cpu_irq_restore(flags);
+	}
+
+	return idx_new - idx_old;
 }
 
 
@@ -449,7 +513,7 @@ void task(uint64_t now)
 	static uint64_t s_timer_fb			= 0ULL;
 	static uint64_t s_timer_pv			= 0ULL;
 
-	static uint8_t s_fsm_state			= 0;
+	static uint8_t s_fsm_state			= 0x51;
 	static bool s_change_dir			= false;
 
 	static bool s_i_fb					= false;	// FB
@@ -481,6 +545,10 @@ void task(uint64_t now)
 	static bool s_i_sa_o_t0				= false;
 	static bool s_i_sa_o_t1				= false;
 	static bool s_i_sa_o_t2				= false;
+	static bool s_i_sh_g				= false;	// SH_G
+	static bool s_i_sh_g_t0				= false;
+	static bool s_i_sh_g_t1				= false;
+	static bool s_i_sh_g_t2				= false;
 
 	static bool s_o_kl					= false;	// KL
 	static bool s_o_pv_g				= false;	// PV_G
@@ -525,6 +593,9 @@ void task(uint64_t now)
 
 		s_i_sa_o_t2	= s_i_sa_o_t1;
 		s_i_sa_o_t1	= s_i_sa_o_t0;
+
+		s_i_sh_g_t2	= s_i_sh_g_t1;
+		s_i_sh_g_t1	= s_i_sh_g_t0;
 	}
 
 	/* Break up into single input signals */
@@ -536,6 +607,7 @@ void task(uint64_t now)
 		s_i_sk_o_t0	= (l_pin_b & _BV(7)) ?  false : true;
 		s_i_sa_g_t0	= (l_pin_d & _BV(6)) ?  false : true;
 		s_i_sa_o_t0	= (l_pin_d & _BV(7)) ?  false : true;
+		s_i_sh_g_t0	= (l_pin_b & _BV(0)) ?  false : true;
 	}
 
 	/* De-noising logics */
@@ -581,27 +653,36 @@ void task(uint64_t now)
 		} else if (!s_i_sa_o_t2 && !s_i_sa_o_t1 && !s_i_sa_o_t0) {
 			s_i_sa_o = false;
 		}
+
+		if (s_i_sh_g_t2 && s_i_sh_g_t1 && s_i_sh_g_t0) {
+			s_i_sh_g = true;
+		} else if (!s_i_sh_g_t2 && !s_i_sh_g_t1 && !s_i_sh_g_t0) {
+			s_i_sh_g = false;
+		}
 	}
 
 	/* FSM (Finite State Machine) */
 	{
 		/* FSM_1 - Logic */
 		switch (s_fsm_state) {
-			case 0x00:
+			case 0x51:
 			{	/* INIT: Init and Error handling: check for correct starting vector */
+				led_blink_code_set(s_fsm_state);
+
 				s_o_kl		= false;
 				s_o_pv_g	= false;
 				s_o_pv_o	= false;
 				s_o_m1		= false;
 				s_o_m2		= false;
 
-				s_fsm_state = 0x01;
+				s_fsm_state = 0x11;
 			}
 			break;
 
-			case 0x01:
+			case 0x11:
 			{
 				/* STANDBY CLOSED: Tailgate closed, normal LandCruiser driving state, KL dark */
+				led_blink_code_set(s_fsm_state);
 
 				/* Dropping the button (or under-voltage) allowance */
 				if (!s_i_fb || s_i_uv || s_i_os) {
@@ -612,22 +693,23 @@ void task(uint64_t now)
 				}
 
 				/* Remote control button pressed and no under-voltage or over-speed detected */
-				if (s_i_fb && !s_i_uv && !s_i_os && s_i_sa_g && !s_i_sa_o && s_i_sk_g && !s_i_sk_o) {
+				if (s_i_fb && !s_i_uv && !s_i_os && s_i_sa_g && !s_i_sa_o && s_i_sk_g && !s_i_sk_o && s_i_sh_g) {
 					s_o_kl = true;
 
 					/* Button pressed long enough, open valve for unlocking */
 					if (s_timer_fb && (s_timer_fb <= now)) {
 						s_o_pv_o	= true;
 						s_timer_pv	= now + C_PV_ACTION_TIME;
-						s_fsm_state = 0x10;
+						s_fsm_state = 0x21;
 					}
 				}
 			}
 			break;
 
-			case 0x10:
+			case 0x21:
 			{
 				/* GATE-OPENING UNLOCKING: valve for unlocking is opened for 0.5 sec */
+				led_blink_code_set(s_fsm_state);
 
 				/* Release pressure of opening valve in case we block in this state */
 				if (s_timer_pv && (s_timer_pv <= now)) {
@@ -643,20 +725,21 @@ void task(uint64_t now)
 				}
 
 				/* Sensor reports being unlocked, start actor to open wings */
-				if (s_i_sk_o && !s_i_sk_g && s_i_fb && s_timer_fb && (s_timer_fb <= now)) {
+				if (s_i_sk_o && !s_i_sk_g && s_i_sh_g && s_i_fb && s_timer_fb && (s_timer_fb <= now)) {
 					/* Combination for actor to OPEN wings */
 					s_o_pv_o		= false;
 					s_o_m1			= true;
 					s_o_m2			= false;
 					s_change_dir	= false;
-					s_fsm_state		= 0x11;
+					s_fsm_state		= 0x22;
 				}
 			}
 			break;
 
-			case 0x11:
+			case 0x22:
 			{
 				/* GATE-OPENING MOTOR running: valve for unlocking is opened for 1 sec */
+				led_blink_code_set(s_fsm_state);
 
 				/* Release pressure of opening valve */
 				if (s_timer_pv && (s_timer_pv <= now)) {
@@ -667,7 +750,7 @@ void task(uint64_t now)
 				if (s_i_sa_o) {
 					s_o_m1		= false;
 					s_o_m2		= false;
-					s_fsm_state	= 0x12;
+					s_fsm_state	= 0x23;
 
 				} else {
 					/* Button check */
@@ -703,25 +786,28 @@ void task(uint64_t now)
 							s_o_m1			= false;
 							s_o_m2			= true;
 							s_change_dir	= false;
-							s_fsm_state		= 0x21;
+							s_fsm_state		= 0x41;
 						}
 					}
 				}
 			}
 			break;
 
-			case 0x12:
+			case 0x23:
 			{
 				/* OPENING - WAIT FOR RELEASE: after motor stops, wait for button release */
+				led_blink_code_set(s_fsm_state);
+
 				if (!s_i_fb) {
-					s_fsm_state = 0x20;
+					s_fsm_state = 0x31;
 				}
 			}
 			break;
 
-			case 0x20:
+			case 0x31:
 			{
 				/* STANDBY OPENED: wait for close command */
+				led_blink_code_set(s_fsm_state);
 
 				/* Reset timer when button released or under-voltage detected within low-pass filtering time */
 				if (!s_i_fb || s_i_uv) {
@@ -739,21 +825,22 @@ void task(uint64_t now)
 				}
 
 				/* Remote control button pressed and no under-voltage detected */
-				if (s_i_fb && !s_i_uv && !s_i_sa_g && s_i_sa_o && !s_i_sk_g && s_i_sk_o) {
+				if (s_i_fb && !s_i_uv && !s_i_sa_g && s_i_sa_o && !s_i_sk_g && s_i_sk_o && s_i_sh_g) {
 					/* Button pressed long enough, move wings back to lock position */
 					if (s_timer_fb && (s_timer_fb <= now)) {
 						s_o_m1		= false;
 						s_o_m2		= true;
 						s_o_pv_o	= false;
-						s_fsm_state = 0x21;
+						s_fsm_state = 0x41;
 					}
 				}
 			}
 			break;
 
-			case 0x21:
+			case 0x41:
 			{
 				/* MOVING WINGS BACK: motors running */
+				led_blink_code_set(s_fsm_state);
 
 				/* Stop motor due to reaching end position and open valve for securing */
 				if (s_i_sa_g) {
@@ -761,7 +848,7 @@ void task(uint64_t now)
 					s_o_m2		= false;
 					s_timer_pv	= now + C_PV_ACTION_TIME;
 					s_o_pv_g	= true;
-					s_fsm_state	= 0x22;
+					s_fsm_state	= 0x42;
 
 				} else {
 					/* Stop motor due to release of button */
@@ -810,16 +897,17 @@ void task(uint64_t now)
 							s_o_m1			= true;
 							s_o_m2			= false;
 							s_change_dir	= false;
-							s_fsm_state		= 0x11;
+							s_fsm_state		= 0x22;
 						}
 					}
 				}
 			}
 			break;
 
-			case 0x22:
+			case 0x42:
 			{
 				/* SECURING WINGS: valve for locking is opened for 1 sec */
+				led_blink_code_set(s_fsm_state);
 
 				/* Release pressure of opening valve */
 				if (s_timer_pv <= now) {
@@ -830,25 +918,26 @@ void task(uint64_t now)
 				if (s_i_sk_g) {
 					s_o_pv_g	= false;
 					s_o_kl		= false;
-					s_fsm_state = 0x23;
+					s_fsm_state = 0x43;
 				}
 			}
 			break;
 
-			case 0x23:
+			case 0x43:
 			{
 				/* PREPARING FOR STANDBY: wait for the button to be released */
+				led_blink_code_set(s_fsm_state);
 
 				/* Button released, power off signal lamp and fall back to STANDBY */
 				if (!s_i_fb) {
-					s_fsm_state = 0x00;
+					s_fsm_state = 0x51;
 				}
 			}
 			break;
 
 			default:
 				/* Jump to Init / error handling */
-				s_fsm_state = 0x00;
+				s_fsm_state = 0x51;
 		}
 	}
 
