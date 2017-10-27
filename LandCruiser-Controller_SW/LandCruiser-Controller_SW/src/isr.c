@@ -51,7 +51,7 @@ extern bool					g_led;
 extern uint8_t				g_led_digits[C_BC_DIGITS];
 extern led_bc_q_entry_t		g_led_blink_code_table[C_BC_T_LEN];
 extern uint8_t				g_led_blink_code_idx;
-extern uint64_t				g_led_blink_code_last_ts;
+extern uint64_t				g_led_blink_code_next_ts;
 extern uint8_t				g_adc_state;
 extern float				g_adc_12v;
 extern uint16_t				g_adc_12v_1000;
@@ -234,12 +234,12 @@ ISR(__vector_13, ISR_BLOCK)
 
 	/* Check for LED operations */
 	{
-		uint64_t now = get_abs_time_ms();
+		uint64_t now	= get_abs_time_ms();
 
-		if ((g_led_blink_code_last_ts + g_led_blink_code_table[g_led_blink_code_idx].delta_ms) <= now) {
-			led_bc_q_entry_o_t op = g_led_blink_code_table[++g_led_blink_code_idx].op;
+		if (g_led_blink_code_next_ts <= now) {
+			g_led_blink_code_next_ts = now + g_led_blink_code_table[g_led_blink_code_idx].delta_ms;
 
-			switch (op) {
+			switch (g_led_blink_code_table[g_led_blink_code_idx++].op) {
 			case LED_ON:
 				g_led = true;
 				led_set(true, g_led);
@@ -254,6 +254,13 @@ ISR(__vector_13, ISR_BLOCK)
 				g_led_blink_code_idx = 0;
 				break;
 			}
+		}
+
+		/* List not terminated - reset to known state */
+		if (g_led_blink_code_idx >= C_BC_T_LEN) {
+			g_led_blink_code_idx = 0;
+			g_led = false;
+			led_set(true, g_led);
 		}
 	}
 

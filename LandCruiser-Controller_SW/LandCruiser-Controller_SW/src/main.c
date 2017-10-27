@@ -49,7 +49,7 @@ bool				g_led								= false;
 uint8_t				g_led_digits[C_BC_DIGITS]			= { 0 };
 led_bc_q_entry_t	g_led_blink_code_table[C_BC_T_LEN]	= { 0 };
 uint8_t				g_led_blink_code_idx				= 0;
-uint64_t			g_led_blink_code_last_ts			= 0;
+uint64_t			g_led_blink_code_next_ts			= 0;
 uint8_t				g_adc_state							= 0;
 float				g_adc_12v							= 0.f;
 uint16_t			g_adc_12v_1000						= 0;
@@ -167,13 +167,13 @@ void led_set(bool doOutput, bool setHigh)
 
 void led_blink_code_set(uint32_t code)
 {
-	irqflags_t flags = cpu_irq_save();
+	irqflags_t	flags	= cpu_irq_save();
 
-	for (int idx = 0; idx < C_LED_DIGITS; idx++, code >>= 8) {
+	for (int idx = 0; idx < C_LED_DIGITS; idx++) {
 		uint8_t digit = 0;
 
 		if (code) {
-			digit = code & 0x07;
+			digit = (code >> ((C_LED_DIGITS - idx - 1) << 2)) & 0x07;
 			if (!digit || (digit > 5)) {
 				digit = 5;
 			}
@@ -192,32 +192,41 @@ uint8_t led_blink_code_enqueue(void)
 	{
 		irqflags_t flags = cpu_irq_save();
 
-		idx_old = g_led_blink_code_idx;
+		idx_new = idx_old = g_led_blink_code_idx;
 
-		for (int idx = 0; idx < C_LED_DIGITS; idx++) {
-			uint8_t digit = g_led_digits[idx];
-			for (int dot = 0; dot < digit; dot++) {
-				g_led_blink_code_table[g_led_blink_code_idx]  .op		= LED_ON;
-				g_led_blink_code_table[g_led_blink_code_idx++].delta_ms = C_LED_DOT_ON_TIME_MS;
+		/* Do update only when list is empty */
+		if (!idx_old) {
+			for (int idx = 0; idx < C_LED_DIGITS; idx++) {
+				uint8_t digit = g_led_digits[idx];
 
-				g_led_blink_code_table[g_led_blink_code_idx]  .op		= LED_OFF;
-				g_led_blink_code_table[g_led_blink_code_idx++].delta_ms = C_LED_DOT_OFF_TIME_MS;
+				if (digit) {
+					for (int dot = 0; dot < digit; dot++) {
+						g_led_blink_code_table[g_led_blink_code_idx]  .op		= LED_ON;
+						g_led_blink_code_table[g_led_blink_code_idx++].delta_ms = C_LED_DOT_ON_TIME_MS;
+
+						g_led_blink_code_table[g_led_blink_code_idx]  .op		= LED_OFF;
+						g_led_blink_code_table[g_led_blink_code_idx++].delta_ms = C_LED_DOT_OFF_TIME_MS;
+					}
+
+					/* Additional time between each digit */
+					g_led_blink_code_table[g_led_blink_code_idx]  .op		= LED_OFF;
+					g_led_blink_code_table[g_led_blink_code_idx++].delta_ms = (C_LED_INTERDOT_TIME_MS - C_LED_DOT_OFF_TIME_MS);
+				}
 			}
 
-			/* Additional time between each digit */
+			/* Additional time between each code */
 			g_led_blink_code_table[g_led_blink_code_idx]  .op		= LED_OFF;
-			g_led_blink_code_table[g_led_blink_code_idx++].delta_ms = (C_LED_INTERDOT_TIME_MS - C_LED_DOT_OFF_TIME_MS);
+			g_led_blink_code_table[g_led_blink_code_idx++].delta_ms = (C_LED_CODEEND_TIME_MS - (C_LED_INTERDOT_TIME_MS + C_LED_DOT_OFF_TIME_MS));
+
+			/* End of message */
+			g_led_blink_code_table[g_led_blink_code_idx]  .op		= LED_LIST_END;
+			g_led_blink_code_table[g_led_blink_code_idx].delta_ms	= 0;
+
+			idx_new = g_led_blink_code_idx;
+
+			/* Point to the start of table */
+			g_led_blink_code_idx = 0;
 		}
-
-		/* Additional time between each code */
-		g_led_blink_code_table[g_led_blink_code_idx]  .op		= LED_OFF;
-		g_led_blink_code_table[g_led_blink_code_idx++].delta_ms = (C_LED_CODEEND_TIME_MS - (C_LED_INTERDOT_TIME_MS + C_LED_DOT_OFF_TIME_MS));
-
-		/* End of message */
-		g_led_blink_code_table[g_led_blink_code_idx]  .op		= LED_LIST_END;
-		g_led_blink_code_table[g_led_blink_code_idx++].delta_ms = 0;
-
-		idx_new = g_led_blink_code_idx;
 
 		cpu_irq_restore(flags);
 	}
@@ -663,12 +672,13 @@ void task(uint64_t now)
 
 	/* FSM (Finite State Machine) */
 	{
+		/* Show current state of FSM */
+		led_blink_code_set(s_fsm_state);
+
 		/* FSM_1 - Logic */
 		switch (s_fsm_state) {
 			case 0x51:
 			{	/* INIT: Init and Error handling: check for correct starting vector */
-				led_blink_code_set(s_fsm_state);
-
 				s_o_kl		= false;
 				s_o_pv_g	= false;
 				s_o_pv_o	= false;
@@ -682,7 +692,6 @@ void task(uint64_t now)
 			case 0x11:
 			{
 				/* STANDBY CLOSED: Tailgate closed, normal LandCruiser driving state, KL dark */
-				led_blink_code_set(s_fsm_state);
 
 				/* Dropping the button (or under-voltage) allowance */
 				if (!s_i_fb || s_i_uv || s_i_os) {
@@ -709,7 +718,6 @@ void task(uint64_t now)
 			case 0x21:
 			{
 				/* GATE-OPENING UNLOCKING: valve for unlocking is opened for 0.5 sec */
-				led_blink_code_set(s_fsm_state);
 
 				/* Release pressure of opening valve in case we block in this state */
 				if (s_timer_pv && (s_timer_pv <= now)) {
@@ -739,7 +747,6 @@ void task(uint64_t now)
 			case 0x22:
 			{
 				/* GATE-OPENING MOTOR running: valve for unlocking is opened for 1 sec */
-				led_blink_code_set(s_fsm_state);
 
 				/* Release pressure of opening valve */
 				if (s_timer_pv && (s_timer_pv <= now)) {
@@ -796,7 +803,6 @@ void task(uint64_t now)
 			case 0x23:
 			{
 				/* OPENING - WAIT FOR RELEASE: after motor stops, wait for button release */
-				led_blink_code_set(s_fsm_state);
 
 				if (!s_i_fb) {
 					s_fsm_state = 0x31;
@@ -807,7 +813,6 @@ void task(uint64_t now)
 			case 0x31:
 			{
 				/* STANDBY OPENED: wait for close command */
-				led_blink_code_set(s_fsm_state);
 
 				/* Reset timer when button released or under-voltage detected within low-pass filtering time */
 				if (!s_i_fb || s_i_uv) {
@@ -840,7 +845,6 @@ void task(uint64_t now)
 			case 0x41:
 			{
 				/* MOVING WINGS BACK: motors running */
-				led_blink_code_set(s_fsm_state);
 
 				/* Stop motor due to reaching end position and open valve for securing */
 				if (s_i_sa_g) {
@@ -907,7 +911,6 @@ void task(uint64_t now)
 			case 0x42:
 			{
 				/* SECURING WINGS: valve for locking is opened for 1 sec */
-				led_blink_code_set(s_fsm_state);
 
 				/* Release pressure of opening valve */
 				if (s_timer_pv <= now) {
@@ -926,7 +929,6 @@ void task(uint64_t now)
 			case 0x43:
 			{
 				/* PREPARING FOR STANDBY: wait for the button to be released */
-				led_blink_code_set(s_fsm_state);
 
 				/* Button released, power off signal lamp and fall back to STANDBY */
 				if (!s_i_fb) {

@@ -19,7 +19,7 @@
 
 /* VERSION: YYM, MDD */
 #define VERSION_HIGH												171
-#define VERSION_LOW													 19
+#define VERSION_LOW													 27
 
 /* I2C-Version V1.1 */
 #define I2C_VERSION													0x11
@@ -118,18 +118,18 @@ typedef struct showData {
 
 /* LED blink code queue */
 
-#define C_BC_DIGITS						3
-#define C_BC_T_LEN						((5 * 2 + 1 ) * C_BC_DIGITS)
+#define C_BC_DIGITS						2
+#define C_BC_T_LEN						(((5 * 2 + 1) * C_BC_DIGITS) + 1 + 1)
 #define C_LED_DOT_ON_TIME_MS			100
-#define C_LED_DOT_OFF_TIME_MS			150
+#define C_LED_DOT_OFF_TIME_MS			200
 #define C_LED_INTERDOT_TIME_MS			750
 #define C_LED_CODEEND_TIME_MS			1500
 
 
 typedef enum led_bc_q_entry_o_ENUM {
-	LED_OFF = 0,
-	LED_ON,
-	LED_LIST_END,
+	LED_OFF			= 0x00,
+	LED_ON			= 0x01,
+	LED_LIST_END	= 0xff,
 } led_bc_q_entry_o_t;
 
 typedef struct led_bc_q_entry {
@@ -139,7 +139,7 @@ typedef struct led_bc_q_entry {
 
 
 /* UTILITIES section */
-void led_set(bool isOutput, bool setHigh);
+void led_set(bool doOutput, bool setHigh);
 void led_blink_code_set(uint32_t code);
 uint8_t led_blink_code_enqueue(void);
 uint64_t get_abs_time_ms(void);
