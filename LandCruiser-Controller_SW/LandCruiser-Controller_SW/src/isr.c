@@ -48,6 +48,10 @@
 
 extern uint_fast64_t		g_timer_abs_msb;
 extern bool					g_led;
+extern uint8_t				g_led_digits[C_BC_DIGITS];
+extern led_bc_q_entry_t		g_led_blink_code_table[C_BC_T_LEN];
+extern uint8_t				g_led_blink_code_idx;
+extern uint64_t				g_led_blink_code_next_ts;
 extern uint8_t				g_adc_state;
 extern float				g_adc_12v;
 extern uint16_t				g_adc_12v_1000;
@@ -223,98 +227,43 @@ ISR(__vector_13, ISR_BLOCK)
 {	/* TIMER 1 OVF - Overflow */
 	++g_timer_abs_msb;
 
-	cpu_irq_enable();
+	/* Set-up blink queue */
+	if (!g_led_blink_code_idx) {
+		led_blink_code_enqueue();
+	}
 
-	/* Show 1 sec LED activity */
+	/* Check for LED operations */
 	{
-		volatile uint16_t mod	= (uint16_t)  ((uint32_t)g_timer_abs_msb % 1000);
-		volatile uint8_t  sec	= (uint8_t)  (((uint32_t)g_timer_abs_msb / 1000) % 10);
-		volatile bool	 led	= false;
+		uint64_t now	= get_abs_time_ms();
 
-		switch (mod) {
-			case   0:
-				{
-				}
-			break;
+		if (g_led_blink_code_next_ts <= now) {
+			g_led_blink_code_next_ts = now + g_led_blink_code_table[g_led_blink_code_idx].delta_ms;
 
-			case  50:
-				if (sec >= 1) {
-					led = true;
-				}
-			break;
+			switch (g_led_blink_code_table[g_led_blink_code_idx++].op) {
+			case LED_ON:
+				g_led = true;
+				led_set(true, g_led);
+				break;
 
-			case 100:
-				if (sec >= 2) {
-					led = true;
-				}
-			break;
+			case LED_OFF:
+				g_led = false;
+				led_set(true, g_led);
+				break;
 
-			case 150:
-				if (sec >= 3) {
-					led = true;
-				}
-			break;
-
-			case 200:
-				if (sec >= 4) {
-					led = true;
-				}
-			break;
-
-			case 250:
-				if (sec >= 5) {
-					led = true;
-				}
-			break;
-
-			case 300:
-				if (sec >= 6) {
-					led = true;
-				}
-			break;
-
-			case 350:
-				if (sec >= 7) {
-					led = true;
-				}
-			break;
-
-			case 400:
-				if (sec >= 8) {
-					led = true;
-				}
-			break;
-
-			case 450:
-				if (sec == 9) {
-					led = true;
-				}
-			break;
-
-			/* Turn off short time after activation */
-			case  21:
-			case  71:
-			case 121:
-			case 171:
-			case 221:
-			case 271:
-			case 321:
-			case 371:
-			case 421:
-			case 471:
-				{
-					g_led = false;
-					led_set(true, g_led);
-				}
-			break;
+			case LED_LIST_END:
+				g_led_blink_code_idx = 0;
+				break;
+			}
 		}
 
-		/* Turn on when selected for blinking */
-		if (led) {
-			g_led = true;
+		/* List not terminated - reset to known state */
+		if (g_led_blink_code_idx >= C_BC_T_LEN) {
+			g_led_blink_code_idx = 0;
+			g_led = false;
 			led_set(true, g_led);
 		}
 	}
+
 
 	#if 0
 	/* Start A/D convertion by entering ADC sleep-mode */

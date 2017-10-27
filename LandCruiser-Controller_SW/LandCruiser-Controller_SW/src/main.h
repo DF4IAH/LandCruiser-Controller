@@ -18,8 +18,8 @@
 
 
 /* VERSION: YYM, MDD */
-#define VERSION_HIGH												170
-#define VERSION_LOW													915
+#define VERSION_HIGH												171
+#define VERSION_LOW													 27
 
 /* I2C-Version V1.1 */
 #define I2C_VERSION													0x11
@@ -40,6 +40,9 @@
 
 /* Minimum period = maximum speed to allow FSM to proceed */
 #define C_TICKS_MAXSPEED											100
+
+/* Blink code number of digits */
+#define C_LED_DIGITS												2
 
 
 typedef enum C_ADC_STATE__ENUM {
@@ -113,8 +116,32 @@ typedef struct showData {
 } showData_t;
 
 
+/* LED blink code queue */
+
+#define C_BC_DIGITS						2
+#define C_BC_T_LEN						(((5 * 2 + 1) * C_BC_DIGITS) + 1 + 1)
+#define C_LED_DOT_ON_TIME_MS			100
+#define C_LED_DOT_OFF_TIME_MS			200
+#define C_LED_INTERDOT_TIME_MS			750
+#define C_LED_CODEEND_TIME_MS			1500
+
+
+typedef enum led_bc_q_entry_o_ENUM {
+	LED_OFF			= 0x00,
+	LED_ON			= 0x01,
+	LED_LIST_END	= 0xff,
+} led_bc_q_entry_o_t;
+
+typedef struct led_bc_q_entry {
+	led_bc_q_entry_o_t	op;				// operation
+	uint16_t			delta_ms;		// duration of an operation
+} led_bc_q_entry_t;
+
+
 /* UTILITIES section */
-void led_set(bool isOutput, bool setHigh);
+void led_set(bool doOutput, bool setHigh);
+void led_blink_code_set(uint32_t code);
+uint8_t led_blink_code_enqueue(void);
 uint64_t get_abs_time_ms(void);
 void mem_set(uint8_t* buf, uint8_t count, uint8_t val);
 void eeprom_nvm_settings_write(uint8_t flags);
