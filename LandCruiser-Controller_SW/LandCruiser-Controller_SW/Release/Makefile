@@ -64,6 +64,7 @@ SUBDIRS :=  \
 C_SRCS +=  \
 ../src/isr.c \
 ../src/main.c \
+../src/serial.c \
 ../src/ASF/common/boards/user_board/init.c \
 ../src/ASF/common/services/calendar/calendar.c \
 ../src/ASF/common/services/clock/mega/sysclk.c \
@@ -79,6 +80,7 @@ ASM_SRCS +=
 OBJS +=  \
 src/isr.o \
 src/main.o \
+src/serial.o \
 src/ASF/common/boards/user_board/init.o \
 src/ASF/common/services/calendar/calendar.o \
 src/ASF/common/services/clock/mega/sysclk.o \
@@ -87,6 +89,7 @@ src/ASF/mega/drivers/usart/usart_mega.o
 OBJS_AS_ARGS +=  \
 src/isr.o \
 src/main.o \
+src/serial.o \
 src/ASF/common/boards/user_board/init.o \
 src/ASF/common/services/calendar/calendar.o \
 src/ASF/common/services/clock/mega/sysclk.o \
@@ -95,6 +98,7 @@ src/ASF/mega/drivers/usart/usart_mega.o
 C_DEPS +=  \
 src/isr.d \
 src/main.d \
+src/serial.d \
 src/ASF/common/boards/user_board/init.d \
 src/ASF/common/services/calendar/calendar.d \
 src/ASF/common/services/clock/mega/sysclk.d \
@@ -103,6 +107,7 @@ src/ASF/mega/drivers/usart/usart_mega.d
 C_DEPS_AS_ARGS +=  \
 src/isr.d \
 src/main.d \
+src/serial.d \
 src/ASF/common/boards/user_board/init.d \
 src/ASF/common/services/calendar/calendar.d \
 src/ASF/common/services/clock/mega/sysclk.d \
@@ -122,6 +127,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

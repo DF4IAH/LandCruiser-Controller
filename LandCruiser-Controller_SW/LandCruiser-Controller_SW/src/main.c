@@ -35,6 +35,7 @@
 #include <avr/eeprom.h>
 
 #include "isr.h"
+#include "serial.h"
 //#include "twi.h"
 //#include "lcd.h"
 //#include "gfx_mono/sysfont.h"
@@ -44,35 +45,40 @@
 
 /* GLOBAL section */
 
-uint_fast64_t		g_timer_abs_msb						= 0ULL;
-bool				g_led								= false;
-uint8_t				g_led_digits[C_BC_DIGITS]			= { 0 };
-led_bc_q_entry_t	g_led_blink_code_table[C_BC_T_LEN]	= { 0 };
-uint8_t				g_led_blink_code_idx				= 0;
-uint64_t			g_led_blink_code_next_ts			= 0;
-uint8_t				g_adc_state							= 0;
-float				g_adc_12v							= 0.f;
-uint16_t			g_adc_12v_1000						= 0;
-bool				g_adc_12v_under						= false;
-float				g_adc_temp							= 0.f;
-int32_t				g_adc_temp_100						= 0;
-bool				g_speed_over						= false;
-bool				g_o_kl								= false;
-//bool				g_lcdbl_auto						= true;
-//uint8_t			g_lcdbl_dimmer						= 0;
-//uint8_t			g_lcd_contrast_pm					= 0;
-showData_t			g_showData							= { 0 };
-uint8_t				g_SmartLCD_mode						= C_SMART_LCD_MODE_UNIQUE;
-//gfx_mono_color_t	g_lcd_pixel_type					= GFX_PIXEL_CLR;
-//gfx_coord_t		g_lcd_pencil_x						= 0;
-//gfx_coord_t		g_lcd_pencil_y						= 0;
-uint8_t				g_resetCause						= 0;
-//char				g_strbuf[48]						= { 0 };
+uint_fast64_t		g_timer_abs_msb							= 0ULL;
+bool				g_led									= false;
+uint8_t				g_led_digits[C_BC_DIGITS]				= { 0 };
+led_bc_q_entry_t	g_led_blink_code_table[C_BC_T_LEN]		= { 0 };
+uint8_t				g_led_blink_code_idx					= 0;
+uint64_t			g_led_blink_code_next_ts				= 0;
+uint8_t				g_adc_state								= 0;
+float				g_adc_12v								= 0.f;
+uint16_t			g_adc_12v_1000							= 0;
+bool				g_adc_12v_under							= false;
+float				g_adc_temp								= 0.f;
+int32_t				g_adc_temp_100							= 0;
+bool				g_speed_over							= false;
+bool				g_o_kl									= false;
+//bool				g_lcdbl_auto							= true;
+//uint8_t			g_lcdbl_dimmer							= 0;
+//uint8_t			g_lcd_contrast_pm						= 0;
+showData_t			g_showData								= { 0 };
+uint8_t				g_SmartLCD_mode							= C_SMART_LCD_MODE_UNIQUE;
+//gfx_mono_color_t	g_lcd_pixel_type						= GFX_PIXEL_CLR;
+//gfx_coord_t		g_lcd_pencil_x							= 0;
+//gfx_coord_t		g_lcd_pencil_y							= 0;
+uint8_t				g_resetCause							= 0;
+char				g_serial_rx_buf[C_SERIAL_RX_BUF_SIZE]	= { 0 };
+uint16_t			g_serial_rx_idx							= 0;
+bool				g_serial_rx_eol							= false;
+char				g_serial_tx_buf[C_SERIAL_TX_BUF_SIZE]	= { 0 };
+uint16_t			g_serial_tx_len							= 0;
+char				g_strbuf[C_SERIAL_TX_BUF_SIZE]			= { 0 };
 
 
 /* MAIN STATIC section */
 
-static uint8_t		runmode								= 0;
+static uint8_t		runmode									= 0;
 
 
 
@@ -80,7 +86,7 @@ static uint8_t		runmode								= 0;
 
 static void s_reset_global_vars(void)
 {
-	irqflags_t flags	= cpu_irq_save();
+	irqflags_t flags = cpu_irq_save();
 
 	runmode								= 0;
 
@@ -110,6 +116,13 @@ static void s_reset_global_vars(void)
 	g_lcd_pencil_x						= 0;
 	g_lcd_pencil_y						= 0;
 	#endif
+
+	memset(&g_serial_rx_buf, 0, sizeof(g_serial_rx_buf));
+	g_serial_rx_idx						= 0;
+	g_serial_rx_eol						= false;
+
+	memset(&g_serial_tx_buf, 0, sizeof(g_serial_tx_buf));
+	g_serial_tx_len						= 0;
 
 	g_resetCause						= 0;
 
@@ -523,6 +536,7 @@ void task(uint64_t now)
 	static uint64_t s_timer_pv			= 0ULL;
 
 	static uint8_t s_fsm_state			= 0x51;
+	static uint8_t s_fsm_state_dbg		= 0;
 	static bool s_change_dir			= false;
 
 	static bool s_i_fb					= false;	// FB
@@ -674,6 +688,22 @@ void task(uint64_t now)
 	{
 		/* Show current state of FSM */
 		led_blink_code_set(s_fsm_state);
+
+		/* Modem info */
+		if (s_fsm_state_dbg != s_fsm_state) {
+			serial_printFsmState(s_fsm_state_dbg, s_fsm_state);
+			s_fsm_state_dbg = s_fsm_state;
+		}
+		if (s_i_fb_t0	!= s_i_fb_t1	||
+			s_i_uv_t0	!= s_i_uv_t1	||
+			s_i_os_t0	!= s_i_os_t1	||
+			s_i_sk_g_t0	!= s_i_sk_g_t1	||
+			s_i_sk_o_t0	!= s_i_sk_o_t1	||
+			s_i_sa_g_t0	!= s_i_sa_g_t1	||
+			s_i_sa_o_t0	!= s_i_sa_o_t1	||
+			s_i_sh_g_t0	!= s_i_sh_g_t1) {
+			serial_printFsmInput(s_i_fb_t0, s_i_uv_t0, s_i_os_t0, s_i_sk_g_t0, s_i_sk_o_t0, s_i_sa_g_t0, s_i_sa_o_t0, s_i_sh_g_t0);
+		}
 
 		/* FSM_1 - Logic */
 		switch (s_fsm_state) {
@@ -1007,11 +1037,11 @@ void task(uint64_t now)
 void enter_sleep(uint8_t sleep_mode)
 {
 	SMCR  = (sleep_mode << SM0)
-		  | _BV(SE);							// enable sleep command
+		  | _BV(SE);											// Enable sleep command
 
 	__asm__ __volatile__ ("sleep" ::: "memory");
 
-	SMCR &= ~(_BV(SE));							// disable sleep command
+	SMCR &= ~(_BV(SE));											// Disable sleep command
 }
 
 
@@ -1031,7 +1061,9 @@ int main (void)
 	s_io_preinit();
 
 	/* Init of sub-modules */
-	sysclk_init();	PRR = 0b11101011;			// For debugging this module has to be powered on, again
+	sysclk_init();
+	sysclk_enable_module(POWER_RED_REG0, PRSPI_bm);				// For debugging this module has to be powered on, again
+
 	ioport_init();
 	s_adc_init();
 	s_tc_init();
@@ -1052,7 +1084,10 @@ int main (void)
 	}
 
 	/* Read non-volatile settings */
-	eeprom_nvm_settings_read(C_EEPROM_NVM_SETTING_ALL);			// load all entries from NVM
+	eeprom_nvm_settings_read(C_EEPROM_NVM_SETTING_ALL);			// Load all entries from NVM
+
+	/* Serial terminal connection */
+	serial_init(C_SERIAL_BAUD);
 
 	/* I2C interface - 10 MHz-Ref-Osc. second display */
 //	s_twi_init(TWI_SLAVE_ADDR_SMARTLCD, TWI_SLAVE_ADDR_BM);
@@ -1061,12 +1096,14 @@ int main (void)
 	cpu_irq_enable();
 
 	/* Start of sub-modules */
-	s_tc_start();								// All clocks and PWM timers start here
+	s_tc_start();												// All clocks and PWM timers start here
 
 	/* Initialize external components */
 //	lcd_init();
-//	lcd_test(0b11111101);						// Debugging purposes
+//	lcd_test(0b11111101);										// Debugging purposes
 
+	/* Version information */
+	serial_printVersion();
 
 	/* main loop */
 	runmode = 1;
@@ -1091,17 +1128,18 @@ int main (void)
 	cpu_irq_disable();
 
 	/* disable sub-modules */
-	ACSR |= _BV(ACD);							// disable AnalogCompare sub-module
+	ACSR |= _BV(ACD);											// Disable AnalogCompare sub-module
 
 //	sysclk_disable_module(POWER_RED_REG0, PRSPI_bm);
 //	sysclk_disable_module(POWER_RED_REG0, PRUSART0_bm);
 
 //	s_twi_disable();
+	serial_disable();
 	led_set(false, false);
 	s_adc_disable();
 	s_tc_disable();
 
     enter_sleep(SLEEP_MODE_PWR_DOWN);
 
-    return retcode;								// should never be reached
+    return retcode;												// Should never be reached
 }
