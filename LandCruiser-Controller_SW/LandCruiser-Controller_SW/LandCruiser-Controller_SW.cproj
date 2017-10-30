@@ -293,6 +293,12 @@
     <Compile Include="src\main.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\serial.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\serial.h">
+      <SubType>compile</SubType>
+    </Compile>
     <None Include="src\asf.h">
       <SubType>compile</SubType>
     </None>

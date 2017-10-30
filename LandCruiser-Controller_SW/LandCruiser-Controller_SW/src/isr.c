@@ -46,22 +46,7 @@
 
 /* External vars */
 
-extern uint_fast64_t		g_timer_abs_msb;
-extern bool					g_led;
-extern uint8_t				g_led_digits[C_BC_DIGITS];
-extern led_bc_q_entry_t		g_led_blink_code_table[C_BC_T_LEN];
-extern uint8_t				g_led_blink_code_idx;
-extern uint64_t				g_led_blink_code_next_ts;
-extern uint8_t				g_adc_state;
-extern float				g_adc_12v;
-extern uint16_t				g_adc_12v_1000;
-extern bool					g_adc_12v_under;
-extern float				g_adc_temp;
-extern int32_t				g_adc_temp_100;
-extern bool					g_speed_over;
-extern showData_t			g_showData;
-extern uint8_t				g_SmartLCD_mode;
-//extern uint8_t			g_lcd_contrast_pm;
+#include "externals.h"
 
 
 /* Forward declarations */
@@ -314,7 +299,21 @@ ISR(__vector_17, ISR_BLOCK)
 
 ISR(__vector_18, ISR_BLOCK)
 {	/* USART, RX - Complete */
-	s_bad_interrupt();
+
+	/* Get received character */
+	uint8_t c = UDR0;
+	g_serial_rx_buf[g_serial_rx_idx++] = c;
+	g_serial_rx_buf[g_serial_rx_idx]   = 0;
+
+	/* Line ending */
+	if (c == '\n') {
+		g_serial_rx_eol = true;
+	}
+
+	/* Buffer size clamping */
+	if (g_serial_rx_idx >= C_SERIAL_RX_BUF_SIZE) {
+		g_serial_rx_idx = C_SERIAL_RX_BUF_SIZE - 1;
+	}
 }
 
 ISR(__vector_19, ISR_BLOCK)
@@ -324,7 +323,19 @@ ISR(__vector_19, ISR_BLOCK)
 
 ISR(__vector_20, ISR_BLOCK)
 {	/* USART, TX - Complete */
-	s_bad_interrupt();
+
+	if (g_serial_tx_len > 0) {
+		/* Send next character */
+		UDR0 = g_serial_tx_buf[0];
+
+		/* Move string one position ahead */
+		for (uint8_t idx = 0; idx < g_serial_tx_len; idx++) {
+			g_serial_tx_buf[idx] = g_serial_tx_buf[idx + 1];
+		}
+
+		/* Resize length to be sent */
+		--g_serial_tx_len;
+	}
 }
 
 ISR(__vector_21, ISR_BLOCK)

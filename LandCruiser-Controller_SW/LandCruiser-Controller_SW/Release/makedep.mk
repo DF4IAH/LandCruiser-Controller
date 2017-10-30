@@ -6,6 +6,8 @@ src\isr.c
 
 src\main.c
 
+src\serial.c
+
 src\ASF\common\boards\user_board\init.c
 
 src\ASF\common\services\calendar\calendar.c
