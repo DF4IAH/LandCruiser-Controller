@@ -574,10 +574,15 @@ void task(uint64_t now)
 	static bool s_i_sh_g_t2				= false;
 
 	static bool s_o_kl					= false;	// KL
+	static bool s_o_kl_t0				= false;
 	static bool s_o_pv_g				= false;	// PV_G
+	static bool s_o_pv_g_t0				= false;
 	static bool s_o_pv_o				= false;	// PV_O
+	static bool s_o_pv_o_t0				= false;
 	static bool s_o_m1					= false;	// M1
+	static bool s_o_m1_t0				= false;
 	static bool s_o_m2					= false;	// M2
+	static bool s_o_m2_t0				= false;
 
 	/* Running every C_TASK_TIMESPAN milliseconds */
 	if (s_timer_task_next <= now) {
@@ -703,6 +708,22 @@ void task(uint64_t now)
 			s_i_sa_o_t0	!= s_i_sa_o_t1	||
 			s_i_sh_g_t0	!= s_i_sh_g_t1) {
 			serial_printFsmInput(s_i_fb_t0, s_i_uv_t0, s_i_os_t0, s_i_sk_g_t0, s_i_sk_o_t0, s_i_sa_g_t0, s_i_sa_o_t0, s_i_sh_g_t0);
+		}
+		if (s_o_kl		!= s_o_kl_t0	||
+			s_o_pv_g	!= s_o_pv_g_t0	||
+			s_o_pv_o	!= s_o_pv_o_t0	||
+			s_o_m1		!= s_o_m1_t0	||
+			s_o_m2		!= s_o_m2_t0) {
+			serial_printFsmOutput(s_o_kl, s_o_pv_g, s_o_pv_o, s_o_m1, s_o_m2);
+
+			/* Output modification check */
+			{
+				s_o_kl_t0	= s_o_kl;
+				s_o_pv_g_t0	= s_o_pv_g;
+				s_o_pv_o_t0	= s_o_pv_o;
+				s_o_m1_t0	= s_o_m1;
+				s_o_m2_t0	= s_o_m2;
+			}
 		}
 
 		/* FSM_1 - Logic */

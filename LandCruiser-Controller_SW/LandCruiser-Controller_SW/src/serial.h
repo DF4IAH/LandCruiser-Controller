@@ -28,6 +28,7 @@ void serial_printHelp(void);
 void serial_printVersion(void);
 void serial_printFsmState(uint8_t stateOld, uint8_t stateNew);
 void serial_printFsmInput(bool Ifb, bool Iuv, bool Ios, bool Iskg, bool Isko, bool Isag, bool Isao, bool Ishg);
+void serial_printFsmOutput(bool Okl, bool Opvg, bool Opvo, bool Om1, bool Om2);
 
 
 #endif /* SERIAL_H_ */
