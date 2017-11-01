@@ -50,15 +50,19 @@ PROGMEM_DECLARE(const char, PM_IP_OUT_help_1[]);
 const char								PM_IP_OUT_help_2[]										=	"about all available commands\r\n";
 PROGMEM_DECLARE(const char, PM_IP_OUT_help_2[]);
 
+
 const char								PM_IP_CMD_help[]										= "help";
 PROGMEM_DECLARE(const char, PM_IP_CMD_help[]);
 
+
 const char								PM_DBG_Version[]										= "\r\nLandCruiser-Control version 20%03d%03d\r\n=====================================\r\n\r\n";
 PROGMEM_DECLARE(const char, PM_DBG_Version[]);
-const char								PM_DBG_FSM_State[]										= "# FSM-State: 0x%02X --> 0x%02X\r\n";
+const char								PM_DBG_FSM_State[]										= "# FSM- State: 0x%02X --> 0x%02X\r\n";
 PROGMEM_DECLARE(const char, PM_DBG_FSM_State[]);
-const char								PM_DBG_FSM_Input[]										= "# FSM-Input: Ifb=%d, Iuv=%d, Ios=%d, Iskg=%d, Isko=%d, Isag=%d, Isao=%d, Ishg=%d\r\n";
+const char								PM_DBG_FSM_Input[]										= "# FSM- Input: Ifb=%d, Iuv=%d, Ios=%d, Iskg=%d, Isko=%d, Isag=%d, Isao=%d, Ishg=%d\r\n";
 PROGMEM_DECLARE(const char, PM_DBG_FSM_Input[]);
+const char								PM_DBG_FSM_Output[]										= "# FSM-Output: Okl=%d, Opvg=%d, Opvo=%d, Om1=%d, Om2=%d\r\n";
+PROGMEM_DECLARE(const char, PM_DBG_FSM_Output[]);
 
 
 /* Forward declarations */
@@ -204,5 +208,11 @@ void serial_printFsmState(uint8_t stateOld, uint8_t stateNew)
 void serial_printFsmInput(bool Ifb, bool Iuv, bool Ios, bool Iskg, bool Isko, bool Isag, bool Isao, bool Ishg)
 {
 	int len = snprintf_P(g_strbuf, sizeof(g_strbuf), PM_DBG_FSM_Input, Ifb, Iuv, Ios, Iskg, Isko, Isag, Isao, Ishg);
+	serial_send(g_strbuf, len);
+}
+
+void serial_printFsmOutput(bool Okl, bool Opvg, bool Opvo, bool Om1, bool Om2)
+{
+	int len = snprintf_P(g_strbuf, sizeof(g_strbuf), PM_DBG_FSM_Output, Okl, Opvg, Opvo, Om1, Om2);
 	serial_send(g_strbuf, len);
 }

@@ -19,7 +19,7 @@
 
 /* VERSION: YYM, MDD */
 #define VERSION_HIGH												171
-#define VERSION_LOW													 30
+#define VERSION_LOW													101
 
 /* I2C-Version V1.1 */
 #define I2C_VERSION													0x11
