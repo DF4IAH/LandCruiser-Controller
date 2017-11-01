@@ -9,7 +9,7 @@
 <grid distance="0.05" unitdist="inch" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.635" altunitdist="mm" altunit="mm"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
-<layer number="2" name="Route2" color="1" fill="3" visible="yes" active="yes"/>
+<layer number="2" name="Route2" color="1" fill="3" visible="no" active="yes"/>
 <layer number="3" name="Route3" color="4" fill="3" visible="no" active="no"/>
 <layer number="4" name="Route4" color="1" fill="4" visible="no" active="no"/>
 <layer number="5" name="Route5" color="4" fill="4" visible="no" active="no"/>
@@ -163,7 +163,7 @@
 <dimension x1="0" y1="0" x2="0" y2="63" x3="-8.5" y3="31.5" textsize="1.016" layer="47"/>
 <dimension x1="0" y1="62.865" x2="98" y2="62.865" x3="49" y3="70.935" textsize="1.016" layer="47"/>
 <text x="10.16" y="57.15" size="1.4224" layer="21" ratio="15">LandCruiser-Controller V1.1
-(c) 2017 by DF4IAH </text>
+(C) 2017 by DF4IAH </text>
 <text x="64.77" y="53.975" size="1.016" layer="21" ratio="12">I2C</text>
 <polygon width="0.1" layer="21">
 <vertex x="11.30031875" y="53.9959625"/>
@@ -198,29 +198,27 @@ X111-6 = GND</text>
 <text x="34.925" y="39.37" size="0.6096" layer="21" ratio="20" rot="R180">1</text>
 <text x="26.67" y="32.385" size="1.016" layer="21" ratio="12">debugWIRE</text>
 <text x="1.27" y="9.525" size="1.016" layer="21" ratio="12">INPUT</text>
-<text x="7.62" y="48.26" size="1.016" layer="21" ratio="12" rot="R90">+12V</text>
-<text x="7.62" y="43.18" size="1.016" layer="21" ratio="12" rot="R90">GND</text>
+<text x="8.255" y="47.625" size="1.016" layer="21" ratio="12" rot="R90">+12V</text>
+<text x="8.255" y="42.545" size="1.016" layer="21" ratio="12" rot="R90">GND</text>
 <text x="28.575" y="48.26" size="1.016" layer="21" ratio="12">15 A</text>
 <text x="28.575" y="43.18" size="1.016" layer="21" ratio="12">500 mA</text>
-<text x="7.62" y="12.7" size="1.016" layer="21" ratio="12" rot="R90">TACHO</text>
-<text x="7.62" y="19.05" size="1.016" layer="21" ratio="12" rot="R90">FB</text>
-<text x="7.62" y="22.86" size="1.016" layer="21" ratio="12" rot="R90">SK_G</text>
-<text x="7.62" y="27.94" size="1.016" layer="21" ratio="12" rot="R90">SK_O</text>
-<text x="7.62" y="33.02" size="1.016" layer="21" ratio="12" rot="R90">SA_G</text>
-<text x="7.62" y="38.1" size="1.016" layer="21" ratio="12" rot="R90">SA_O</text>
+<text x="9.525" y="11.43" size="1.016" layer="21" ratio="12" rot="R90">TACHO</text>
+<text x="9.525" y="17.145" size="1.016" layer="21" ratio="12" rot="R90">SH_G</text>
+<text x="9.525" y="22.225" size="1.016" layer="21" ratio="12" rot="R90">SK_G</text>
+<text x="9.525" y="27.305" size="1.016" layer="21" ratio="12" rot="R90">SK_O</text>
+<text x="9.525" y="32.385" size="1.016" layer="21" ratio="12" rot="R90">SA_G</text>
+<text x="9.525" y="37.465" size="1.016" layer="21" ratio="12" rot="R90">SA_O</text>
 <text x="92.075" y="9.525" size="1.016" layer="21" ratio="12">OUTPUT</text>
 <text x="50.8" y="55.245" size="1.016" layer="21" ratio="12">X511-1 = TXD
 X511-2 = RXD
 X511-3 = N.C.
 X511-4 = N.C.</text>
-<text x="90.805" y="47.625" size="1.016" layer="21" ratio="12" rot="R90">KL</text>
-<text x="90.805" y="42.545" size="1.016" layer="21" ratio="12" rot="R90">PV_G</text>
-<text x="90.805" y="37.465" size="1.016" layer="21" ratio="12" rot="R90">PV_O</text>
-<text x="90.805" y="33.02" size="1.016" layer="21" ratio="12" rot="R90">M1</text>
-<text x="90.805" y="27.94" size="1.016" layer="21" ratio="12" rot="R90">M2</text>
-<text x="90.805" y="22.86" size="1.016" layer="21" ratio="12" rot="R90">GND</text>
-<text x="90.805" y="18.415" size="1.016" layer="21" ratio="12" rot="R90">GND</text>
-<text x="90.805" y="12.7" size="1.016" layer="21" ratio="12" rot="R90">SH_G</text>
+<text x="88.9" y="48.895" size="1.016" layer="21" ratio="12" rot="R90">KL</text>
+<text x="88.9" y="42.545" size="1.016" layer="21" ratio="12" rot="R90">PV_G</text>
+<text x="88.9" y="37.465" size="1.016" layer="21" ratio="12" rot="R90">PV_O</text>
+<text x="88.9" y="33.655" size="1.016" layer="21" ratio="12" rot="R90">M1</text>
+<text x="88.9" y="28.575" size="1.016" layer="21" ratio="12" rot="R90">M2</text>
+<text x="88.9" y="11.43" size="1.016" layer="21" ratio="12" rot="R90">ECU_FB</text>
 <text x="57.15" y="47.625" size="0.6096" layer="21" ratio="20" rot="R180">1</text>
 <dimension x1="4.5" y1="4.5" x2="4.445" y2="0" x3="-1.878546875" y3="2.25" textsize="0.8128" layer="47" dtype="vertical"/>
 <dimension x1="4.5" y1="58.5" x2="4.445" y2="0" x3="-5.06920625" y3="29.25896875" textsize="0.8128" layer="47"/>
@@ -2388,13 +2386,8 @@ Your Eurocircuits Team
 <contactref element="U221" pad="7"/>
 <contactref element="IC611" pad="2"/>
 <contactref element="U301" pad="10"/>
-<contactref element="U301" pad="6"/>
-<contactref element="U301" pad="7"/>
-<contactref element="U301" pad="8"/>
 <contactref element="K314" pad="3"/>
 <contactref element="K315" pad="3"/>
-<contactref element="X321" pad="7"/>
-<contactref element="X321" pad="6"/>
 <contactref element="U501" pad="15"/>
 <contactref element="C504" pad="2"/>
 <contactref element="C503" pad="2"/>
@@ -2629,16 +2622,15 @@ Your Eurocircuits Team
 <wire x1="41.275" y1="16.51" x2="42.545" y2="16.51" width="0.3048" layer="16"/>
 </signal>
 <signal name="MP_FB">
-<contactref element="U101" pad="6"/>
-<contactref element="R212" pad="2"/>
-<contactref element="R121" pad="1"/>
-<wire x1="11.11" y1="19.05" x2="13.02" y2="19.05" width="0.3048" layer="16"/>
-<wire x1="13.02" y1="19.05" x2="13.02" y2="17.46" width="0.3048" layer="16"/>
-<wire x1="13.02" y1="17.46" x2="13.335" y2="17.145" width="0.3048" layer="16"/>
-<wire x1="13.335" y1="17.145" x2="19.685" y2="17.145" width="0.3048" layer="16"/>
-<wire x1="19.685" y1="17.145" x2="26.035" y2="23.495" width="0.3048" layer="16"/>
-<wire x1="26.035" y1="23.495" x2="41.275" y2="23.495" width="0.3048" layer="16"/>
-<wire x1="41.275" y1="23.495" x2="42.545" y2="24.13" width="0.3048" layer="16"/>
+<contactref element="R321" pad="1"/>
+<contactref element="U101" pad="14"/>
+<wire x1="42.545" y1="3.81" x2="38.1" y2="3.81" width="0.3048" layer="1"/>
+<wire x1="42.545" y1="3.81" x2="44.45" y2="1.905" width="0.3048" layer="16"/>
+<wire x1="44.45" y1="1.905" x2="87.63" y2="1.905" width="0.3048" layer="16"/>
+<wire x1="87.63" y1="1.905" x2="88.9" y2="3.175" width="0.3048" layer="16"/>
+<contactref element="R124" pad="1"/>
+<wire x1="88.9" y1="3.175" x2="88.9" y2="7.94" width="0.3048" layer="16"/>
+<wire x1="38.1" y1="4.13" x2="38.1" y2="3.81" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="MP_SK_O">
 <contactref element="U101" pad="10"/>
@@ -2828,7 +2820,7 @@ Your Eurocircuits Team
 <wire x1="67.31" y1="34.29" x2="69.85" y2="36.83" width="1.5" layer="1"/>
 <wire x1="69.85" y1="36.83" x2="80.01" y2="36.83" width="1.5" layer="1"/>
 </signal>
-<signal name="ECU_FB">
+<signal name="SH_G">
 <contactref element="R212" pad="1"/>
 <contactref element="X201" pad="2"/>
 <wire x1="3.81" y1="19.05" x2="9.21" y2="19.05" width="0.3048" layer="16"/>
@@ -3113,17 +3105,18 @@ Your Eurocircuits Team
 <contactref element="U101" pad="24"/>
 </signal>
 <signal name="MP_SH_G">
-<contactref element="R124" pad="1"/>
-<contactref element="U101" pad="14"/>
-<wire x1="42.545" y1="3.81" x2="38.1" y2="3.81" width="0.3048" layer="1"/>
-<wire x1="38.1" y1="3.81" x2="38.1" y2="4.13" width="0.3048" layer="1"/>
-<wire x1="42.545" y1="3.81" x2="44.45" y2="1.905" width="0.3048" layer="16"/>
-<wire x1="44.45" y1="1.905" x2="87.63" y2="1.905" width="0.3048" layer="16"/>
-<contactref element="R321" pad="1"/>
-<wire x1="87.63" y1="1.905" x2="88.9" y2="3.175" width="0.3048" layer="16"/>
-<wire x1="88.9" y1="3.175" x2="88.9" y2="7.94" width="0.3048" layer="16"/>
+<contactref element="R212" pad="2"/>
+<contactref element="U101" pad="6"/>
+<wire x1="13.02" y1="17.46" x2="13.335" y2="17.145" width="0.3048" layer="16"/>
+<wire x1="13.335" y1="17.145" x2="19.685" y2="17.145" width="0.3048" layer="16"/>
+<wire x1="19.685" y1="17.145" x2="26.035" y2="23.495" width="0.3048" layer="16"/>
+<wire x1="26.035" y1="23.495" x2="41.275" y2="23.495" width="0.3048" layer="16"/>
+<wire x1="41.275" y1="23.495" x2="42.545" y2="24.13" width="0.3048" layer="16"/>
+<contactref element="R121" pad="1"/>
+<wire x1="13.02" y1="17.46" x2="13.02" y2="19.05" width="0.3048" layer="16"/>
+<wire x1="13.02" y1="19.05" x2="11.11" y2="19.05" width="0.3048" layer="16"/>
 </signal>
-<signal name="SH_G">
+<signal name="ECU_FB_IN">
 <contactref element="R321" pad="2"/>
 <contactref element="X321" pad="8"/>
 <wire x1="88.9" y1="9.84" x2="93.03" y2="13.97" width="0.3048" layer="16"/>
