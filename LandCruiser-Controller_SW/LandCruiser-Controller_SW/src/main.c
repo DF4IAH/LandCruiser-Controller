@@ -627,15 +627,15 @@ void task(uint64_t now)
 	}
 
 	/* Break up into single input signals */
-	{
-		s_i_fb_t0	= (l_pin_d & _BV(4)) ?  false : true;
+	{  // @see conf_board.h
+		s_i_fb_t0	= (l_pin_b & _BV(0)) ?  false : true;
 		s_i_uv_t0	= g_adc_12v_under;
 		s_i_os_t0	= g_speed_over;
 		s_i_sk_g_t0	= (l_pin_b & _BV(6)) ?  false : true;
 		s_i_sk_o_t0	= (l_pin_b & _BV(7)) ?  false : true;
 		s_i_sa_g_t0	= (l_pin_d & _BV(6)) ?  false : true;
 		s_i_sa_o_t0	= (l_pin_d & _BV(7)) ?  false : true;
-		s_i_sh_g_t0	= (l_pin_b & _BV(0)) ?  false : true;
+		s_i_sh_g_t0	= (l_pin_d & _BV(4)) ?  false : true;
 	}
 
 	/* De-noising logics */
@@ -1131,15 +1131,11 @@ int main (void)
     while (runmode) {
 	    task(get_abs_time_ms());
 
-		//led_enable(IOPORT_PIN_LEVEL_LOW);
 		if (!g_led) {
 			led_set(false, false);
 		}
 	    enter_sleep(SLEEP_MODE_IDLE);
 		led_set(true, g_led);
-		//led_enable(IOPORT_PIN_LEVEL_HIGH);
-		//led_enable(g_speed_over | g_adc_12v_under);
-		//led_enable(g_o_kl);
     }
 
 
