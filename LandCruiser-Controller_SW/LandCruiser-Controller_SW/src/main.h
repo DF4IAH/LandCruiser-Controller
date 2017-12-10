@@ -19,7 +19,7 @@
 
 /* VERSION: YYM, MDD */
 #define VERSION_HIGH												171
-#define VERSION_LOW													101
+#define VERSION_LOW													210
 
 /* I2C-Version V1.1 */
 #define I2C_VERSION													0x11
@@ -46,9 +46,7 @@
 
 
 typedef enum C_ADC_STATE__ENUM {
-	C_ADC_STATE_PRE_12V												= 1,
-	C_ADC_STATE_VLD_12V,
-	C_ADC_STATE_PRE_TEMP,
+	C_ADC_STATE_VLD_12V												=  0,
 	C_ADC_STATE_VLD_TEMP,
 } C_ADC_STATE__ENUM_t;
 
@@ -142,6 +140,8 @@ typedef struct led_bc_q_entry {
 void led_set(bool doOutput, bool setHigh);
 void led_blink_code_set(uint32_t code);
 uint8_t led_blink_code_enqueue(void);
+void my_adc_init(uint8_t mux);
+void my_adc_disable(void);
 uint64_t get_abs_time_ms(void);
 void mem_set(uint8_t* buf, uint8_t count, uint8_t val);
 void eeprom_nvm_settings_write(uint8_t flags);

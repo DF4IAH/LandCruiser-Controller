@@ -55,7 +55,11 @@ const char								PM_IP_CMD_help[]										= "help";
 PROGMEM_DECLARE(const char, PM_IP_CMD_help[]);
 
 
-const char								PM_DBG_Version[]										= "\r\nLandCruiser-Control version 20%03d%03d\r\n=====================================\r\n\r\n";
+const char								PM_DBG_CRLF[]											= "\r\n";
+PROGMEM_DECLARE(const char, PM_DBG_CRLF[]);
+const char								PM_DBG_Line[]											= "=====================================\r\n";
+PROGMEM_DECLARE(const char, PM_DBG_Line[]);
+const char								PM_DBG_Version[]										= "LandCruiser-Control version 20%03d%03d\r\n";
 PROGMEM_DECLARE(const char, PM_DBG_Version[]);
 const char								PM_DBG_FSM_State[]										= "# FSM- State: 0x%02X --> 0x%02X\r\n";
 PROGMEM_DECLARE(const char, PM_DBG_FSM_State[]);
@@ -106,7 +110,7 @@ void serial_init(uint32_t baud)
 	UCSR0A = _BV(TXC0);
 
 	/* Enabling Interrupts and TX and RX operations */
-	UCSR0B = _BV(RXCIE0) | _BV(TXCIE0) | _BV(RXEN0) | _BV(TXEN0);
+	UCSR0B = _BV(RXCIE0) | _BV(TXCIE0) | _BV(UDRIE0) | _BV(RXEN0) | _BV(TXEN0);
 }
 
 void serial_disable(void)
@@ -139,13 +143,15 @@ void serial_send(const char* buf, uint16_t len)
 	g_serial_tx_len += len;
 	g_serial_tx_buf[g_serial_tx_len] = 0;
 
+	cpu_irq_restore(flags);
+
 	/* Start transmission, when not running */
-	if (UCSR0A & _BV(UDRE0)) {
+	if (!g_serial_tx_ongoing) {
+		g_serial_tx_ongoing = true;
+
 		/* Start transmission */
 		UDR0 = *buf;
 	}
-
-	cpu_irq_restore(flags);
 }
 
 void serial_receive_and_parse_line(void)
@@ -193,9 +199,27 @@ void serial_printHelp(void)
 	serial_send(g_strbuf, len);
 }
 
+void serial_printLines(uint8_t lines)
+{
+	int len;
+
+	for (uint8_t cnt = lines; cnt; --cnt) {
+		len = snprintf_P(g_strbuf, sizeof(g_strbuf), PM_DBG_CRLF);
+		serial_send(g_strbuf, len);
+	}
+}
+
 void serial_printVersion(void)
 {
-	int len = snprintf_P(g_strbuf, sizeof(g_strbuf), PM_DBG_Version, VERSION_HIGH, VERSION_LOW);
+	int len;
+
+	len = snprintf_P(g_strbuf, sizeof(g_strbuf), PM_DBG_Line);
+	serial_send(g_strbuf, len);
+
+	len = snprintf_P(g_strbuf, sizeof(g_strbuf), PM_DBG_Version, VERSION_HIGH, VERSION_LOW);
+	serial_send(g_strbuf, len);
+
+	len = snprintf_P(g_strbuf, sizeof(g_strbuf), PM_DBG_Line);
 	serial_send(g_strbuf, len);
 }
 
