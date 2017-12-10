@@ -29,5 +29,7 @@ enum TWI_FSM_STATUS {
 /* Helper functions */
 void asm_break(void);
 
+void process_adc(void);
+
 
 #endif /* ISR_H_ */
