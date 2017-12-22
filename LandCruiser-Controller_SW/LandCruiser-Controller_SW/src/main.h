@@ -19,7 +19,7 @@
 
 /* VERSION: YYM, MDD */
 #define VERSION_HIGH												171
-#define VERSION_LOW													210
+#define VERSION_LOW													222
 
 /* I2C-Version V1.1 */
 #define I2C_VERSION													0x11
@@ -29,7 +29,7 @@
 #define C_TC1_TOP_VAL												(500 - 1)
 
 /* Task runs with this intervals */
-#define C_TASK_TIMESPAN												50
+#define C_TASK_TIMESPAN												10
 
 /* Remote control timer */
 #define C_FB_PRESS_SHORT_TIME										500

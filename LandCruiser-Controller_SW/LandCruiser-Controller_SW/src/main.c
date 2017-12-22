@@ -168,26 +168,13 @@ static void s_io_preinit(void)
 
 void led_set(bool doOutput, bool setHigh)
 {
-	static bool s_isOutput	= false;
-	static bool s_isHigh	= false;
-
 	if (doOutput) {
-		if (!s_isOutput) {
-			ioport_set_pin_dir(LED_GPIO, IOPORT_DIR_OUTPUT);
-			s_isOutput = true;
-		}
-
-		if (s_isHigh != setHigh) {
-			ioport_set_pin_level(LED_GPIO, setHigh);
-			s_isHigh = setHigh;
-		}
+		ioport_set_pin_level(LED_GPIO, setHigh);
+		ioport_set_pin_dir(LED_GPIO, IOPORT_DIR_OUTPUT);
 
 	} else {
-		if (s_isOutput) {
-			ioport_set_pin_dir(LED_GPIO, IOPORT_DIR_INPUT);
-			ioport_set_pin_mode(LED_GPIO, IOPORT_MODE_PULLDOWN);
-			s_isOutput = false;
-		}
+		ioport_set_pin_dir(LED_GPIO, IOPORT_DIR_INPUT);
+		ioport_set_pin_mode(LED_GPIO, IOPORT_MODE_PULLDOWN);
 	}
 }
 
@@ -540,7 +527,7 @@ void task(uint64_t now)
 	static uint64_t s_timer_fb			= 0ULL;
 	static uint64_t s_timer_pv			= 0ULL;
 
-	static uint8_t s_fsm_state			= 0x00;
+	static uint8_t s_fsm_state			= 0x11;
 	static uint8_t s_fsm_state_dbg		= 0;
 	static bool s_change_dir			= false;
 
@@ -647,47 +634,47 @@ void task(uint64_t now)
 	{
 		if (s_i_fb_t2 && s_i_fb_t1 && s_i_fb_t0) {
 			s_i_fb = true;
-		} else if (!s_i_fb_t2 && !s_i_fb_t1 && !s_i_fb_t0) {
+		} else if (!s_i_fb_t2 || !s_i_fb_t1 || !s_i_fb_t0) {
 			s_i_fb = false;
 		}
 
-		if (s_i_uv_t2 && s_i_uv_t1 && s_i_uv_t0) {
+		if (s_i_uv_t2 || s_i_uv_t1 || s_i_uv_t0) {
 			s_i_uv = true;
 		} else if (!s_i_uv_t2 && !s_i_uv_t1 && !s_i_uv_t0) {
 			s_i_uv = false;
 		}
 
-		if (s_i_os_t2 && s_i_os_t1 && s_i_os_t0) {
+		if (s_i_os_t2 || s_i_os_t1 || s_i_os_t0) {
 			s_i_os = true;
 		} else if (!s_i_os_t2 && !s_i_os_t1 && !s_i_os_t0) {
 			s_i_os = false;
 		}
 
-		if (s_i_sk_g_t2 && s_i_sk_g_t1 && s_i_sk_g_t0) {
+		if (s_i_sk_g_t2 || s_i_sk_g_t1 || s_i_sk_g_t0) {
 			s_i_sk_g = true;
 			} else if (!s_i_sk_g_t2 && !s_i_sk_g_t1 && !s_i_sk_g_t0) {
 			s_i_sk_g = false;
 		}
 
-		if (s_i_sk_o_t2 && s_i_sk_o_t1 && s_i_sk_o_t0) {
+		if (s_i_sk_o_t2 || s_i_sk_o_t1 || s_i_sk_o_t0) {
 			s_i_sk_o = true;
 		} else if (!s_i_sk_o_t2 && !s_i_sk_o_t1 && !s_i_sk_o_t0) {
 			s_i_sk_o = false;
 		}
 
-		if (s_i_sa_g_t2 && s_i_sa_g_t1 && s_i_sa_g_t0) {
+		if (s_i_sa_g_t2 || s_i_sa_g_t1 || s_i_sa_g_t0) {
 			s_i_sa_g = true;
 		} else if (!s_i_sa_g_t2 && !s_i_sa_g_t1 && !s_i_sa_g_t0) {
 			s_i_sa_g = false;
 		}
 
-		if (s_i_sa_o_t2 && s_i_sa_o_t1 && s_i_sa_o_t0) {
+		if (s_i_sa_o_t2 || s_i_sa_o_t1 || s_i_sa_o_t0) {
 			s_i_sa_o = true;
 		} else if (!s_i_sa_o_t2 && !s_i_sa_o_t1 && !s_i_sa_o_t0) {
 			s_i_sa_o = false;
 		}
 
-		if (s_i_sh_g_t2 && s_i_sh_g_t1 && s_i_sh_g_t0) {
+		if (s_i_sh_g_t2 || s_i_sh_g_t1 || s_i_sh_g_t0) {
 			s_i_sh_g = true;
 		} else if (!s_i_sh_g_t2 && !s_i_sh_g_t1 && !s_i_sh_g_t0) {
 			s_i_sh_g = false;
@@ -733,7 +720,7 @@ void task(uint64_t now)
 
 		/* FSM_1 - Logic */
 		switch (s_fsm_state) {
-			case 0x00:
+			case 0x11:
 			{	/* INIT: Init and Error handling: check for correct starting vector */
 				s_o_kl		= false;
 				s_o_pv_g	= false;
@@ -743,18 +730,18 @@ void task(uint64_t now)
 
 				if (!s_i_uv && !s_i_os) {
 					s_timer_fb	= 0ULL;
-					s_fsm_state = 0x11;
+					s_fsm_state = 0x00;
 				}
 			}
 			break;
 
-			case 0x11:
+			case 0x00:
 			{
 				/* STANDBY CLOSED: Tailgate closed, normal LandCruiser driving state, KL dark */
 
 				/* Under-voltage or over-speed detected */
 				if (s_i_uv || s_i_os) {
-					s_fsm_state = 0x00;
+					s_fsm_state = 0x11;
 					break;
 				}
 
@@ -997,14 +984,14 @@ void task(uint64_t now)
 
 				/* Button released, power off signal lamp and fall back to STANDBY */
 				if (!s_i_fb) {
-					s_fsm_state = 0x00;
+					s_fsm_state = 0x11;
 				}
 			}
 			break;
 
 			default:
 				/* Jump to Init / error handling */
-				s_fsm_state = 0x00;
+				s_fsm_state = 0x11;
 		}
 	}
 
@@ -1144,7 +1131,6 @@ int main (void)
 			led_set(false, false);
 		}
 	    enter_sleep(SLEEP_MODE_IDLE);
-		led_set(true, g_led);
     }
 
 	/* Shutdown external components */
