@@ -168,26 +168,13 @@ static void s_io_preinit(void)
 
 void led_set(bool doOutput, bool setHigh)
 {
-	static bool s_isOutput	= false;
-	static bool s_isHigh	= false;
-
 	if (doOutput) {
-		if (!s_isOutput) {
-			ioport_set_pin_dir(LED_GPIO, IOPORT_DIR_OUTPUT);
-			s_isOutput = true;
-		}
-
-		if (s_isHigh != setHigh) {
-			ioport_set_pin_level(LED_GPIO, setHigh);
-			s_isHigh = setHigh;
-		}
+		ioport_set_pin_level(LED_GPIO, setHigh);
+		ioport_set_pin_dir(LED_GPIO, IOPORT_DIR_OUTPUT);
 
 	} else {
-		if (s_isOutput) {
-			ioport_set_pin_dir(LED_GPIO, IOPORT_DIR_INPUT);
-			ioport_set_pin_mode(LED_GPIO, IOPORT_MODE_PULLDOWN);
-			s_isOutput = false;
-		}
+		ioport_set_pin_dir(LED_GPIO, IOPORT_DIR_INPUT);
+		ioport_set_pin_mode(LED_GPIO, IOPORT_MODE_PULLDOWN);
 	}
 }
 
@@ -540,7 +527,7 @@ void task(uint64_t now)
 	static uint64_t s_timer_fb			= 0ULL;
 	static uint64_t s_timer_pv			= 0ULL;
 
-	static uint8_t s_fsm_state			= 0x00;
+	static uint8_t s_fsm_state			= 0x11;
 	static uint8_t s_fsm_state_dbg		= 0;
 	static bool s_change_dir			= false;
 
@@ -1144,7 +1131,6 @@ int main (void)
 			led_set(false, false);
 		}
 	    enter_sleep(SLEEP_MODE_IDLE);
-		led_set(true, g_led);
     }
 
 	/* Shutdown external components */
