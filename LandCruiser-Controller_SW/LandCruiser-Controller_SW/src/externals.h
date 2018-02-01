@@ -2,7 +2,7 @@
  * externals.h
  *
  * Created: 28.10.2017 16:43:00
- *  Author: DF4IAH
+ * Author: DF4IAH
  */
 
 

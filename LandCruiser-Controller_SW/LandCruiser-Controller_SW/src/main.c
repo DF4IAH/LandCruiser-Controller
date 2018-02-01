@@ -1126,11 +1126,8 @@ int main (void)
 	runmode = 1;
     while (runmode) {
 	    task(get_abs_time_ms());
-
-		if (!g_led) {
-			led_set(false, false);
-		}
 	    enter_sleep(SLEEP_MODE_IDLE);
+		led_set(true, g_led);
     }
 
 	/* Shutdown external components */

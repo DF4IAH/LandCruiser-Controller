@@ -2,7 +2,7 @@
  * main.h
  *
  * Created: 25.08.2017 20:55:00
- *  Author: DF4IAH
+ * Author: DF4IAH
  */
 
 
@@ -18,8 +18,8 @@
 
 
 /* VERSION: YYM, MDD */
-#define VERSION_HIGH												171
-#define VERSION_LOW													222
+#define VERSION_HIGH												180
+#define VERSION_LOW													201
 
 /* I2C-Version V1.1 */
 #define I2C_VERSION													0x11
