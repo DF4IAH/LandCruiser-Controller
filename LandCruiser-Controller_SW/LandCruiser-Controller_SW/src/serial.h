@@ -2,7 +2,7 @@
  * serial.h
  *
  * Created: 28.10.2017 15:38:00
- *  Author: DF4IAH
+ * Author: DF4IAH
  */
 
 
