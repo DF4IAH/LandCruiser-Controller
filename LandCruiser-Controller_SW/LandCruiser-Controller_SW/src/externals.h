@@ -2,7 +2,7 @@
  * externals.h
  *
  * Created: 28.10.2017 16:43:00
- *  Author: DF4IAH
+ * Author: DF4IAH
  */
 
 
@@ -18,7 +18,8 @@ extern uint8_t				g_led_digits[C_BC_DIGITS];
 extern led_bc_q_entry_t		g_led_blink_code_table[C_BC_T_LEN];
 extern uint8_t				g_led_blink_code_idx;
 extern uint64_t				g_led_blink_code_next_ts;
-extern uint8_t				g_adc_state;
+extern C_ADC_STATE__ENUM_t	g_adc_state;
+extern uint8_t				g_adc_mux;
 extern float				g_adc_12v;
 extern uint16_t				g_adc_12v_1000;
 extern bool					g_adc_12v_under;
@@ -33,6 +34,7 @@ extern uint16_t				g_serial_rx_idx;
 extern bool					g_serial_rx_eol;
 extern char					g_serial_tx_buf[C_SERIAL_TX_BUF_SIZE];
 extern uint16_t				g_serial_tx_len;
+extern bool					g_serial_tx_ongoing;
 extern char					g_strbuf[C_SERIAL_TX_BUF_SIZE];
 
 

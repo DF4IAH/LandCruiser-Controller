@@ -2,7 +2,7 @@
  * isr.h
  *
  * Created: 25.08.2017 20:55:00
- *  Author: DF4IAH
+ * Author: DF4IAH
  */
 
 
@@ -28,6 +28,8 @@ enum TWI_FSM_STATUS {
 
 /* Helper functions */
 void asm_break(void);
+
+void process_adc(void);
 
 
 #endif /* ISR_H_ */

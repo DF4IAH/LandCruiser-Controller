@@ -219,7 +219,7 @@ ISR(__vector_13, ISR_BLOCK)
 
 	/* Check for LED operations */
 	{
-		uint64_t now	= get_abs_time_ms();
+		uint64_t now = get_abs_time_ms();
 
 		if (g_led_blink_code_next_ts <= now) {
 			g_led_blink_code_next_ts = now + g_led_blink_code_table[g_led_blink_code_idx].delta_ms;
@@ -249,6 +249,14 @@ ISR(__vector_13, ISR_BLOCK)
 		}
 	}
 
+	/* Start next ADC convertion */
+	my_adc_init(g_adc_mux);
+	while ((ADCSRA & (1 << ADSC))) {
+		/* wait for conversion complete */
+	}
+	process_adc();
+	my_adc_disable();
+
 
 	#if 0
 	/* Start A/D convertion by entering ADC sleep-mode */
@@ -258,7 +266,7 @@ ISR(__vector_13, ISR_BLOCK)
 	ADCSRA |= _BV(ADIF);						// clear interrupt status bit by setting it to clear
 	adc_enable_interrupt();						// enable the ADC interrupt
 	cpu_irq_enable();
-	//adc_start_conversion();					// TODO ???
+	adc_start_conversion();
 	enter_sleep(SLEEP_MODE_ADC);
 	adc_disable_interrupt();
 	#endif
@@ -318,11 +326,6 @@ ISR(__vector_18, ISR_BLOCK)
 
 ISR(__vector_19, ISR_BLOCK)
 {	/* USART, UDRE - Data Register Empty */
-	s_bad_interrupt();
-}
-
-ISR(__vector_20, ISR_BLOCK)
-{	/* USART, TX - Complete */
 
 	if (g_serial_tx_len > 0) {
 		/* Send next character */
@@ -338,11 +341,26 @@ ISR(__vector_20, ISR_BLOCK)
 	}
 }
 
+ISR(__vector_20, ISR_BLOCK)
+{	/* USART, TX - Complete */
+
+	g_serial_tx_ongoing = false;
+}
+
 ISR(__vector_21, ISR_BLOCK)
 {	/* ADC */
-	static uint8_t s_cntr = 1;
-	uint16_t adc_val = ADCL | (ADCH << 8);
-	uint8_t reason  = g_adc_state;
+
+	s_bad_interrupt();
+}
+
+void process_adc(void) {
+	static uint8_t s_initCtr = 32;
+	/* Get data from the ADC - read low byte first (@see 8271G–AVR–02/2013 page 243) */
+	uint8_t adcl = ADCL;
+	barrier();
+	uint8_t adch = ADCH;
+
+	volatile uint16_t adc_val = (uint16_t)adch << 8 | (uint16_t)adcl;
 
 	/* Remove ADC offset */
 	if (adc_val > 60) {
@@ -351,71 +369,60 @@ ISR(__vector_21, ISR_BLOCK)
 		adc_val = 0;
 	}
 
-	/* Every 10th of a second */
-	if (++s_cntr >= 100) {
-		s_cntr = 0;
-	}
-
-	//TIFR1 |= _BV(TOV1);							// Reset Timer1 overflow status bit (when no ISR for TOV1 activated!)
-
-	switch (reason) {
-		case C_ADC_STATE_PRE_12V:
-			// drop one ADC value after switching MUX
-			g_adc_state = C_ADC_STATE_VLD_12V;
-		break;
-
+	C_ADC_STATE__ENUM_t l_adc_state = g_adc_state;
+	switch (l_adc_state) {
 		case C_ADC_STATE_VLD_12V:
 		{
-			if (!s_cntr) {
-				/* Low pass filtering and enhancing the data depth */
-				float l_adc_12v = g_adc_12v;
-				cpu_irq_enable();
-				float i_adc_12v = l_adc_12v ?  (0.980f * l_adc_12v + 0.020f * adc_val) : adc_val;	// load with initial value if none is set before
-				uint16_t i_adc_12v_1000 = (uint16_t) (((uint32_t)l_adc_12v * 11013UL * 265) / (10240UL * 18));  // Uref = 1.1 V
-				cpu_irq_disable();
+			/* Low pass filtering and enhancing the data depth */
+			float l_adc_12v			= 0.95f * g_adc_12v + 0.05f * adc_val;
+			int32_t l_adc_12v_1000	= -32300 + (uint16_t) (((uint32_t)l_adc_12v * 122820UL) / 1024UL);  // Uref = 5.0 V: -32300 + x*122820UL
 
-				g_adc_12v		= i_adc_12v;
-				g_adc_12v_1000	= i_adc_12v_1000;
-				g_adc_12v_under = i_adc_12v_1000 < 10500U ?  true : false;
+			g_adc_12v		= l_adc_12v;
+			g_adc_12v_1000	= (uint16_t)l_adc_12v_1000;
+			g_adc_12v_under = l_adc_12v_1000 < 10500U ?  true : false;
 
-				adc_set_admux(ADC_MUX_TEMPSENSE | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
-				g_adc_state = C_ADC_STATE_PRE_TEMP;
+			g_adc_mux		= (ADC_MUX_TEMPSENSE | ADC_VREF_AVCC | ADC_ADJUSTMENT_RIGHT);
+			g_adc_state		= C_ADC_STATE_VLD_TEMP;
+
+			/* Drop first samples */
+			if (s_initCtr) {
+				--s_initCtr;
+				g_adc_12v		= adc_val;
+				g_adc_12v_1000	= 12000U;
+				g_adc_12v_under = false;
 			}
 		}
 		break;
 
-		case C_ADC_STATE_PRE_TEMP:
-			// drop one ADC value after switching MUX
-			g_adc_state = C_ADC_STATE_VLD_TEMP;
-		break;
-
 		case C_ADC_STATE_VLD_TEMP:
 		{
-			if (!s_cntr) {
-				const float C_temp_coef_k			= 1.0595703f;
-				const float C_temp_coef_ofs_atmel	= 1024 * 0.314f / 1.1f;
-				const float C_temp_coef_ofs			= -6.20f - C_temp_coef_ofs_atmel;
+			const float C_temp_coef_k			= 1.0595703f * (5.f / 1.1f);
+			const float C_temp_coef_ofs_atmel	= 1024 * 0.314f / 5.0f;
+			const float C_temp_coef_ofs			= 52.00f;
 
-				/* Low pass filtering and enhancing the data depth */
-				float l_adc_temp  = g_adc_temp;
-				cpu_irq_enable();
-				float i_adc_temp = l_adc_temp ?  0.998f * l_adc_temp  + 0.002f * adc_val : adc_val;	// load with initial value if none is set before
-				float i_adc_temp_100 = 100.f * (25.f + (i_adc_temp + C_temp_coef_ofs) * C_temp_coef_k);
-				cpu_irq_disable();
+			/* Low pass filtering and enhancing the data depth */
+			float l_adc_temp		= 0.998f * g_adc_temp  + 0.002f * adc_val;
+			float l_adc_temp_100	= 100.f * (C_temp_coef_ofs + 25.f + (l_adc_temp - C_temp_coef_ofs_atmel) * C_temp_coef_k);
 
-				g_adc_temp = i_adc_temp;
-				g_adc_temp_100 = (int32_t)i_adc_temp_100;
+			g_adc_temp		= l_adc_temp;
+			g_adc_temp_100	= (int32_t)l_adc_temp_100;
 
-				adc_set_admux(ADC_MUX_ADC0 | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
-				g_adc_state = C_ADC_STATE_PRE_12V;
+			g_adc_mux		= (ADC_MUX_ADC0 | ADC_VREF_AVCC | ADC_ADJUSTMENT_RIGHT);
+			g_adc_state		= C_ADC_STATE_VLD_12V;
+
+			/* Drop first samples */
+			if (s_initCtr) {
+				g_adc_temp = adc_val;
 			}
 		}
 		break;
 
 		default:
-			adc_set_admux(ADC_MUX_ADC0 | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
-			g_adc_state = C_ADC_STATE_PRE_12V;
+			g_adc_state = C_ADC_STATE_VLD_12V;
 	}
+
+	/* Reset Timer1 overflow status bit (when no ISR for TOV1 is activated!) */
+	//TIFR1 |= _BV(TOV1);
 }
 
 ISR(__vector_22, ISR_BLOCK)

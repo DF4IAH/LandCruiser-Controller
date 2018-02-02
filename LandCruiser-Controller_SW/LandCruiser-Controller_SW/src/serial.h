@@ -2,7 +2,7 @@
  * serial.h
  *
  * Created: 28.10.2017 15:38:00
- *  Author: DF4IAH
+ * Author: DF4IAH
  */
 
 
@@ -25,6 +25,7 @@ void serial_receive_and_parse_line(void);
 
 void serial_printCmd(void);
 void serial_printHelp(void);
+void serial_printLines(uint8_t lines);
 void serial_printVersion(void);
 void serial_printFsmState(uint8_t stateOld, uint8_t stateNew);
 void serial_printFsmInput(bool Ifb, bool Iuv, bool Ios, bool Iskg, bool Isko, bool Isag, bool Isao, bool Ishg);
