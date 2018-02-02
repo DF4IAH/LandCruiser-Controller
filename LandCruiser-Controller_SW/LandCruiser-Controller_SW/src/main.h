@@ -19,7 +19,7 @@
 
 /* VERSION: YYM, MDD */
 #define VERSION_HIGH												180
-#define VERSION_LOW													201
+#define VERSION_LOW													202
 
 /* I2C-Version V1.1 */
 #define I2C_VERSION													0x11
@@ -37,6 +37,7 @@
 
 /* Securing valve timer */
 #define C_PV_ACTION_TIME											1000
+#define C_PV_SILENCE_TIME											650
 
 /* Minimum period = maximum speed to allow FSM to proceed */
 #define C_TICKS_MAXSPEED											100

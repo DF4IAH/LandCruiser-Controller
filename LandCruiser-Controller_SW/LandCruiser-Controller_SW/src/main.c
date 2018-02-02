@@ -737,7 +737,7 @@ void task(uint64_t now)
 
 			case 0x00:
 			{
-				/* STANDBY CLOSED: Tailgate closed, normal LandCruiser driving state, KL dark */
+				/* STANDBY CLOSED: Tailgate closed, normal LandCruiser driving state, KL off */
 
 				/* Under-voltage or over-speed detected */
 				if (s_i_uv || s_i_os) {
@@ -753,8 +753,8 @@ void task(uint64_t now)
 					s_timer_fb = now + C_FB_PRESS_SHORT_TIME;  // Short time is enough for the end points
 				}
 
-				/* Remote control button pressed and no under-voltage or over-speed detected */
-				if (s_i_fb && !s_i_uv && !s_i_os && s_i_sa_g && !s_i_sa_o && s_i_sk_g && !s_i_sk_o && s_i_sh_g) {
+				/* Remote control button pressed, tail gate closed (system ready) and no under-voltage or over-speed detected */
+				if (s_i_fb && !s_i_uv && !s_i_os && s_i_sa_g && !s_i_sa_o && s_i_sk_g && !s_i_sk_o && !s_i_sh_g) {
 					s_o_kl = true;
 
 					/* Button pressed long enough, open valve for unlocking */
@@ -785,7 +785,7 @@ void task(uint64_t now)
 				}
 
 				/* Sensor reports being unlocked, start actor to open wings */
-				if (s_i_sk_o && !s_i_sk_g && s_i_sh_g && s_i_fb && s_timer_fb && (s_timer_fb <= now)) {
+				if (s_i_sk_o && !s_i_sk_g && !s_i_sh_g && s_i_fb && s_timer_fb && (s_timer_fb <= now)) {
 					/* Combination for actor to OPEN wings */
 					s_o_pv_o		= false;
 					s_o_m1			= true;
@@ -881,8 +881,8 @@ void task(uint64_t now)
 					s_o_pv_o = true;
 				}
 
-				/* Remote control button pressed and no under-voltage detected */
-				if (s_i_fb && !s_i_uv && !s_i_sa_g && s_i_sa_o && !s_i_sk_g && s_i_sk_o && s_i_sh_g) {
+				/* Remote control button pressed, tail gate closed (system ready) and no under-voltage detected */
+				if (s_i_fb && !s_i_uv && !s_i_sa_g && s_i_sa_o && !s_i_sk_g && s_i_sk_o && !s_i_sh_g) {
 					/* Button pressed long enough, move wings back to lock position */
 					if (s_timer_fb && (s_timer_fb <= now)) {
 						s_o_m1		= false;
@@ -898,12 +898,11 @@ void task(uint64_t now)
 			{
 				/* MOVING WINGS BACK: motors running */
 
-				/* Stop motor due to reaching end position and open valve for securing */
+				/* Stop motor due to reaching end position and start silence timer */
 				if (s_i_sa_g) {
 					s_o_m1		= false;
 					s_o_m2		= false;
-					s_timer_pv	= now + C_PV_ACTION_TIME;
-					s_o_pv_g	= true;
+					s_timer_pv	= now + C_PV_SILENCE_TIME;
 					s_fsm_state	= 0x42;
 
 				} else {
@@ -962,23 +961,35 @@ void task(uint64_t now)
 
 			case 0x42:
 			{
-				/* SECURING WINGS: valve for locking is opened for 1 sec */
+				/* WAITING FOR SILENCE BEFORE LOCKING */
 
-				/* Release pressure of opening valve */
+				/* No actors moving, open valve for securing and start valve action timer */
 				if (s_timer_pv <= now) {
-					s_o_pv_g	= false;
-				}
-
-				/* Locks at their position and timer done */
-				if (s_i_sk_g) {
-					s_o_pv_g	= false;
-					s_o_kl		= false;
+					s_timer_pv = now + C_PV_ACTION_TIME;
+					s_o_pv_g = true;
 					s_fsm_state = 0x43;
 				}
 			}
 			break;
 
 			case 0x43:
+			{
+				/* SECURING WINGS: valve for locking is opened for 1 sec */
+
+				/* Release pressure of opening valve */
+				if (s_timer_pv <= now) {
+					s_o_pv_g = false;
+
+					/* Locks at their position and timer done */
+					if (s_i_sk_g) {
+						s_o_kl = false;
+						s_fsm_state = 0x44;
+					}
+				}
+			}
+			break;
+
+			case 0x44:
 			{
 				/* PREPARING FOR STANDBY: wait for the button to be released */
 
@@ -990,8 +1001,10 @@ void task(uint64_t now)
 			break;
 
 			default:
+			{
 				/* Jump to Init / error handling */
 				s_fsm_state = 0x11;
+			}
 		}
 	}
 
