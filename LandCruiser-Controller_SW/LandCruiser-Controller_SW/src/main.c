@@ -743,22 +743,14 @@ void task(uint64_t now)
 				if (s_i_uv || s_i_os) {
 					s_fsm_state = 0x11;
 					break;
-				}
 
-				/* Dropping the button allowance */
-				if (!s_i_fb) {
-					s_timer_fb = 0ULL;
-				} else if ((s_i_fb && !s_i_uv && !s_i_os) && (!s_i_fb_t3 || s_i_uv_t2 || s_i_os_t2)) {
-					/* Button just pressed - after repressing the button, wait until low-pass filtering time is over */
-					s_timer_fb = now + C_FB_PRESS_SHORT_TIME;  // Short time is enough for the end points
-				}
+				} else {
+					/* Remote control button pressed, tail gate closed (system ready) and no under-voltage or over-speed detected */
+					if (s_i_fb && s_i_sa_g && !s_i_sa_o && s_i_sk_g && !s_i_sk_o && !s_i_sh_g) {
+						/* Show up KL LED */
+						s_o_kl = true;
 
-				/* Remote control button pressed, tail gate closed (system ready) and no under-voltage or over-speed detected */
-				if (s_i_fb && !s_i_uv && !s_i_os && s_i_sa_g && !s_i_sa_o && s_i_sk_g && !s_i_sk_o && !s_i_sh_g) {
-					s_o_kl = true;
-
-					/* Button pressed long enough, open valve for unlocking */
-					if (s_timer_fb && (s_timer_fb <= now)) {
+						/* Open valve for unlocking */
 						s_o_pv_o	= true;
 						s_timer_pv	= now + C_PV_ACTION_TIME;
 						s_fsm_state = 0x21;
@@ -776,21 +768,14 @@ void task(uint64_t now)
 					s_o_pv_o	= false;
 				}
 
-				/* Dropping the button allowance */
-				if (!s_i_fb) {
-					s_timer_fb = 0ULL;
-				} else if (!s_i_fb_t3) {
-					/* Button just pressed - after repressing the button, wait until low-pass filtering time is over */
-					s_timer_fb = now + C_FB_PRESS_LONG_TIME;
-				}
-
 				/* Sensor reports being unlocked, start actor to open wings */
-				if (s_i_sk_o && !s_i_sk_g && !s_i_sh_g && s_i_fb && s_timer_fb && (s_timer_fb <= now)) {
+				if (s_i_sk_o && !s_i_sk_g && !s_i_sh_g && s_i_fb) {
 					/* Combination for actor to OPEN wings */
 					s_o_pv_o		= false;
 					s_o_m1			= true;
 					s_o_m2			= false;
 					s_change_dir	= false;
+					s_timer_fb		= now;
 					s_fsm_state		= 0x22;
 				}
 			}
@@ -866,30 +851,18 @@ void task(uint64_t now)
 			{
 				/* STANDBY OPENED: wait for close command */
 
-				/* Reset timer when button released or under-voltage detected within low-pass filtering time */
-				if (!s_i_fb || s_i_uv) {
-					s_timer_fb = 0ULL;
-				} else {
-					if ((s_i_fb && !s_i_uv) && (!s_i_fb_t3 || s_i_uv_t2)) {
-						/* Button just pressed - after repressing the button, wait until low-pass filtering time is over */
-						s_timer_fb = now + C_FB_PRESS_SHORT_TIME;
-					}
-				}
-
 				/* When S-K.O has opened due to pressure release, re-open PV_O until contact is made again */
 				if (s_i_fb && !s_i_uv && !s_i_sk_o) {
 					s_o_pv_o = true;
-				}
 
 				/* Remote control button pressed, tail gate closed (system ready) and no under-voltage detected */
-				if (s_i_fb && !s_i_uv && !s_i_sa_g && s_i_sa_o && !s_i_sk_g && s_i_sk_o && !s_i_sh_g) {
-					/* Button pressed long enough, move wings back to lock position */
-					if (s_timer_fb && (s_timer_fb <= now)) {
-						s_o_m1		= false;
-						s_o_m2		= true;
-						s_o_pv_o	= false;
-						s_fsm_state = 0x41;
-					}
+				} else if (s_i_fb && !s_i_uv && !s_i_sa_g && s_i_sa_o && !s_i_sk_g && s_i_sk_o && !s_i_sh_g) {
+					/* Move wings back to lock position */
+					s_o_m1		= false;
+					s_o_m2		= true;
+					s_o_pv_o	= false;
+					s_timer_fb	= now;
+					s_fsm_state = 0x41;
 				}
 			}
 			break;
@@ -926,11 +899,7 @@ void task(uint64_t now)
 						}
 
 						/* When pressure releases during swing of arms, keep the valve open as long contact is opened */
-						if (!s_i_sk_o) {
-							s_o_pv_o	= true;
-						} else {
-							s_o_pv_o	= false;
-						}
+						s_o_pv_o = !s_i_sk_o ?  true : false;
 					}
 
 					/* Restart motor after qualified button press */
@@ -980,9 +949,8 @@ void task(uint64_t now)
 				if (s_timer_pv <= now) {
 					s_o_pv_g = false;
 
-					/* Locks at their position and timer done */
+					/* Lockers fixed and timer done */
 					if (s_i_sk_g) {
-						s_o_kl = false;
 						s_fsm_state = 0x44;
 					}
 				}
@@ -995,6 +963,7 @@ void task(uint64_t now)
 
 				/* Button released, power off signal lamp and fall back to STANDBY */
 				if (!s_i_fb) {
+					s_o_kl = false;
 					s_fsm_state = 0x11;
 				}
 			}
